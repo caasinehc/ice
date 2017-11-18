@@ -2,7 +2,7 @@
  *	colors module
  */
  
-ice.colors.version = "v1.0.0"; // This version of the ice.colors module
+ice.colors.version = "v1.0.1"; // This version of the ice.colors module
  
 // Variables
 // Hues
@@ -27,7 +27,7 @@ ice.colors.LIGHT_LIME = 		ice.colors.SHAMROCK = 		"#80FF80";
 ice.colors.LIGHT_MINT = 		ice.colors.SEAFOAM = 		"#80FFC0";
 ice.colors.LIGHT_CYAN = 		ice.colors.SKY = 			"#80FFFF";
 ice.colors.LIGHT_CERULEAN = 	ice.colors.CORNFLOWER = 	"#80C0FF";
-ice.colors.LIGHT_BLUE = 		ice.colors.INDIGO = 		"#8080FF";
+ice.colors.LIGHT_BLUE = 		ice.colors.PERIWINKLE = 	"#8080FF";
 ice.colors.LIGHT_PURPLE = 		ice.colors.LAVENDER = 		"#C080FF";
 ice.colors.LIGHT_MAGENTA = 		ice.colors.ORCHID = 		"#800080";
 ice.colors.LIGHT_PINK = 		ice.colors.CARNATION = 		"#FF80C0";
