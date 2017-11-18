@@ -2,6 +2,8 @@
  *	math module
  */
  
+ice.math.version = "v1.0.0"; // This version of the ice.math module
+ 
 // Variables
 ice.math.PI = Math.PI; // The constant Pi. The ratio of a circle's circumference to its diameter
 ice.math.TAU = ice.math.PI * 2; // The constant Tau. The number of radians in a circle

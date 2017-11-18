@@ -2,6 +2,8 @@
  *	colors module
  */
  
+ice.colors.version = "v1.0.0"; // This version of the ice.colors module
+ 
 // Variables
 // Hues
 ice.colors.RED = 											"#FF0000";

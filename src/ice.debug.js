@@ -1,8 +1,11 @@
 /*
  *	debug module
  */
+ 
+ice.debug.version = "v1.0.1"; // This version of the ice.debug module
+
 // Functions
-ice.debug.testFunction = function(testFunction, sampleSize, arguments) {
+ice.debug.testFunction = function(testFunction, sampleSize, args) {
 	// Stores results
 	var results = {}
 	// Stores info on results
@@ -12,7 +15,7 @@ ice.debug.testFunction = function(testFunction, sampleSize, arguments) {
 	var totalResults = 0;
 	// Runs the function [sampleSize] times, incrementing results[(the result)]
 	for(var i = 0; i < sampleSize; i++) {
-		var result = testFunction.apply(null, arguments);
+		var result = testFunction.apply(null, args);
 		if(typeof results[result] === "undefined") {
 			results[result] = 1;
 		}
