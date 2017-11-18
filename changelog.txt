@@ -1,0 +1,23 @@
+ice.js Changelog
+
+-------- a1.0.0 --------
+  > Released
+  + Added main ice object
+  + Added a few basic modules (some are empty for now):
+    + ice.math
+    + ice.graphics (empty)
+    + ice.physics (empty)
+    + ice.colors
+    + ice.debug
+  > Meta information will be directly under ice, like the new ice.version
+  + math module got many new functions:
+    + ice.math.PI
+    + ice.math.TAU
+    + ice.math.randomInt(min, max)
+    + ice.math.randomIntExcl(min, max)
+    + ice.math.randomFloat(min, max)
+    + ice.math.chance(chance)
+    + ice.math.percentChance(chance)
+    + ice.math.coinFlip()
+    + ice.math.pythag(a1, a2, b1, b2)
+    + ice.math.getDist(aX, aY, bX, bY)
