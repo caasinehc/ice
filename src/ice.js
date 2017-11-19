@@ -10,7 +10,7 @@ var ice = (function (ice) {
 
 (function() {
 
-	var commitHash = "c46a0273e1f0a58cc937f8d3c44c1a616437a961"
+	var commitHash = "02588f7b12cefd3ffbee77dca746264f1576916f"
 
 	var urlStart = "https://cdn.rawgit.com/caasinehc/ice/"
 
