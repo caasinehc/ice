@@ -1,6 +1,6 @@
 var ice = (function (ice) {
 
-	ice.version = "v2.1.1"
+	ice.version = "v2.1.2"
 	ice.modules = [];
 
 	return ice;
@@ -9,14 +9,9 @@ var ice = (function (ice) {
 // Import all ice modules
 
 (function() {
-
-	var commitHash = "02588f7b12cefd3ffbee77dca746264f1576916f"
-
-	var urlStart = "https://cdn.rawgit.com/caasinehc/ice/"
-
 	function importFile(file) {
 		var script = document.createElement("script");
-		script.src = urlStart + commitHash + "/" + file;
+		script.src = "https://caasinehc.github.io/ice/" + file;
 		document.head.appendChild(script);
 	}
 
