@@ -31,11 +31,6 @@ ice.math.percentChance = function(chance) { // returns true [chance] percent of 
 ice.math.coinFlip = function() { // returns true 50% of the time
 	return 0.50 > Math.random();
 }
-ice.math.pythag = function(a, b) { // returns the length of the hypotenuse from the two other side lengths
-	return Math.sqrt(a * a + b * b);
-}
-ice.math.getDist = function(aX, aY, bX, bY) { // returns the distance between two points
-	var a = aX < bX ? bX - aX : aX - bX;
-	var b = aY < bY ? bY - aY : aY - bY;
-	return Math.sqrt(a * a + b * b);
+ice.math.pythag = function(dX, dY) { // returns the length of the hypotenuse from the two other side lengths
+	return Math.sqrt(dX * dX + dY * dY);
 }
