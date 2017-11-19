@@ -3,7 +3,7 @@ var ice = (function (ice) {
 	ice.modules = ice.modules || [];
 	ice.modules.push("colors");
 	ice.colors = {};
-	ice.colors.version = "v2.0.0"; // This version of the ice.colors module
+	ice.colors.version = "v2.0.1"; // This version of the ice.colors module
 
 	/*
 	 *	================ Colors Module ================
@@ -57,7 +57,7 @@ var ice = (function (ice) {
 	ice.colors.DARK_GRAY = 			ice.colors.CHARCOAL = 		"#404040";
 	ice.colors.BLACK = 											"#000000";
 	// Misc colors
-	ice.colors.BROWN = 											"#804020";
+	ice.colors.BROWN = 											"#402000";
 	ice.colors.GOLD = 											"#D0B030";
 	// Duplicates
 	ice.colors.AQUA = 				ice.colors.CYAN;
