@@ -1,6 +1,6 @@
 var ice = (function (ice) {
 
-	ice.version = "v2.1.0"
+	ice.version = "v2.1.1"
 	ice.modules = [];
 
 	return ice;
@@ -16,7 +16,7 @@ var ice = (function (ice) {
 
 	function importFile(file) {
 		var script = document.createElement("script");
-		script.src = urlStart + commitHash + file;
+		script.src = urlStart + commitHash + "/" + file;
 		document.head.appendChild(script);
 	}
 
