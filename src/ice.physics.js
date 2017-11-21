@@ -53,15 +53,12 @@ var ice = (function (ice) {
 	
 	// Returns the angle of the vector from another (In radians)
 	ice.physics.Vector.prototype.radians = function(vec) {
-		vec = vec || ice.physics.origin;
-		return Math.atan2(vec.y - this.y, vec.x - this.x);
+		return Math.atan2(this.y, this.x) - (vec ? Math.atan2(this.y, this.x) : 0);
 	}
 	
 	// Returns the angle of the vector from another (In degrees)
 	ice.physics.Vector.prototype.degrees = function(vec) {
-		vec = vec || ice.physics.origin;
-		var degrees = Math.atan2(vec.y - this.y, vec.x - this.x) * 180 / Math.PI;
-		return (360 + Math.round(degrees)) % 360;
+        	return (360 + this.radians(vec) * 180 / Math.PI) % 360;
 	}
 
 	// Returns whether or not two vectors are equal (same x and y)
