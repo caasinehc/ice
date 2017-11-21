@@ -18,7 +18,7 @@ var ice = (function (ice) {
 	 *	dot and cross
 	 *	distance (x, y, euclidian, manhattan) (absolute and not absolute) (squared and not)
 	 *	angle stuff (angleTo, slerp)
-	 *	limit (set and multiply)
+	 *	limit (clamp and multiply)
 	 *	get min and max xy values
 	 */
 	ice.physics.Vector = function(x, y) {
