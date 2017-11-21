@@ -58,14 +58,15 @@ var ice = (function (ice) {
 
 	// Moves the vector towards another (By absolute distance)
 	ice.physics.Vector.prototype.towards = function(vec, dist) {
-		return this.;
+		return this; // TODO: This
 	}
 
 	// Moves the vector towards another (By relative distance)
-	ice.physics.Vector.prototype.towardsRel = function(vec, dist) {
-		return this.setXY((1 - dist) * this.x + dist * vec.x, (1 - dist) * this.y + dist * vec.y);
-		return this.add(this.clone().normalize.mult(dist));
+	ice.physics.Vector.prototype.linearInterpolate = function(vec, frac) {
+		return this.add(vec.sub(this).mult(frac));
 	}
+	ice.physics.Vector.prototype.linInt = ice.physics.Vector.prototype.linearInterpolate;
+	ice.physics.Vector.prototype.lerp = ice.physics.Vector.prototype.linearInterpolate;
 
 	// Inverts the vector (x and/or y *= -1)
 	ice.physics.Vector.prototype.invert = function() {
@@ -80,8 +81,8 @@ var ice = (function (ice) {
 
 	// Sets the vectors x and y
 	ice.physics.Vector.prototype.set = function(vec) {
-		this.x = vec.x || vec;
-		this.y = vec.y || vec;
+		this.x = vec.x || (vec.x === 0 ? 0 : vec);
+		this.y = vec.y || (vec.y === 0 ? 0 : vec);
 		return this;
 	}
 	ice.physics.Vector.prototype.setX = function(vec) {
@@ -89,7 +90,7 @@ var ice = (function (ice) {
 		return this;
 	}
 	ice.physics.Vector.prototype.setY = function(vec) {
-		this.y = vec.y || y;
+		this.y = vec.y || (vec.y === 0 ? 0 : vec);
 		return this;
 	}
 	ice.physics.Vector.prototype.setXY = function(x, y) {
@@ -100,16 +101,16 @@ var ice = (function (ice) {
 
 	// Adds to the vectors x and y
 	ice.physics.Vector.prototype.add = function(vec) {
-		this.x += vec.x || vec;
-		this.y += vec.y || vec;
+		this.x += vec.x || (vec.x === 0 ? 0 : vec);
+		this.y += vec.y || (vec.y === 0 ? 0 : vec);
 		return this;
 	}
 	ice.physics.Vector.prototype.addX = function(vec) {
-		this.x += vec.x || vec;
+		this.x += vec.x || (vec.x === 0 ? 0 : vec);
 		return this;
 	}
 	ice.physics.Vector.prototype.addY = function(vec) {
-		this.y += vec.y || vec;
+		this.y += (vec.y === 0 ? 0 : vec);
 		return this;
 	}
 	ice.physics.Vector.prototype.addXY = function(x, y) {
@@ -120,16 +121,16 @@ var ice = (function (ice) {
 
 	// Subtracts from the vectors x and y
 	ice.physics.Vector.prototype.sub = function(vec) {
-		this.x -= vec.x || vec;
-		this.y -= vec.y || vec;
+		this.x -= vec.x || (vec.x === 0 ? 0 : vec);
+		this.y -= vec.y || (vec.y === 0 ? 0 : vec);
 		return this;
 	}
 	ice.physics.Vector.prototype.subX = function(vec) {
-		this.x -= vec.x || vec;
+		this.x -= vec.x || (vec.x === 0 ? 0 : vec);
 		return this;
 	}
 	ice.physics.Vector.prototype.subY = function(vec) {
-		this.y -= vec.y || vec;
+		this.y -= vec.y || (vec.y === 0 ? 0 : vec);
 		return this;
 	}
 	ice.physics.Vector.prototype.subXY = function(x, y) {
@@ -140,16 +141,16 @@ var ice = (function (ice) {
 
 	// Multiplies the vectors x and y
 	ice.physics.Vector.prototype.mult = function(vec) {
-		this.x *= vec.x || vec;
-		this.y *= vec.y || vec;
+		this.x *= vec.x || (vec.x === 0 ? 0 : vec);
+		this.y *= vec.y || (vec.y === 0 ? 0 : vec);
 		return this;
 	}
 	ice.physics.Vector.prototype.multX = function(vec) {
-		this.x *= vec.x || vec;
+		this.x *= vec.x || (vec.x === 0 ? 0 : vec);
 		return this;
 	}
 	ice.physics.Vector.prototype.multY = function(vec) {
-		this.y *= vec.y || vec;
+		this.y *= vec.y || (vec.y === 0 ? 0 : vec);
 		return this;
 	}
 	ice.physics.Vector.prototype.multXY = function(x, y) {
@@ -160,16 +161,16 @@ var ice = (function (ice) {
 
 	// Divides the vectors x and y
 	ice.physics.Vector.prototype.div = function(vec) {
-		this.x /= vec.x || vec;
-		this.y /= vec.y || vec;
+		this.x /= vec.x || (vec.x === 0 ? 0 : vec);
+		this.y /= vec.y || (vec.y === 0 ? 0 : vec);
 		return this;
 	}
 	ice.physics.Vector.prototype.divX = function(vec) {
-		this.x /= vec.x || vec;
+		this.x /= vec.x || (vec.x === 0 ? 0 : vec);
 		return this;
 	}
 	ice.physics.Vector.prototype.divY = function(vec) {
-		this.y /= vec.y || vec;
+		this.y /= vec.y || (vec.y === 0 ? 0 : vec);
 		return this;
 	}
 	ice.physics.Vector.prototype.divXY = function(x, y) {
