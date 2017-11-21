@@ -50,6 +50,19 @@ var ice = (function (ice) {
 	}
 	ice.physics.Vector.prototype.magSq = ice.physics.Vector.prototype.magnitudeSq;
 	ice.physics.Vector.prototype.lengthSq = ice.physics.Vector.prototype.magnitudeSq;
+	
+	// Returns the angle of the vector from another (In radians)
+	ice.physics.Vector.prototype.radians = function(vec) {
+		vec = vec || ice.physics.origin;
+		return Math.atan2(vec.y - this.y, vec.x - this.x);
+	}
+	
+	// Returns the angle of the vector from another (In degrees)
+	ice.physics.Vector.prototype.degrees = function(vec) {
+		vec = vec || ice.physics.origin;
+		var degrees = Math.atan2(vec.y - this.y, vec.x - this.x) * 180 / Math.PI;
+		return (360 + Math.round(degrees)) % 360;
+	}
 
 	// Returns whether or not two vectors are equal (same x and y)
 	ice.physics.Vector.prototype.equals = function(vec) {
@@ -86,11 +99,13 @@ var ice = (function (ice) {
 
 	// Moves the vector towards another (By absolute distance)
 	ice.physics.Vector.prototype.towards = function(vec, dist) {
+		dist = dist || (dist === 0 ? 0 : 1);
 		return this.add(vec.clone().subtract(this).normalize().multiply(dist));
 	}
 
 	// Moves the vector towards another (By relative distance)
 	ice.physics.Vector.prototype.linearInterpolate = function(vec, frac) {
+		frac = frac || (frac === 0 ? 0 : 1);
 		return this.add(vec.clone().subtract(this).multiply(frac));
 	}
 	ice.physics.Vector.prototype.linInt = ice.physics.Vector.prototype.linearInterpolate;
@@ -231,6 +246,10 @@ var ice = (function (ice) {
 	ice.physics.method = function() {
 		// code
 	}
+	
+	// Properties
+	
+	ice.physics.origin = new ice.physics.Vector(0, 0);
 
 	return ice;
 }(ice || {}));
