@@ -12,14 +12,16 @@ var ice = (function (ice) {
 	// Constructors
 
 	/*
-	 *	rotate (deg and rad) (by and to)
-	 *	set and get angle (deg and rad)
-	 *	randomize (x, y, xy, xor, angle, and magnitude)
-	 *	dot and cross
-	 *	distance (x, y, euclidian, manhattan) (absolute and not absolute) (squared and not)
-	 *	angle stuff (angleTo, slerp)
-	 *	limit (clamp and multiply)
-	 *	get min and max xy values
+	 *	[TODO] rotate by (deg and rad)
+	 *	[TODO] rotate to (deg and rad) [AKA set rotation]
+	 *		[DONE] get angle (deg and rad)
+	 *	[TODO] randomize (x, y, xy, xor, angle, and magnitude)
+	 *		[DONE] dot and cross
+	 *	[TODO] distance (x, y, euclidian, manhattan) (absolute and not absolute) (squared and not)
+	 *	[TODO] angle stuff (angleTo, slerp)
+	 *	[TODO] limit (clamp and multiply)
+	 *		[DONE] round
+	 *	[TODO] get min and max xy values
 	 */
 	ice.physics.Vector = function(x, y) {
 		if(!(this instanceof ice.physics.Vector)) {
@@ -51,14 +53,27 @@ var ice = (function (ice) {
 	ice.physics.Vector.prototype.magSq = ice.physics.Vector.prototype.magnitudeSq;
 	ice.physics.Vector.prototype.lengthSq = ice.physics.Vector.prototype.magnitudeSq;
 	
+	// Returns the dot product of the vector and another
+	ice.physics.Vector.prototype.dot = function(vec) {
+		return this.x * vec.x + this.y * vec.y;
+	}
+	
+	// Returns the cross product of the vector and another
+	ice.physics.Vector.prototype.cross = function(vec) {
+		return (this.x * vec.y) - (this.y * vec.x);
+	}
+	
 	// Returns the angle of the vector from another (In radians)
 	ice.physics.Vector.prototype.radians = function(vec) {
-		return Math.atan2(this.y, this.x) - (vec ? Math.atan2(this.y, this.x) : 0);
+		if(vec === undefined) {
+			return Math.atan2(this.y, this.x);
+		}
+		return Math.atan2(this.y, this.x) - Math.atan2(vec.y, vec.x);
 	}
 	
 	// Returns the angle of the vector from another (In degrees)
 	ice.physics.Vector.prototype.degrees = function(vec) {
-        	return (360 + this.radians(vec) * 180 / Math.PI) % 360;
+		return (360 + this.radians(vec) * 180 / Math.PI) % 360;
 	}
 
 	// Returns whether or not two vectors are equal (same x and y)
@@ -102,8 +117,10 @@ var ice = (function (ice) {
 
 	// Moves the vector towards another (By relative distance)
 	ice.physics.Vector.prototype.linearInterpolate = function(vec, frac) {
-		frac = frac || (frac === 0 ? 0 : 1);
-		return this.add(vec.clone().subtract(this).multiply(frac));
+		frac = frac || (frac === 0 ? 0 : 0.5);
+		this.x += (vec.x - this.x) * frac;
+		this.y += (vec.y - this.y) * frac;
+		return this;
 	}
 	ice.physics.Vector.prototype.linInt = ice.physics.Vector.prototype.linearInterpolate;
 	ice.physics.Vector.prototype.lerp = ice.physics.Vector.prototype.linearInterpolate;
@@ -119,6 +136,7 @@ var ice = (function (ice) {
 		return this.multiplyY(-1);
 	}
 	
+	// Rounds the vector's x and y to the nearest integer
 	ice.physics.Vector.prototype.round = function() {
 		this.x = Math.round(this.x);
 		this.y = Math.round(this.y);
