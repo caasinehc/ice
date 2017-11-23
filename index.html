@@ -136,30 +136,30 @@
 				embedInput.select();
 			}
 			function updateBookmarklet(toInclude) {
-				var text = ("javascript: \
-					(function() { \
-						var modules = " + "[\"" + toInclude.join("\", \"") + "\"]" + "; \
-						for(var module in modules) { \
-							var script = document.createElement(\"script\"); \
-							script.src = \"https://caasinehc.github.io/ice/\" + module + \"; \
-							document.head.appendChild(script); \
-					})(); \
-				");
+				var text = (
+					"javascript: " +
+					"(function() {" +
+						"var modules = [\"" + toInclude.join("\", \"") + "\"];" +
+						"for(var module in modules) {" +
+							"var script = document.createElement(\"script\");" +
+							"script.src = \"https://caasinehc.github.io/ice/\" + module + \"\\\"\";" +
+							"document.head.appendChild(script);" +
+						"}" +
+					"})();"
+				);
 				bookmarklet.href = text;
 			}
 			function updateJsInclude(toInclude) {
-				var text = ("\
-					(function() { \
-						var modules = " + "[\"" + toInclude.join("\", \"") + "\"]" + "; \
-						for(var module in modules) { \
-							var script = document.createElement(\"script\"); \
-							script.src = \"https://caasinehc.github.io/ice/\" + module + \"; \
-							document.head.appendChild(script); \
-					})(); \
-				");
-				for(var module of toInclude) {
-					text += "<script src=\"https://caasinehc.github.io/ice/" + module + "\"><\/script>\n";
-				}
+				var text = (
+					"(function() {\n" +
+					"	var modules = [\"" + toInclude.join("\", \"") + "\"];\n" +
+					"	for(var module in modules) {\n" +
+					"		var script = document.createElement(\"script\");\n" +
+					"		script.src = \"https://caasinehc.github.io/ice/\" + module + \"\\\"\";\n" +
+					"		document.head.appendChild(script);\n" +
+					"	}\n" +
+					"})();"
+				);
 				jsInput.innerText = text;
 			}
 			jsInput.onclick = function() {
