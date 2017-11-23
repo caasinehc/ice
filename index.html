@@ -116,7 +116,7 @@
 			function updateEmbed(toInclude) {
 				var text = "";
 				for(var module of toInclude) {
-					text += "&lt;script src=\"https://caasinehc.github.io/ice/" + module + "\">&lt;/script>";
+					text += "<script src=\"https://caasinehc.github.io/ice/" + module + "\"><\/script>";
 				}
 				embedInput.value = text;
 				//embedImport.select();
