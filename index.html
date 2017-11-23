@@ -140,9 +140,9 @@
 					"javascript: " +
 					"(function() {" +
 						"var modules = [\"" + toInclude.join("\", \"") + "\"];" +
-						"for(var module in modules) {" +
+						"for(var module of modules) {" +
 							"var script = document.createElement(\"script\");" +
-							"script.src = \"https://caasinehc.github.io/ice/\" + module + \"\\\"\";" +
+							"script.src = \"https://caasinehc.github.io/ice/\" + module + \";\"" +
 							"document.head.appendChild(script);" +
 						"}" +
 					"})();"
@@ -153,9 +153,9 @@
 				var text = (
 					"(function() {\n" +
 					"	var modules = [\"" + toInclude.join("\", \"") + "\"];\n" +
-					"	for(var module in modules) {\n" +
+					"	for(var module of modules) {\n" +
 					"		var script = document.createElement(\"script\");\n" +
-					"		script.src = \"https://caasinehc.github.io/ice/\" + module + \"\\\"\";\n" +
+					"		script.src = \"https://caasinehc.github.io/ice/\" + module + \";\"\n" +
 					"		document.head.appendChild(script);\n" +
 					"	}\n" +
 					"})();"
