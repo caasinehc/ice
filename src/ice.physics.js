@@ -269,12 +269,12 @@ var ice = (function (ice) {
 	}
 	ice.physics.Vector.prototype.randomizeAngle = function(min, max) {
 		min = min || (min === undefined ? 0 : 0);
-		max = max || (max === undefined ? 0 : ice.util.TAU);
+		max = max || (max === undefined ? ice.util.TAU : 0);
 		return this.setAngle(Math.random() * (max - min) + min);
 	}
 	ice.physics.Vector.prototype.randomizeDegrees = function(min, max) {
 		min = min || (min === undefined ? 0 : 0);
-		max = max || (max === undefined ? 0 : 360);
+		max = max || (max === undefined ? 360 : 0);
 		return this.setDegrees(Math.random() * (max - min) + min);
 	}
 	ice.physics.Vector.prototype.randomizeMagnitude = function(min, max) {
