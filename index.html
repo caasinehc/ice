@@ -14,15 +14,15 @@
 		<p>Here's a convenient tool to help you use ice.js!</p>
 		
 		<form id="importTool">
-			<fieldset id="modules" onclick="updateModules();">
+			<fieldset onclick="updateModules();">
 				
 				<legend>Modules to include: </legend>
 				
 				<label>
-					<input type="radio" name="importAll" value="all" onclick="setSpecify(false);" checked />
+					<input type="radio" name="importAll" value="all" onclick="setSpecify(false);" id="importAll" checked />
 					All modules<br />
 				</label>
-				</label>
+				<label>
 					<input type="radio" name="importAll" value="specify" onclick="setSpecify(true);" />
 					Specify:
 				</label>
@@ -59,9 +59,12 @@
 						</label>
 					</li>
 				</ul>
-
 			</fieldset>
-		</div>
+		</form>
+		<label>
+			HTML embed:
+			<input type="text" id="embedInput" />
+		</label>
 
 		<script>
 			var modules = {
@@ -71,6 +74,8 @@
 				debug: document.getElementById("debugCB")
 			}
 			var allCB = document.getElementById("allCB");
+			var importAll = document.getElementById("importAll");
+			var embedImport = document.getElementById("embedImport");
 			
 			function toggleEverything() {
 				for(var module in modules) {
@@ -86,12 +91,36 @@
 					}
 				}
 				allCB.checked = allChecked;
+				updateOutput();
 			}
 			function setSpecify(enabled) {
 				allCB.disabled = !enabled;
 				for(var module in modules) {
 					modules[module].disabled = !enabled;
 				}
+			}
+			function updateOutput() {
+				var toInclude = [];
+				if(importAll.checked) {
+					toInclude.push("src/ice.js");
+				}
+				else {
+					for(var module in modules) {
+						if(modules[module].checked) {
+							toInclude.push("src/ice." + module + ".js");
+						}
+					}
+				}
+				updateEmbed(toInclude);
+			}
+			function updateEmbed(toInclude) {
+				var text = "";
+				for(var module of toInclude) {
+					text += "&lt;script src=\"https://caasinehc.github.io/ice/" + module + "\">&lt;/script>";
+				}
+				embedImport.value = text;
+				//embedImport.select();
+				//embedImport.focus();
 			}
 		</script>
 	
