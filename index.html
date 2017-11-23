@@ -62,8 +62,8 @@
 			</fieldset>
 		</form>
 		<label>
-			HTML embed:
-			<textarea id="embedInput" rows="20" cols="80"></textarea>
+			HTML embed:<br />
+			<textarea id="embedInput" rows="10" cols="80"></textarea>
 		</label>
 
 		<script>
@@ -119,8 +119,9 @@
 					text += "<script src=\"https://caasinehc.github.io/ice/" + module + "\"><\/script>\n";
 				}
 				embedInput.innerText = text;
-				//embedImport.select();
-				//embedImport.focus();
+			}
+			embedInput.onclick = function() {
+				embedINput.select();
 			}
 			
 			updateOutput();
