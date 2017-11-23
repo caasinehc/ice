@@ -63,7 +63,7 @@
 		</form>
 		<label>
 			HTML embed:
-			<input type="text" id="embedInput" />
+			<textarea id="embedInput"></textarea>
 		</label>
 
 		<script>
@@ -116,9 +116,9 @@
 			function updateEmbed(toInclude) {
 				var text = "";
 				for(var module of toInclude) {
-					text += "<script src=\"https://caasinehc.github.io/ice/" + module + "\"><\/script>";
+					text += "<script src=\"https://caasinehc.github.io/ice/" + module + "\"><\/script>\n";
 				}
-				embedInput.value = text;
+				embedInput.innerText = text;
 				//embedImport.select();
 				//embedImport.focus();
 			}
