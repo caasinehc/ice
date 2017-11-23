@@ -15,11 +15,13 @@
 				<input type="radio" name="importAll" value="all" onclick="setSpecify(false);" checked>All modules</radio><br />
 				<input type="radio" name="importAll" value="specify" onclick="setSpecify(true);">Specify</radio><br />
 		
-				<input type="checkbox" id="allCB" onclick="toggleEverything();">Select all</input><br />
-				<input type="checkbox" id="mathCB">Math</input><br />
-				<input type="checkbox" id="physicsCB">Physics</input><br />
-				<input type="checkbox" id="colorsCB">Colors</input><br />
-				<input type="checkbox" id="debugCB">Debug</input><br />
+				<ul style="list-style: none;">
+					<li><input type="checkbox" id="allCB" onclick="toggleEverything();" disabled>Select all</input></li>
+					<li><input type="checkbox" id="mathCB" disabled>Math</input></li>
+					<li><input type="checkbox" id="physicsCB" disabled>Physics</input></li>
+					<li><input type="checkbox" id="colorsCB" disabled>Colors</input></li>
+					<li><input type="checkbox" id="debugCB" disabled>Debug</input></li>
+				</ul>
 
 			</fieldset>
 		</div>
