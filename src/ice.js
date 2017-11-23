@@ -1,6 +1,6 @@
 var ice = (function (ice) {
 
-	ice.version = "v2.1.2"
+	ice.version = "v2.1.3"
 	ice.modules = [];
 
 	return ice;
@@ -19,6 +19,6 @@ var ice = (function (ice) {
 	importFile("src/ice.colors.js");
 	// importFile("src/ice.graphics.js");
 	importFile("src/ice.debug.js");
-	// importFile("src/ice.physics.js");
+	importFile("src/ice.physics.js");
 
 })();
