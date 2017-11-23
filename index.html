@@ -75,7 +75,7 @@
 			}
 			var allCB = document.getElementById("allCB");
 			var importAll = document.getElementById("importAll");
-			var embedImport = document.getElementById("embedImport");
+			var embedInput = document.getElementById("embedInput");
 			
 			function toggleEverything() {
 				for(var module in modules) {
@@ -118,7 +118,7 @@
 				for(var module of toInclude) {
 					text += "&lt;script src=\"https://caasinehc.github.io/ice/" + module + "\">&lt;/script>";
 				}
-				embedImport.value = text;
+				embedInput.value = text;
 				//embedImport.select();
 				//embedImport.focus();
 			}
