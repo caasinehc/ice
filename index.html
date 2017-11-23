@@ -61,10 +61,18 @@
 				</ul>
 			</fieldset>
 		</form>
+		
 		<label>
 			HTML embed:<br />
 			<textarea id="embedInput" rows="10" cols="80"></textarea>
-		</label>
+		</label><br />
+		
+		<a id="bookmarklet">Import ice.js</a><br />
+		
+		<label>
+			Javascript import:<br />
+			<textarea id="jsInput" rows="10" cols="80"></textarea>
+		</label><br />
 
 		<script>
 			var modules = {
@@ -76,6 +84,8 @@
 			var allCB = document.getElementById("allCB");
 			var importAll = document.getElementById("importAll");
 			var embedInput = document.getElementById("embedInput");
+			var bookmarklet = document.getElementById("bookmarklet");
+			var jsInput = document.getElementById("jsInput");
 			
 			function toggleEverything() {
 				for(var module in modules) {
@@ -112,6 +122,8 @@
 					}
 				}
 				updateEmbed(toInclude);
+				updateBookmarklet(toInclude);
+				updateJsInclude(toInclude);
 			}
 			function updateEmbed(toInclude) {
 				var text = "";
@@ -122,6 +134,36 @@
 			}
 			embedInput.onclick = function() {
 				embedInput.select();
+			}
+			function updateBookmarklet(toInclude) {
+				var text = ("javascript: \
+					(function() { \
+						var modules = " + "[\"" + toInclude.join("\", \"") + "\"]" + "; \
+						for(var module in modules) { \
+							var script = document.createElement(\"script\"); \
+							script.src = \"https://caasinehc.github.io/ice/" + module + "\"; \
+							document.head.appendChild(script); \
+					})(); \
+				");
+				bookmarklet.href = text;
+			}
+			function updateEmbed(toInclude) {
+				var text = ("\
+					(function() { \
+						var modules = " + "[\"" + toInclude.join("\", \"") + "\"]" + "; \
+						for(var module in modules) { \
+							var script = document.createElement(\"script\"); \
+							script.src = \"https://caasinehc.github.io/ice/" + module + "\"; \
+							document.head.appendChild(script); \
+					})(); \
+				");
+				for(var module of toInclude) {
+					text += "<script src=\"https://caasinehc.github.io/ice/" + module + "\"><\/script>\n";
+				}
+				jsInput.innerText = text;
+			}
+			jsInput.onclick = function() {
+				jsInput.select();
 			}
 			
 			updateOutput();
