@@ -10,12 +10,17 @@
 		
 		<form id="importTool">
 			<fieldset id="modules" onclick="updateModules();">
+				
 				<legend>Modules to include: </legend>
-				<input type="checkbox" id="allCB" onclick="toggleEverything();">All Modules</input><br />
+				<input type="radio" name="importAll" value="all" onclick="setSpecify(false);" checked>All modules</radio><br />
+				<input type="radio" name="importAll" value="specify" onclick="setSpecify(true);">Specify</radio><br />
+		
+				<input type="checkbox" id="allCB" onclick="toggleEverything();">Select all</input><br />
 				<input type="checkbox" id="mathCB">Math</input><br />
 				<input type="checkbox" id="physicsCB">Physics</input><br />
 				<input type="checkbox" id="colorsCB">Colors</input><br />
 				<input type="checkbox" id="debugCB">Debug</input><br />
+
 			</fieldset>
 		</div>
 
@@ -42,6 +47,12 @@
 					}
 				}
 				allCB.checked = allChecked;
+			}
+			function setSpecify(enabled) {
+				allCB.disabled = !enabled;
+				for(var module in modules) {
+					modules[module].disabled = !enabled;
+				}
 			}
 		</script>
 	
