@@ -12,15 +12,32 @@
 			<fieldset id="modules" onclick="updateModules();">
 				
 				<legend>Modules to include: </legend>
-				<input type="radio" name="importAll" value="all" onclick="setSpecify(false);" checked>All modules</input><br />
-				<input type="radio" name="importAll" value="specify" onclick="setSpecify(true);">Specify</input>
+				<label><All modules</label>
+				<input type="radio" name="importAll" value="all" onclick="setSpecify(false);" checked /><br />
+				</label>Specify: </label>
+				<input type="radio" name="importAll" value="specify" onclick="setSpecify(true);" />
 		
 				<ul style="list-style: none;">
-					<li><input type="checkbox" id="allCB" onclick="toggleEverything();" disabled>Select all</input></li>
-					<li><input type="checkbox" id="mathCB" disabled>Math</input></li>
-					<li><input type="checkbox" id="physicsCB" disabled>Physics</input></li>
-					<li><input type="checkbox" id="colorsCB" disabled>Colors</input></li>
-					<li><input type="checkbox" id="debugCB" disabled>Debug</input></li>
+					<li>
+						<label>Select all</label>
+						<input type="checkbox" id="allCB" onclick="toggleEverything();" disabled />
+					</li>
+					<li>
+						<label>Math</label>
+						<input type="checkbox" id="mathCB" disabled />
+					</li>
+					<li>
+						<label>Physics</label>
+						<input type="checkbox" id="physicsCB" disabled />
+					</li>
+					<li>
+						<label>Colors</label>
+						<input type="checkbox" id="colorsCB" disabled />
+					</li>
+					<li>
+						<label>Debug</label>
+						<input type="checkbox" id="debugCB" disabled />
+					</li>
 				</ul>
 
 			</fieldset>
