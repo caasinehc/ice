@@ -3,11 +3,12 @@ var ice = (function (ice) {
 	ice.modules = ice.modules || [];
 	ice.modules.push("physics");
 	ice.physics = {};
-	ice.physics.version = "v2.0.0"; // This version of the ice.physics module
-	
+	ice.physics.version = "v2.1.0"; // This version of the ice.physics module
+
 	ice.util = ice.util || {};
 	ice.util.TAU = Math.PI * 2;
 	ice.util.radToDeg = 180 / Math.PI;
+	ice.util.degToRad = Math.PI / 180;
 
 	/*
 	 *	================ Physics Module ================
@@ -16,10 +17,10 @@ var ice = (function (ice) {
 	// Constructors
 
 	/*
-	 *	TODO: 
+	 *	TODO:
 	 *		.slerp(angle, center)
 	 */
-	
+
 	ice.physics.Vector = function(x, y) {
 		if(!(this instanceof ice.physics.Vector)) {
 			return new ice.physics.Vector(x, y);
@@ -43,17 +44,17 @@ var ice = (function (ice) {
 	ice.physics.Vector.prototype.magnitudeSq = function() {
 		return this.x * this.x + this.y * this.y;
 	}
-	
+
 	// Returns the dot product of the vector and another
 	ice.physics.Vector.prototype.dot = function(vec) {
 		return this.x * vec.x + this.y * vec.y;
 	}
-	
+
 	// Returns the cross product of the vector and another
 	ice.physics.Vector.prototype.cross = function(vec) {
 		return (this.x * vec.y) - (this.y * vec.x);
 	}
-	
+
 	// Returns the angle of the vector from another (In radians)
 	ice.physics.Vector.prototype.radians = function(vec) {
 		if(vec === undefined) {
@@ -61,17 +62,17 @@ var ice = (function (ice) {
 		}
 		return Math.atan2(this.y, this.x) - Math.atan2(vec.y, vec.x);
 	}
-	
+
 	// Returns the angle of the vector from another (In degrees)
 	ice.physics.Vector.prototype.degrees = function(vec) {
 		return this.radians(vec) * ice.util.radToDeg;
 	}
-	
+
 	// Returns the angle of the vector from another (In non-negative radians)
 	ice.physics.Vector.prototype.radiansCCW = function(vec) {
 		return (ice.util.TAU + this.radians(vec)) % ice.util.TAU;
 	}
-	
+
 	// Returns the angle of the vector from another (In non-negative degrees)
 	ice.physics.Vector.prototype.degreesCCW = function(vec) {
 		return (360 + this.radians(vec) * ice.util.radToDeg) % 360;
@@ -106,17 +107,17 @@ var ice = (function (ice) {
 	ice.physics.Vector.prototype.equals = function(vec) {
 		return this.x === vec.x && this.y === vec.y;
 	}
-	
+
 	// Returns the vector as a string (Mostly for debugging)
 	ice.physics.Vector.prototype.toString = function() {
 		return "[object ice.physics.Vector] {x: " + this.x + ", y: " + this.y + "}";
 	}
-	
+
 	// Returns the vector as an object (Mostly for debugging)
 	ice.physics.Vector.prototype.toObject = function() {
 		return {x: this.x, y: this.y};
 	}
-	
+
 	// Returns the vector as an array (Mostly for debugging)
 	ice.physics.Vector.prototype.toArray = function() {
 		return [this.x, this.y];
@@ -144,60 +145,70 @@ var ice = (function (ice) {
 		this.y += (vec.y - this.y) * frac;
 		return this;
 	}
-	
+
 	// Rotates the vector around another by a certain angle (In radians)
 	ice.physics.Vector.prototype.rotate = function(angle, center) {
-		center = center || (center === undefined ? ice.physics.origin() : 0);
-		
+		center = center || ice.physics.origin();
+
 		var cos = Math.cos(angle);
 		var sin = Math.sin(angle);
 		var x = this.x - center.x;
 		var y = this.y - center.y;
-		
+
 		this.x = x * cos - y * sin + center.x;
 		this.y = x * sin + y * cos + center.y;
 		return this;
 	}
-	
+
 	// Rotates the vector around another by a certain angle (In degrees)
 	ice.physics.Vector.prototype.rotateDegrees = function(angle, center) {
-		return this.rotate(angle * ice.util.radToDeg, center);
+		return this.rotate(angle * ice.util.degToRad, center);
 	}
-	
+
 	// Sets the vectors angle (In radians)
 	ice.physics.Vector.prototype.setAngle = function(angle, center) {
-		center = center || (center === undefined ? ice.physics.origin() : 0);
-		
-		var cos = Math.cos(angle);
-		var sin = Math.sin(angle);
-		var x = this.x - center.x;
-		var y = this.y - center.y;
-		
-		this.x = x * cos - y * sin + center.x;
-		this.y = x * sin + y * cos + center.y;
+		center = center || ice.physics.origin();
+
+		var mag = this.distance(center);
+
+		this.x = Math.cos(-1 * angle) * mag + center.x;
+		this.y = Math.sin(-1 * angle) * mag + center.y;
 		return this;
 	}
-	
+
 	// Sets the vectors angle (In degrees)
 	ice.physics.Vector.prototype.setDegrees = function(angle, center) {
-		return this.setAngle(angle * ice.util.radToDeg, center);
+		return this.setAngle(angle * ice.util.degToRad, center);
 	}
 
 	// Inverts the vector (x and y *= -1)
-	ice.physics.Vector.prototype.invert = function() {
-		this.x *= -1;
-		this.y *= -1;
+	ice.physics.Vector.prototype.invert = function(center) {
+		if(center === undefined) {
+			this.x *= -1;
+			this.y *= -1;
+			return this;
+		}
+		this.x = ((this.x - center.x) * -1) + center.x;
+		this.y = ((this.y - center.y) * -1) + center.y;
 		return this;
 	}
-	ice.physics.Vector.prototype.invertX = function() {
-		this.x *= -1;
+	ice.physics.Vector.prototype.invertX = function(center) {
+		if(center === undefined) {
+			this.x *= -1;
+			return this;
+		}
+		this.x = ((this.x - center.x) * -1) + center.x;
 		return this;
 	}
-	ice.physics.Vector.prototype.invertY = function() {
-		this.y *= -1;
+	ice.physics.Vector.prototype.invertY = function(center) {
+		if(center === undefined) {
+			this.y *= -1;
+			return this;
+		}
+		this.y = ((this.y - center.y) * -1) + center.y;
 		return this;
 	}
-	
+
 	// Rounds the vector's x and y to the nearest integer
 	ice.physics.Vector.prototype.round = function() {
 		this.x = Math.round(this.x);
@@ -212,11 +223,11 @@ var ice = (function (ice) {
 		this.y = Math.round(this.y);
 		return this;
 	}
-	
+
 	// Clamps the vector's x and y
 	ice.physics.Vector.prototype.clamp = function(topLeft, bottomRight) {
 		this.x = Math.max(topLeft.x, Math.min(bottomRight.x, this.x));
-		this.y = Math.min(topLeft.y, Math.max(bottomRight.y, this.y));
+		this.y = Math.max(topLeft.y, Math.min(bottomRight.y, this.y));
 		return this;
 	}
 	ice.physics.Vector.prototype.clampX = function(topLeft, bottomRight) {
@@ -224,10 +235,10 @@ var ice = (function (ice) {
 		return this;
 	}
 	ice.physics.Vector.prototype.clampY = function(topLeft, bottomRight) {
-		this.y = Math.min(topLeft.y, Math.max(bottomRight.y, this.y));
+		this.y = Math.max(topLeft.y, Math.min(bottomRight.y, this.y));
 		return this;
 	}
-	
+
 	// Clamps the vector's magnitude
 	ice.physics.Vector.prototype.clampMagnitude = function(min, max) {
 		if(max < min) {
@@ -235,15 +246,15 @@ var ice = (function (ice) {
 			max = min;
 			min = oldMax;
 		}
-		if(this.magnitude < min) {
+		if(this.magnitude() < min) {
 			return this.setMagnitude(min);
 		}
-		if(this.magnitude > max) {
+		if(this.magnitude() > max) {
 			return this.setMagnitude(max);
 		}
 		return this;
 	}
-	
+
 	// Randomizes the vector's x and y
 	ice.physics.Vector.prototype.randomize = function(topLeft, bottomRight) {
 		this.x = Math.random() * (bottomRight.x - topLeft.x) + topLeft.x;
@@ -380,9 +391,9 @@ var ice = (function (ice) {
 		this.y /= y;
 		return this;
 	}
-	
+
 	// Synonyms
-	
+
 	ice.physics.Vector.prototype.copy = ice.physics.Vector.prototype.clone;
 	ice.physics.Vector.prototype.duplicate = ice.physics.Vector.prototype.clone;
 	ice.physics.Vector.prototype.mag = ice.physics.Vector.prototype.magnitude;
