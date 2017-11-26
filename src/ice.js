@@ -2,6 +2,8 @@ var ice = (function (ice) {
 
 	ice.version = "v2.1.3"
 	ice.modules = [];
+	console.log("ice " + ice.version + " imported successfully.");
+	console.log("Importing all modules...");
 
 	return ice;
 }(ice || {}));

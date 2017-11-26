@@ -4,6 +4,7 @@ var ice = (function (ice) {
 	ice.modules.push("debug");
 	ice.debug = {};
 	ice.debug.version = "v2.0.0"; // This version of the ice.debug module
+	console.log("ice.debug " + ice.debug.version + " imported successfully.");
 
 	/*
 	 *	================ Debug Module ================

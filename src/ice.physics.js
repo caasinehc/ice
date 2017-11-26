@@ -3,16 +3,18 @@ var ice = (function (ice) {
 	ice.modules = ice.modules || [];
 	ice.modules.push("physics");
 	ice.physics = {};
-	ice.physics.version = "v2.1.0"; // This version of the ice.physics module
-
-	ice.util = ice.util || {};
-	ice.util.TAU = Math.PI * 2;
-	ice.util.radToDeg = 180 / Math.PI;
-	ice.util.degToRad = Math.PI / 180;
+	ice.physics.version = "v2.1.1"; // This version of the ice.physics module
+	console.log("ice.physics " + ice.physics.version + " imported successfully.");
 
 	/*
 	 *	================ Physics Module ================
 	 */
+
+	// Private variables/functions
+
+	var TAU = Math.PI * 2;
+	var radToDeg = 180 / Math.PI;
+	var degToRad = Math.PI / 180;
 
 	// Constructors
 
@@ -65,17 +67,17 @@ var ice = (function (ice) {
 
 	// Returns the angle of the vector from another (In degrees)
 	ice.physics.Vector.prototype.degrees = function(vec) {
-		return this.radians(vec) * ice.util.radToDeg;
+		return this.radians(vec) * radToDeg;
 	}
 
 	// Returns the angle of the vector from another (In non-negative radians)
 	ice.physics.Vector.prototype.radiansCCW = function(vec) {
-		return (ice.util.TAU + this.radians(vec)) % ice.util.TAU;
+		return (TAU + this.radians(vec)) % TAU;
 	}
 
 	// Returns the angle of the vector from another (In non-negative degrees)
 	ice.physics.Vector.prototype.degreesCCW = function(vec) {
-		return (360 + this.radians(vec) * ice.util.radToDeg) % 360;
+		return (360 + this.radians(vec) * radToDeg) % 360;
 	}
 
 	// Returns the euclidian distance between the vector and another
@@ -162,7 +164,7 @@ var ice = (function (ice) {
 
 	// Rotates the vector around another by a certain angle (In degrees)
 	ice.physics.Vector.prototype.rotateDegrees = function(angle, center) {
-		return this.rotate(angle * ice.util.degToRad, center);
+		return this.rotate(angle * degToRad, center);
 	}
 
 	// Sets the vectors angle (In radians)
@@ -178,7 +180,7 @@ var ice = (function (ice) {
 
 	// Sets the vectors angle (In degrees)
 	ice.physics.Vector.prototype.setDegrees = function(angle, center) {
-		return this.setAngle(angle * ice.util.degToRad, center);
+		return this.setAngle(angle * degToRad, center);
 	}
 
 	// Inverts the vector (x and y *= -1)
@@ -280,7 +282,7 @@ var ice = (function (ice) {
 	}
 	ice.physics.Vector.prototype.randomizeAngle = function(min, max) {
 		min = min || (min === undefined ? 0 : 0);
-		max = max || (max === undefined ? ice.util.TAU : 0);
+		max = max || (max === undefined ? TAU : 0);
 		return this.setAngle(Math.random() * (max - min) + min);
 	}
 	ice.physics.Vector.prototype.randomizeDegrees = function(min, max) {

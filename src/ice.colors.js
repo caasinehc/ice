@@ -4,6 +4,7 @@ var ice = (function (ice) {
 	ice.modules.push("colors");
 	ice.colors = {};
 	ice.colors.version = "v2.0.1"; // This version of the ice.colors module
+	console.log("ice.colors " + ice.colors.version + " imported successfully.");
 
 	/*
 	 *	================ Colors Module ================
