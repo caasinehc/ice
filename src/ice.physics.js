@@ -3,7 +3,7 @@ var ice = (function (ice) {
 	ice.modules = ice.modules || [];
 	ice.modules.push("physics");
 	ice.physics = {};
-	ice.physics.version = "v2.1.1"; // This version of the ice.physics module
+	ice.physics.version = "v2.1.2"; // This version of the ice.physics module
 	console.log("ice.physics " + ice.physics.version + " imported successfully.");
 
 	/*
@@ -173,8 +173,8 @@ var ice = (function (ice) {
 
 		var mag = this.distance(center);
 
-		this.x = Math.cos(-1 * angle) * mag + center.x;
-		this.y = Math.sin(-1 * angle) * mag + center.y;
+		this.x = Math.cos(angle) * mag + center.x;
+		this.y = Math.sin(angle) * mag + center.y;
 		return this;
 	}
 
