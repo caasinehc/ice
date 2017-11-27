@@ -3,7 +3,7 @@ var ice = (function (ice) {
 	ice.modules = ice.modules || [];
 	ice.modules.push("debug");
 	ice.debug = {};
-	ice.debug.version = "v2.1.3"; // This version of the ice.debug module
+	ice.debug.version = "v2.1.4"; // This version of the ice.debug module
 	console.log("ice.debug " + ice.debug.version + " imported successfully.");
 
 	/*
@@ -18,15 +18,15 @@ var ice = (function (ice) {
 		size: "32px",
 		underline: true
 	};
-	ice.debug.styles.LINE_RAINBOW = {
+	ice.debug.styles.RAINBOW_LINE = {
 		padding: "0px 50% 0px 50%",
-		size: "4px",
+		size: "2px",
 		background: "linear-gradient(to right, #F00, #FF0, #0F0, #0FF, #00F, #F0F)",
 		type: "hidden"
 	};
 	ice.debug.styles.LINE = {
 		padding: "0px 50% 0px 50%",
-		size: "4px",
+		size: "2px",
 		background: "#000000",
 		type: "hidden"
 	};
@@ -44,6 +44,9 @@ var ice = (function (ice) {
 		background: "#C0C0FF",
 		color: "#000040",
 		prefix: "\u{1F6C8} "
+	};
+	ice.debug.styles.GREY = {
+		color: "#808080"
 	};
 
 	// Methods
@@ -108,11 +111,14 @@ var ice = (function (ice) {
 		return returnObject;
 	}
 
-	ice.debug.log = function(text, style) {
+	ice.debug.log = function(text, style, style2) {
 		if(typeof style === "string") {
 			console.log("%c" + text, style);
 		}
 		else if(typeof style === "object") {
+			if(typeof style2 === "object") {
+				style = Object.assign(Object.assign({}, style), style2);
+			}
 			var css = "";
 			if(style.color !== undefined) {css += "color: " + style.color + ";";}
 			if(style.bold) {css += "font-weight: bold;";}
