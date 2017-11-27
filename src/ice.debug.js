@@ -154,7 +154,7 @@ var ice = (function (ice) {
 				console.debug("%c" + text, css);
 			}
 			else if(style.type === "hidden") {
-				console.debug("%c", css);
+				console.log("%c", css);
 			}
 			else {
 				console.log("%c" + text, css);
