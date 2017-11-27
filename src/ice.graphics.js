@@ -16,12 +16,24 @@ var ice = (function (ice) {
 
 	// Properties
 
-	ice.graphics.property = "property";
+	ice.graphics.defaultCtx = document.querySelector("canvas").getContext("2d");
+	ice.graphics.defaultColor = "#000000";
 
 	// Methods
 
-	ice.graphics.method = function() {
-		// code
+	ice.graphics.setCtx = function(ctx) {
+		if(typeof ctx === "string") {
+			ice.defaultCtx = document.querySelector(ctx).getContext("2d");
+		}
+		else if(ctx instanceof HTMLCanvasElement) {
+			ice.defaultCtx = ctx.getContext("2d");
+		}
+		else if(ctx.canvas instanceof HTMLCanvasElement) {
+			ice.defaultCtx = ctx;
+		}
+		else {
+			throw new TypeError();
+		}
 	}
 
 	return ice;
