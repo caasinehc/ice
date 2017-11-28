@@ -3,7 +3,7 @@ var ice = (function (ice) {
 	ice.modules = ice.modules || [];
 	ice.modules.push("debug");
 	ice.debug = {};
-	ice.debug.version = "v2.1.8"; // This version of the ice.debug module
+	ice.debug.version = "v2.1.9"; // This version of the ice.debug module
 	console.log("ice.debug " + ice.debug.version + " imported successfully.");
 
 	/*
@@ -132,7 +132,9 @@ var ice = (function (ice) {
 		var resultsText = {};
 		var totalResults = 0;
 		var percent = Math.floor(sampleSize / 100);
-		console.groupCollapsed("Progress");
+		var clearString = Array(100).join("\n");
+		var runtime = 0;
+		console.clear();
 		var before = performance.now();
 		// Runs the function [sampleSize] times, incrementing results[(the result)]
 		for(var i = 0; i < sampleSize; i++) {
@@ -144,11 +146,12 @@ var ice = (function (ice) {
 				results[result]++;
 			}
 			if(i % percent === 0) {
-				console.log("%cTest progress: %c" + Math.floor(i / percent) + "%", "color: #808080", "font-weight: bold");
+				console.log(clearString);
+				console.log("%cTest progress: %c" + Math.floor(i / percent) + "%", "font-size: 36px; color: #808080", "font-size: 36px; font-weight: bold");
 			}
 		}
 		var after = performance.now();
-		console.groupEnd();
+		console.clear();
 		// loops through results, noting important values and adding percentage information
 		for(var key in results) {
 			if(typeof min === "undefined") {min = key; max = key}
