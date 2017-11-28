@@ -3,7 +3,7 @@ var ice = (function (ice) {
 	ice.modules = ice.modules || [];
 	ice.modules.push("debug");
 	ice.debug = {};
-	ice.debug.version = "v2.1.6"; // This version of the ice.debug module
+	ice.debug.version = "v2.1.7"; // This version of the ice.debug module
 	console.log("ice.debug " + ice.debug.version + " imported successfully.");
 
 	/*
@@ -102,7 +102,6 @@ var ice = (function (ice) {
 	}
 	ice.debug.styles.FADE = {
 		shadow: (" \
-			text-shadow: \
 			0px 0px 2px #000, \
 			1px 1px 2px #111, \
 			2px 2px 2px #222, \
@@ -118,7 +117,7 @@ var ice = (function (ice) {
 			12px 12px 2px #CCC, \
 			13px 13px 2px #DDD, \
 			14px 14px 2px #EEE, \
-			15px 15px 2px #FFF; \
+			15px 15px 2px #FFF \
 		")
 	}
 
