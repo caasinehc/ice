@@ -30,6 +30,12 @@ var ice = (function (ice) {
 		background: "#000000",
 		type: "hidden"
 	};
+	ice.debug.styles.DOTTED_LINE = {
+		padding: "0px 50% 0px 50%",
+		size: "2px",
+		background: "repeating-linear-gradient(to left, black 0px, black 2px, white 2px, white 4px)",
+		type: "hidden"
+	};
 	ice.debug.styles.WARN = {
 		background: "#FFFFC0",
 		color: "#404040",
@@ -48,6 +54,52 @@ var ice = (function (ice) {
 	ice.debug.styles.GREY = {
 		color: "#808080"
 	};
+	ice.debug.styles.RAINBOW = {
+		shadow: (" \
+			1px 1px 0px #FF0000, \
+			2px 2px 0px #FF8000, \
+			3px 3px 0px #FFFF00, \
+			4px 4px 0px #80FF00, \
+			5px 5px 0px #00FF00, \
+			6px 6px 0px #00FF80, \
+			7px 7px 0px #00FFFF, \
+			8px 8px 0px #0080FF, \
+			9px 9px 0px #0000FF, \
+			10px 10px 0px #8000FF, \
+			11px 11px 0px #FF00FF, \
+			12px 12px 0px #FF0080, \
+		"),
+		color: "transparent"
+	}
+	ice.debug.styles.DOUBLE_RAINBOW = {
+		shadow: (" \
+			1px 1px 0px #FF0000, \
+			2px 2px 0px #FF8000, \
+			3px 3px 0px #FFFF00, \
+			4px 4px 0px #80FF00, \
+			5px 5px 0px #00FF00, \
+			6px 6px 0px #00FF80, \
+			7px 7px 0px #00FFFF, \
+			8px 8px 0px #0080FF, \
+			9px 9px 0px #0000FF, \
+			10px 10px 0px #8000FF, \
+			11px 11px 0px #FF00FF, \
+			12px 12px 0px #FF0080, \
+			13px 13px 0px #FF0000, \
+			14px 14px 0px #FF8000, \
+			15px 15px 0px #FFFF00, \
+			16px 16px 0px #80FF00, \
+			17px 17px 0px #00FF00, \
+			18px 18px 0px #00FF80, \
+			19px 19px 0px #00FFFF, \
+			20px 20px 0px #0080FF, \
+			21px 21px 0px #0000FF, \
+			22px 22px 0px #8000FF, \
+			23px 23px 0px #FF00FF, \
+			24px 24px 0px #FF0080 \
+		"),
+		color: "transparent"
+	}
 
 	// Methods
 
