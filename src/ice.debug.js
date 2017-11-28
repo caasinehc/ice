@@ -3,7 +3,7 @@ var ice = (function (ice) {
 	ice.modules = ice.modules || [];
 	ice.modules.push("debug");
 	ice.debug = {};
-	ice.debug.version = "v2.1.7"; // This version of the ice.debug module
+	ice.debug.version = "v2.1.8"; // This version of the ice.debug module
 	console.log("ice.debug " + ice.debug.version + " imported successfully.");
 
 	/*
@@ -67,7 +67,7 @@ var ice = (function (ice) {
 			9px 9px 0px #0000FF, \
 			10px 10px 0px #8000FF, \
 			11px 11px 0px #FF00FF, \
-			12px 12px 0px #FF0080, \
+			12px 12px 0px #FF0080 \
 		"),
 		color: "transparent"
 	}
