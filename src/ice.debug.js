@@ -3,7 +3,7 @@ var ice = (function (ice) {
 	ice.modules = ice.modules || [];
 	ice.modules.push("debug");
 	ice.debug = {};
-	ice.debug.version = "v2.1.9"; // This version of the ice.debug module
+	ice.debug.version = "v2.1.10"; // This version of the ice.debug module
 	console.log("ice.debug " + ice.debug.version + " imported successfully.");
 
 	/*
@@ -172,7 +172,7 @@ var ice = (function (ice) {
 			"Sample size": sampleSize,
 			"Total unique results": totalResults,
 			"Total time": totalTime,
-			"Average time": ((after - before) / sampleSize) + " milliseconds",
+			"Average time": (((after - before) / sampleSize) * 1000000).toFixed(4) + " nanoseconds",
 			"Total unique results": totalResults,
 			"Expected frequency (assuming even distribution)": sampleSize / totalResults + "(" + (100 / totalResults).toFixed(2) + "%)",
 			"Most common": max + ", occuring a whopping " + results[max] + " times (" + ((results[max] / sampleSize) * 100).toFixed(2) + "%)",
