@@ -3,7 +3,7 @@ var ice = (function (ice) {
 	ice.modules = ice.modules || [];
 	ice.modules.push("debug");
 	ice.debug = {};
-	ice.debug.version = "v2.1.4"; // This version of the ice.debug module
+	ice.debug.version = "v2.1.6"; // This version of the ice.debug module
 	console.log("ice.debug " + ice.debug.version + " imported successfully.");
 
 	/*
@@ -100,6 +100,27 @@ var ice = (function (ice) {
 		"),
 		color: "transparent"
 	}
+	ice.debug.styles.FADE = {
+		shadow: (" \
+			text-shadow: \
+			0px 0px 2px #000, \
+			1px 1px 2px #111, \
+			2px 2px 2px #222, \
+			3px 3px 2px #333, \
+			4px 4px 2px #444, \
+			5px 5px 2px #555, \
+			6px 6px 2px #666, \
+			7px 7px 2px #777, \
+			8px 8px 2px #888, \
+			9px 9px 2px #999, \
+			10px 10px 2px #AAA, \
+			11px 11px 2px #BBB, \
+			12px 12px 2px #CCC, \
+			13px 13px 2px #DDD, \
+			14px 14px 2px #EEE, \
+			15px 15px 2px #FFF; \
+		")
+	}
 
 	// Methods
 
@@ -124,7 +145,7 @@ var ice = (function (ice) {
 				results[result]++;
 			}
 			if(i % percent === 0) {
-				console.log("Test progress: " + Math.floor(i / percent) + "%");
+				console.log("%cTest progress: %c" + Math.floor(i / percent) + "%", "color: #808080", "font-weight: bold");
 			}
 		}
 		var after = performance.now();
