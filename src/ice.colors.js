@@ -3,7 +3,7 @@ var ice = (function (ice) {
 	ice.modules = ice.modules || [];
 	ice.modules.push("colors");
 	ice.colors = {};
-	ice.colors.version = "v2.0.1"; // This version of the ice.colors module
+	ice.colors.version = "v2.0.2"; // This version of the ice.colors module
 	console.log("ice.colors " + ice.colors.version + " imported successfully.");
 
 	/*
@@ -60,6 +60,7 @@ var ice = (function (ice) {
 	// Misc colors
 	ice.colors.BROWN = 											"#402000";
 	ice.colors.GOLD = 											"#D0B030";
+	ice.colors.SEPIA =											"#704214";
 	// Duplicates
 	ice.colors.AQUA = 				ice.colors.CYAN;
 	ice.colors.VIOLET = 			ice.colors.PURPLE;
