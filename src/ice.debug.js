@@ -242,6 +242,59 @@ var ice = (function (ice) {
 			}
 		}
 	}
+	
+	ice.debug.summonDebugDoug = function() {
+		var debugDougWindow = window.open("", "debugdoug", "width=405 height=380");
+		debugDougWindow.document.write("<title>Debug Doug</title>");
+		debugDougWindow.document.write(
+			"<pre>" +
+			"/* * * * * * * * * * * * * * * * * * * * * * * * * * *\\" + "<br />" +
+			" *                                                   *" + "<br />" +
+			" *  ___      _                ___                _   *" + "<br />" +
+			" * |   \\ ___| |__ _  _ __ _  |   \\ ___ _  _ __ _(_)  *" + "<br />" +
+			" * | |) / -_| '_ | || / _` | | |) / _ | || / _` |_   *" + "<br />" +
+			" * |___/\\___|_.__/\\_,_\\__, | |___/\\___/\\_,_\\__, (_)  *" + "<br />" +
+			" *                    |___/                |___/     *" + "<br />" +
+			" *                                                   *" + "<br />" +
+			" *                                                   *" + "<br />" +
+			" *                           ..---..                 *" + "<br />" +
+			" *                         .`    _  '.               *" + "<br />" +
+			" *                         :    (o)  '..___          *" + "<br />" +
+			" *                         ;          __..'          *" + "<br />" +
+			" *                          \\       .`               *" + "<br />" +
+			" *                ___...---..`      ;                *" + "<br />" +
+			" *       ('-. .-~`                   '.              *" + "<br />" +
+			" *        '._ '                 ;      '.            *" + "<br />" +
+			" *          :       ;       ,,,;:       :            *" + "<br />" +
+			" *~~~~~~~~~~'        \"\"\"\"\"\"\"'           /~~~~~~~~~~~~*" + "<br />" +
+			" * ~~~       ;                         +   ~~~     ~~*" + "<br />" +
+			" *      ~~    \'._                   _.`     ~~~      *" + "<br />" +
+			" *  ~~~     ~    \'~---...___....--~`   ~~~           *" + "<br />" +
+			" *                                               ~~  *" + "<br />" +
+			"\\* * * * * * * * * * * * * * * * * * * * * * * * * * */" +
+			"</pre>"
+		);
+		debugDougWindow.document.write(
+			"<style>" +
+				"pre {" +
+					"position: absolute;" +
+					"top: 0;" +
+					"left: 0;" +
+					"word-wrap: normal;" +
+					"white-space: pre-wrap;" +
+					"width: 400;" +
+					"height: 350;" +
+				"}" +
+			"</style>"
+		);
+		debugDougWindow.document.write(
+			"<script>" +
+				"window.onclick = function() {" +
+					"window.resizeTo(421, 446);" +
+				"}" +
+			"</script>"
+		);
+	}
 
 	return ice;
 }(ice || {}));
