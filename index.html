@@ -58,6 +58,12 @@
 							Debug
 						</label>
 					</li>
+					<li>
+						<label>
+							<input type="checkbox" id="graphicsCB" disabled />
+							Graphics
+						</label>
+					</li>
 				</ul>
 			</fieldset>
 		</form>
@@ -79,7 +85,8 @@
 				math: document.getElementById("mathCB"),
 				physics: document.getElementById("physicsCB"),
 				colors: document.getElementById("colorsCB"),
-				debug: document.getElementById("debugCB")
+				debug: document.getElementById("debugCB"),
+				graphics: document.getElementById("graphicsCB")
 			}
 			var allCB = document.getElementById("allCB");
 			var importAll = document.getElementById("importAll");
@@ -140,10 +147,11 @@
 					"javascript: " +
 					"(function() {" +
 						"var modules = [\"" + toInclude.join("\", \"") + "\"];" +
+						"var appendLocation = document.head || document.body || document.documentElement || document;" +
 						"for(var module of modules) {" +
 							"var script = document.createElement(\"script\");" +
 							"script.src = \"https://caasinehc.github.io/ice/\" + module;" +
-							"document.head.appendChild(script);" +
+							"appendLocation.appendChild(script);" +
 						"}" +
 					"})();"
 				);
@@ -153,10 +161,11 @@
 				var text = (
 					"(function() {\n" +
 					"	var modules = [\"" + toInclude.join("\", \"") + "\"];\n" +
+					"	var appendLocation = document.head || document.body || document.documentElement || document;\n" +
 					"	for(var module of modules) {\n" +
 					"		var script = document.createElement(\"script\");\n" +
 					"		script.src = \"https://caasinehc.github.io/ice/\" + module;\n" +
-					"		document.head.appendChild(script);\n" +
+					"		appendLocation.appendChild(script);\n" +
 					"	}\n" +
 					"})();"
 				);
