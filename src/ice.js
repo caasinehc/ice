@@ -1,6 +1,6 @@
 var ice = (function (ice) {
 
-	ice.version = "v2.1.4"
+	ice.version = "v2.1.5"
 	ice.modules = [];
 	console.log("ice " + ice.version + " imported successfully.");
 	console.log("Importing all modules...");
@@ -13,8 +13,9 @@ var ice = (function (ice) {
 (function() {
 	function importFile(file) {
 		var script = document.createElement("script");
+		var appendSite = document.head || document.documentElement || document;
 		script.src = "https://caasinehc.github.io/ice/" + file;
-		document.head.appendChild(script);
+		appendSite.appendChild(script);
 	}
 
 	importFile("src/ice.math.js");
