@@ -21,6 +21,7 @@ var ice = (function (ice) {
 	/*
 	 *	TODO:
 	 *		.slerp(angle, center)
+	 *		collision detection
 	 */
 
 	ice.physics.Vector = function(x, y) {
