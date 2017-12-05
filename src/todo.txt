@@ -2,6 +2,7 @@ ice.colors
 	translating colors (hex, rgb, hsl, hsv)
 	get/set/inc/dec red, green, blue, hue, sat, lightness, value, shade, tone, tint
 	blend
+	graph stuff
 
 ice.physics
 	collision detection
