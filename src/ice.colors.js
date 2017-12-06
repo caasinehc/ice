@@ -3,12 +3,20 @@ var ice = (function (ice) {
 	ice.modules = ice.modules || [];
 	ice.modules.push("colors");
 	ice.colors = {};
-	ice.colors.version = "v2.0.2"; // This version of the ice.colors module
+	ice.colors.version = "v2.1.0"; // This version of the ice.colors module
 	console.log("ice.colors " + ice.colors.version + " imported successfully.");
 
 	/*
 	 *	================ Colors Module ================
 	 */
+
+	// Private variables/functions
+
+	function randomIntExcl(min, max) {
+		var minInt = Math.ceil(min);
+		var maxInt = Math.floor(max);
+		return Math.floor(Math.random() * (maxInt - minInt) + min);
+	}
 
 	// Properties
 
@@ -36,7 +44,7 @@ var ice = (function (ice) {
 	ice.colors.LIGHT_CERULEAN = 	ice.colors.CORNFLOWER = 	"#80C0FF";
 	ice.colors.LIGHT_BLUE = 		ice.colors.PERIWINKLE = 	"#8080FF";
 	ice.colors.LIGHT_PURPLE = 		ice.colors.LAVENDER = 		"#C080FF";
-	ice.colors.LIGHT_MAGENTA = 		ice.colors.ORCHID = 		"#800080";
+	ice.colors.LIGHT_MAGENTA = 		ice.colors.ORCHID = 		"#C000C0";
 	ice.colors.LIGHT_PINK = 		ice.colors.CARNATION = 		"#FF80C0";
 	// Shades
 	ice.colors.DARK_RED = 			ice.colors.MAROON = 		"#800000";
@@ -74,6 +82,70 @@ var ice = (function (ice) {
 	ice.colors.DARK_VIOLET = 		ice.colors.DARK_PURPLE;
 	ice.colors.DARK_FUCHSIA = 		ice.colors.DARK_MAGENTA;
 	ice.colors.DARK_GREY = 			ice.colors.DARK_GRAY;
+
+	ice.colors.hues = [
+		ice.colors.RED,
+		ice.colors.ORANGE,
+		ice.colors.YELLOW,
+		ice.colors.CHARTREUSE,
+		ice.colors.LIME,
+		ice.colors.MINT,
+		ice.colors.CYAN,
+		ice.colors.CERULEAN,
+		ice.colors.BLUE,
+		ice.colors.PURPLE,
+		ice.colors.MAGENTA,
+		ice.colors.PINK
+	];
+	ice.colors.tints = [
+		ice.colors.SALMON,
+		ice.colors.PEACH,
+		ice.colors.CANARY,
+		ice.colors.KEYLIME,
+		ice.colors.SHAMROCK,
+		ice.colors.SEAFOAM,
+		ice.colors.SKY,
+		ice.colors.CORNFLOWER,
+		ice.colors.PERIWINKLE,
+		ice.colors.LAVENDER,
+		ice.colors.ORCHID,
+		ice.colors.CARNATION
+	];
+	ice.colors.shades = [
+		ice.colors.MAROON,
+		ice.colors.RUST,
+		ice.colors.OLIVE,
+		ice.colors.BASIL,
+		ice.colors.GREEN,
+		ice.colors.PINE,
+		ice.colors.TEAL,
+		ice.colors.COBALT,
+		ice.colors.NAVY,
+		ice.colors.EGGPLANT,
+		ice.colors.PLUM,
+		ice.colors.BEETROOT
+	];
+	ice.colors.grayscale = [
+		ice.colors.WHITE,
+		ice.colors.SILVER,
+		ice.colors.GRAY,
+		ice.colors.CHARCOAL,
+		ice.colors.BLACK
+	];
+	ice.colors.greyscale = ice.colors.grayscale;
+	ice.colors.misc = [
+		ice.colors.BROWN,
+		ice.colors.GOLD,
+		ice.colors.SEPIA
+	];
+	ice.colors.miscellaneous = ice.colors.misc;
+	ice.colors.other = ice.colors.misc;
+	ice.colors.huesExt = [].concat(ice.colors.hues, ice.colors.tints, ice.colors.shades);
+	ice.colors.all = [].concat(ice.colors.huesExt, ice.colors.grayscale, ice.colors.misc);
+	ice.colors.random = function(set) {
+		set = set || ice.colors.huesExt;
+		return set[randomIntExcl(0, set.length)];
+	}
 
 	return ice;
 }(ice || {}));
