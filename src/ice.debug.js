@@ -3,7 +3,7 @@ var ice = (function (ice) {
 	ice.modules = ice.modules || [];
 	ice.modules.push("debug");
 	ice.debug = {};
-	ice.debug.version = "v2.1.13"; // This version of the ice.debug module
+	ice.debug.version = "v2.1.14"; // This version of the ice.debug module
 	console.log("ice.debug " + ice.debug.version + " imported successfully.");
 
 	/*
@@ -165,13 +165,13 @@ var ice = (function (ice) {
 		if(totalSeconds >= 60) {
 			totalTime += Math.floor(totalSeconds / 60) + " Minutes, ";
 		}
-		totalTime += totalSeconds % 60 + " Seconds";
+		totalTime += totalSeconds.toFixed(4) % 60 + " Seconds";
 		// The information to be returned
 		var returnObject = {
 			"Function tested": func.toString(),
 			"Sample size": sampleSize,
 			"Total unique results": totalResults,
-			"Total time": totalTime.toFixed(4),
+			"Total time": totalTime,
 			"Average time": (((after - before) / sampleSize) * 1000000).toFixed(4) + " nanoseconds",
 			"Total unique results": totalResults,
 			"Expected frequency (assuming even distribution)": sampleSize / totalResults + "(" + (100 / totalResults).toFixed(2) + "%)",
@@ -242,7 +242,7 @@ var ice = (function (ice) {
 			}
 		}
 	}
-	
+
 	ice.debug.summonDebugDoug = function() {
 		var debugDougWindow = window.open("", "debugdoug", "width=405 height=380");
 		debugDougWindow.document.write("<title>Debug Doug</title>");
