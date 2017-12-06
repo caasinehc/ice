@@ -4,7 +4,7 @@ var ice = (function (ice) {
 	ice.modules.push("math");
 	ice.math = {};
 	ice.math.version = "v2.0.0"; // This version of the ice.math module
-	console.log("%cice.math " + ice.math.version + " imported successfully.", "color: #00FF00");
+	console.log("%cice.math " + ice.math.version + " imported successfully.", "color: #008000");
 
 	/*
 	 *	================ Math Module ================

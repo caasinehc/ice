@@ -4,7 +4,7 @@ var ice = (function (ice) {
 	ice.modules.push("dom");
 	ice.dom = {};
 	ice.dom.version = "v1.0.1"; // This version of the ice.dom module
-	console.log("%cice.dom " + ice.dom.version + " imported successfully.", "color: #00FF00");
+	console.log("%cice.dom " + ice.dom.version + " imported successfully.", "color: #008000");
 	init();
 
 	/*
