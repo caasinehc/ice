@@ -19,9 +19,16 @@ if(document.head === null) {
 // Import all ice modules
 
 (function() {
+	function getModuleName(src) {
+		return src.replace(/^https\:\/\/caasinehc\.github\.io\/ice\/src\/(ice\.\w*)\.js$/, "$1");
+	}
+	function importError(e) {
+		console.log("%cFailed to import " + getModuleName(e.target.src) + "!", "color: #FF0000");
+	}
 	function importFile(file) {
 		var script = document.createElement("script");
 		script.src = "https://caasinehc.github.io/ice/" + file;
+		script.onerror = importError;
 		document.head.appendChild(script);
 	}
 

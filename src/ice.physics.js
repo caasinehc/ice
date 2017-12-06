@@ -4,7 +4,7 @@ var ice = (function (ice) {
 	ice.modules.push("physics");
 	ice.physics = {};
 	ice.physics.version = "v2.1.2"; // This version of the ice.physics module
-	console.log("ice.physics " + ice.physics.version + " imported successfully.");
+	console.log("%cice.physics " + ice.physics.version + " imported successfully.", "color: #00FF00");
 
 	/*
 	 *	================ Physics Module ================

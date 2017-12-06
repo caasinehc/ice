@@ -4,7 +4,7 @@ var ice = (function (ice) {
 	ice.modules.push("graphics");
 	ice.graphics = {};
 	ice.graphics.version = "v2.1.2"; // This version of the ice.graphics module
-	console.log("ice.graphics " + ice.graphics.version + " imported successfully.");
+	console.log("%cice.graphics " + ice.graphics.version + " imported successfully.", "color: #00FF00");
 
 	/*
 	 *	================ Graphics Module ================
