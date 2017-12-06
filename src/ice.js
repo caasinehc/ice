@@ -1,9 +1,8 @@
 var ice = (function (ice) {
 
-	ice.version = "v2.1.6"
+	ice.version = "v2.1.7"
 	ice.modules = [];
-	console.log("ice " + ice.version + " imported successfully.");
-	console.log("Importing all modules...");
+	console.log("%c-------- Importing ice.js " + ice.version + "--------", "font-weight: bold; font-size: 24px");
 
 	return ice;
 }(ice || {}));
