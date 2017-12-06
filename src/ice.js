@@ -23,7 +23,7 @@ if(document.head === null) {
 		return src.replace(/^https\:\/\/caasinehc\.github\.io\/ice\/src\/(ice\.\w*)\.js$/, "$1");
 	}
 	function importError(e) {
-		console.log("%cFailed to import " + getModuleName(e.target.src) + "!", "color: #FF0000");
+		console.log("%c" + getModuleName(e.target.src) + " import failed!", "color: #FF0000");
 	}
 	function importFile(file) {
 		var script = document.createElement("script");
