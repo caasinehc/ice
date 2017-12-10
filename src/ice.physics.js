@@ -3,7 +3,7 @@ var ice = (function (ice) {
 	ice.modules = ice.modules || [];
 	ice.modules.push("physics");
 	ice.physics = {};
-	ice.physics.version = "v2.1.2"; // This version of the ice.physics module
+	ice.physics.version = "v2.1.3"; // This version of the ice.physics module
 	console.log("%cice.physics " + ice.physics.version + " imported successfully.", "color: #008000");
 
 	/*
@@ -63,7 +63,7 @@ var ice = (function (ice) {
 		if(vec === undefined) {
 			return Math.atan2(this.y, this.x);
 		}
-		return Math.atan2(this.y, this.x) - Math.atan2(vec.y, vec.x);
+		return Math.atan2(vec.y, vec.x) - Math.atan2(this.y, this.x);
 	}
 
 	// Returns the angle of the vector from another (In degrees)
