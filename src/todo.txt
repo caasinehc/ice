@@ -6,3 +6,11 @@ ice.colors
 
 ice.physics
 	collision detection
+
+ice.dom
+  createSlider, createButton, etc.
+
+ice.math
+  map(double n, min, max, newMin, newMax)
+  new Map(double min, max, newMin, newMax)
+  map(double n, Map map)
