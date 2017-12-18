@@ -83,15 +83,18 @@ var ice = (function (ice) {
 
 	// Returns the euclidian distance between the vector and another
 	ice.physics.Vector.prototype.distance = function(vec) {
+		vec = vec || ice.physics.origin();
 		var dx = this.x - vec.x;
 		var dy = this.y - vec.y;
 		return Math.sqrt(dx * dx + dy * dy);
 	}
 	ice.physics.Vector.prototype.distanceX = function(vec) {
-		return this.x - vec.x;
+		vec = vec || ice.physics.origin();
+		return Math.abs(this.x - vec.x);
 	}
 	ice.physics.Vector.prototype.distanceY = function(vec) {
-		return this.y - vec.y;
+		vec = vec || ice.physics.origin();
+		return Math.abs(this.y - vec.y);
 	}
 
 	// Faster than .distance() (for comparison)
@@ -103,6 +106,7 @@ var ice = (function (ice) {
 
 	// Returns the manhattan distance between the vector and another
 	ice.physics.Vector.prototype.manhattanDistance = function(vec) {
+		vec = vec || ice.physics.origin();
 		return Math.abs(this.x - vec.x) + Math.abs(this.y - vec.y);
 	}
 
