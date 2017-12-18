@@ -3,7 +3,7 @@ var ice = (function (ice) {
 	ice.modules = ice.modules || [];
 	ice.modules.push("physics");
 	ice.physics = {};
-	ice.physics.version = "v2.1.4"; // This version of the ice.physics module
+	ice.physics.version = "v2.1.5"; // This version of the ice.physics module
 	console.log("%cice.physics " + ice.physics.version + " imported successfully.", "color: #008000");
 
 	/*
@@ -233,12 +233,22 @@ var ice = (function (ice) {
 		this.y = Math.max(topLeft.y, Math.min(bottomRight.y, this.y));
 		return this;
 	}
-	ice.physics.Vector.prototype.clampX = function(topLeft, bottomRight) {
-		this.x = Math.max(topLeft.x, Math.min(bottomRight.x, this.x));
+	ice.physics.Vector.prototype.clampX = function(min, max) {
+		if(min > max) {
+				var newMin = max;
+				max = min;
+				min = newMin;
+		}
+		this.x = Math.max(min, Math.min(max, this.x));
 		return this;
 	}
-	ice.physics.Vector.prototype.clampY = function(topLeft, bottomRight) {
-		this.y = Math.max(topLeft.y, Math.min(bottomRight.y, this.y));
+	ice.physics.Vector.prototype.clampY = function(min, max) {
+		if(min > max) {
+				var newMin = max;
+				max = min;
+				min = newMin;
+		}
+		this.y = Math.max(min, Math.min(max, this.y));
 		return this;
 	}
 
