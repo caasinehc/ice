@@ -3,7 +3,7 @@ var ice = (function (ice) {
 	ice.modules = ice.modules || [];
 	ice.modules.push("physics");
 	ice.physics = {};
-	ice.physics.version = "v2.1.5"; // This version of the ice.physics module
+	ice.physics.version = "v2.2.0"; // This version of the ice.physics module
 	console.log("%cice.physics " + ice.physics.version + " imported successfully.", "color: #008000");
 
 	/*
@@ -15,14 +15,24 @@ var ice = (function (ice) {
 	var TAU = Math.PI * 2;
 	var radToDeg = 180 / Math.PI;
 	var degToRad = Math.PI / 180;
+	function distSq(v1, v2) {
+		var dx = v1.x - v2.x;
+		var dy = v1.y - v2.y;
+		return dx * dx + dy * dy;
+	}
+	function distSqXYXY(x1, y1, x2, y2) {
+		var dx = x1 - x2;
+		var dy = y1 - y2;
+		return dx * dx + dy * dy;
+	}
+	function clamp(val, min, max) {
+		return Math.max(min, Math.min(max, val));
+	}
+	function lineHelper(l1Pos1, l1Pos2, l2Pos1) {
+		return (l1Pos2.x - l1Pos1.x) * (l2Pos1.y - l1Pos1.y) - (l2Pos1.x - l1Pos1.x) * (l1Pos2.y - l1Pos1.y);
+	}
 
 	// Constructors
-
-	/*
-	 *	TODO:
-	 *		.slerp(angle, center)
-	 *		collision detection
-	 */
 
 	ice.physics.Vector = function(x, y) {
 		if(!(this instanceof ice.physics.Vector)) {
@@ -99,6 +109,7 @@ var ice = (function (ice) {
 
 	// Faster than .distance() (for comparison)
 	ice.physics.Vector.prototype.distanceSq = function(vec) {
+		vec = vec || ice.physics.origin();
 		var dx = this.x - vec.x;
 		var dy = this.y - vec.y;
 		return dx * dx + dy * dy;
@@ -147,7 +158,6 @@ var ice = (function (ice) {
 
 	// Moves the vector towards another (By relative distance)
 	ice.physics.Vector.prototype.linearInterpolate = function(vec, frac) {
-		frac = frac || (frac === undefined ? 0.5 : frac);
 		this.x += (vec.x - this.x) * frac;
 		this.y += (vec.y - this.y) * frac;
 		return this;
@@ -231,10 +241,40 @@ var ice = (function (ice) {
 		return this;
 	}
 
+	// Floors the vector's x and y
+	ice.physics.Vector.prototype.floor = function() {
+		this.x = Math.floor(this.x);
+		this.y = Math.floor(this.y);
+		return this;
+	}
+	ice.physics.Vector.prototype.floorX = function() {
+		this.x = Math.floor(this.x);
+		return this;
+	}
+	ice.physics.Vector.prototype.floorY = function() {
+		this.y = Math.floor(this.y);
+		return this;
+	}
+
+	// Ceils the vector's x and y
+	ice.physics.Vector.prototype.ceil = function() {
+		this.x = Math.ceil(this.x);
+		this.y = Math.ceil(this.y);
+		return this;
+	}
+	ice.physics.Vector.prototype.ceilX = function() {
+		this.x = Math.ceil(this.x);
+		return this;
+	}
+	ice.physics.Vector.prototype.ceilY = function() {
+		this.y = Math.ceil(this.y);
+		return this;
+	}
+
 	// Clamps the vector's x and y
 	ice.physics.Vector.prototype.clamp = function(topLeft, bottomRight) {
-		this.x = Math.max(topLeft.x, Math.min(bottomRight.x, this.x));
-		this.y = Math.max(topLeft.y, Math.min(bottomRight.y, this.y));
+		this.x = clamp(this.x, topLeft.x, bottomRight.x);
+		this.y = clamp(this.y, topLeft.y, bottomRight.y);
 		return this;
 	}
 	ice.physics.Vector.prototype.clampX = function(min, max) {
@@ -243,7 +283,7 @@ var ice = (function (ice) {
 				max = min;
 				min = newMin;
 		}
-		this.x = Math.max(min, Math.min(max, this.x));
+		this.x = clamp(this.x, min, max);
 		return this;
 	}
 	ice.physics.Vector.prototype.clampY = function(min, max) {
@@ -252,7 +292,22 @@ var ice = (function (ice) {
 				max = min;
 				min = newMin;
 		}
-		this.y = Math.max(min, Math.min(max, this.y));
+		this.y = clamp(this.y, min, max);
+		return this;
+	}
+	ice.physics.Vector.prototype.clampXY = function(minX, maxX, minY, maxY) {
+		if(minX > maxX) {
+				var newMinX = maxX;
+				maxX = minX;
+				minX = newMinX;
+		}
+		if(minY > maxY) {
+				var newMinY = maxY;
+				maxY = minY;
+				minY = newMinY;
+		}
+		this.x = clamp(this.x, min, max);
+		this.y = clamp(this.y, min, max);
 		return this;
 	}
 
@@ -278,22 +333,41 @@ var ice = (function (ice) {
 		this.y = Math.random() * (topLeft.y - bottomRight.y) + bottomRight.y;
 		return this;
 	}
-	ice.physics.Vector.prototype.randomizeX = function(topLeft, bottomRight) {
-		this.x = Math.random() * (bottomRight.x - topLeft.x) + topLeft.x;
+	ice.physics.Vector.prototype.randomizeX = function(min, max) {
+		if(max < min) {
+			var oldMax = max;
+			max = min;
+			min = oldMax;
+		}
+		this.x = Math.random() * (max - min) + min;
 		return this;
 	}
-	ice.physics.Vector.prototype.randomizeY = function(topLeft, bottomRight) {
-		this.y = Math.random() * (topLeft.y - bottomRight.y) + bottomRight.y;
+	ice.physics.Vector.prototype.randomizeY = function(min, max) {
+		if(max < min) {
+			var oldMax = max;
+			max = min;
+			min = oldMax;
+		}
+		this.y = Math.random() * (max - min) + min;
 		return this;
 	}
-	ice.physics.Vector.prototype.randomizeXY = function(topLeft, bottomRight) {
+	ice.physics.Vector.prototype.randomizeXY = function(min, max) {
+		if(max < min) {
+			var oldMax = max;
+			max = min;
+			min = oldMax;
+		}
+		this.x = Math.random() * (max - min) + min;
+		this.y = Math.random() * (max - min) + min;
+		return this;
+	}
+	ice.physics.Vector.prototype.randomizeXorY = function(min, max) {
 		if(Math.random() < 0.50) {
-			this.x = Math.random() * (bottomRight.x - topLeft.x) + topLeft.x;
+			return this.randomizeX(min, max);
 		}
 		else {
-			this.y = Math.random() * (topLeft.y - bottomRight.y) + bottomRight.y;
+			return this.randomizeY(min, max);
 		}
-		return this;
 	}
 	ice.physics.Vector.prototype.randomizeAngle = function(min, max) {
 		min = min || (min === undefined ? 0 : 0);
@@ -409,23 +483,36 @@ var ice = (function (ice) {
 		return this;
 	}
 
+	// Mods the vectors x and y
+	ice.physics.Vector.prototype.mod = function(vec) {
+		this.x %= vec.x || (vec.x === undefined ? vec : 0);
+		this.y %= vec.y || (vec.y === undefined ? vec : 0);
+		return this;
+	}
+	ice.physics.Vector.prototype.modX = function(vec) {
+		this.x %= vec.x || (vec.x === undefined ? vec : 0);
+		return this;
+	}
+	ice.physics.Vector.prototype.modY = function(vec) {
+		this.y %= vec.y || (vec.y === undefined ? vec : 0);
+		return this;
+	}
+	ice.physics.Vector.prototype.modXY = function(x, y) {
+		this.x %= x;
+		this.y %= y;
+		return this;
+	}
+
 	// Synonyms
 
 	ice.physics.Vector.prototype.copy = ice.physics.Vector.prototype.clone;
-	ice.physics.Vector.prototype.duplicate = ice.physics.Vector.prototype.clone;
 	ice.physics.Vector.prototype.mag = ice.physics.Vector.prototype.magnitude;
-	ice.physics.Vector.prototype.length = ice.physics.Vector.prototype.magnitude;
 	ice.physics.Vector.prototype.magSq = ice.physics.Vector.prototype.magnitudeSq;
-	ice.physics.Vector.prototype.lengthSq = ice.physics.Vector.prototype.magnitudeSq;
-	ice.physics.Vector.prototype.rad = ice.physics.Vector.prototype.radians;
 	ice.physics.Vector.prototype.angle = ice.physics.Vector.prototype.radians;
+	ice.physics.Vector.prototype.rad = ice.physics.Vector.prototype.radians;
 	ice.physics.Vector.prototype.deg = ice.physics.Vector.prototype.degrees;
 	ice.physics.Vector.prototype.radCCW = ice.physics.Vector.prototype.radiansCCW;
-	ice.physics.Vector.prototype.radiansFull = ice.physics.Vector.prototype.radiansCCW;
-	ice.physics.Vector.prototype.radFull = ice.physics.Vector.prototype.radiansCCW;
 	ice.physics.Vector.prototype.degCCW = ice.physics.Vector.prototype.degreesCCW;
-	ice.physics.Vector.prototype.degreesFull = ice.physics.Vector.prototype.degreesCCW;
-	ice.physics.Vector.prototype.degFull = ice.physics.Vector.prototype.degreesCCW;
 	ice.physics.Vector.prototype.dist = ice.physics.Vector.prototype.distance;
 	ice.physics.Vector.prototype.distX = ice.physics.Vector.prototype.distanceX;
 	ice.physics.Vector.prototype.distY = ice.physics.Vector.prototype.distanceY;
@@ -436,8 +523,6 @@ var ice = (function (ice) {
 	ice.physics.Vector.prototype.norm = ice.physics.Vector.prototype.normalize;
 	ice.physics.Vector.prototype.setMag = ice.physics.Vector.prototype.setMagnitude;
 	ice.physics.Vector.prototype.setLength = ice.physics.Vector.prototype.setMagnitude;
-	ice.physics.Vector.prototype.scale = ice.physics.Vector.prototype.setMagnitude;
-	ice.physics.Vector.prototype.linInt = ice.physics.Vector.prototype.linearInterpolate;
 	ice.physics.Vector.prototype.lerp = ice.physics.Vector.prototype.linearInterpolate;
 	ice.physics.Vector.prototype.rotateRadians = ice.physics.Vector.prototype.rotate;
 	ice.physics.Vector.prototype.rotateRad = ice.physics.Vector.prototype.rotate;
@@ -445,14 +530,8 @@ var ice = (function (ice) {
 	ice.physics.Vector.prototype.setRadians = ice.physics.Vector.prototype.setAngle;
 	ice.physics.Vector.prototype.setRad = ice.physics.Vector.prototype.setAngle;
 	ice.physics.Vector.prototype.setDeg = ice.physics.Vector.prototype.setDegrees;
-	ice.physics.Vector.prototype.limit = ice.physics.Vector.prototype.clamp;
-	ice.physics.Vector.prototype.limitX = ice.physics.Vector.prototype.clampX;
-	ice.physics.Vector.prototype.limitY = ice.physics.Vector.prototype.clampY;
 	ice.physics.Vector.prototype.clampMag = ice.physics.Vector.prototype.clampMagnitude;
 	ice.physics.Vector.prototype.clampLength = ice.physics.Vector.prototype.clampMagnitude;
-	ice.physics.Vector.prototype.limitMagnitude = ice.physics.Vector.prototype.clampMagnitude;
-	ice.physics.Vector.prototype.limitMag = ice.physics.Vector.prototype.clampMagnitude;
-	ice.physics.Vector.prototype.limitLength = ice.physics.Vector.prototype.clampMagnitude;
 	ice.physics.Vector.prototype.random = ice.physics.Vector.prototype.randomize;
 	ice.physics.Vector.prototype.randomX = ice.physics.Vector.prototype.randomizeX;
 	ice.physics.Vector.prototype.randomY = ice.physics.Vector.prototype.randomizeY;
@@ -471,23 +550,153 @@ var ice = (function (ice) {
 	ice.physics.Vector.prototype.randomizeLength = ice.physics.Vector.prototype.randomizeMagnitude;
 	ice.physics.Vector.prototype.randomLength = ice.physics.Vector.prototype.randomizeMagnitude;
 	ice.physics.Vector.prototype.randomAny = ice.physics.Vector.prototype.randomizeAny;
-	ice.physics.Vector.prototype.sub = ice.physics.Vector.prototype.subtract;
-	ice.physics.Vector.prototype.subX = ice.physics.Vector.prototype.subtractX;
-	ice.physics.Vector.prototype.subY = ice.physics.Vector.prototype.subtractY;
-	ice.physics.Vector.prototype.subXY = ice.physics.Vector.prototype.subtractXY;
-	ice.physics.Vector.prototype.mult = ice.physics.Vector.prototype.multiply;
-	ice.physics.Vector.prototype.multX = ice.physics.Vector.prototype.multiplyX;
-	ice.physics.Vector.prototype.multY = ice.physics.Vector.prototype.multiplyY;
-	ice.physics.Vector.prototype.multXY = ice.physics.Vector.prototype.multiplyXY;
-	ice.physics.Vector.prototype.div = ice.physics.Vector.prototype.divide;
-	ice.physics.Vector.prototype.divX = ice.physics.Vector.prototype.divideX;
-	ice.physics.Vector.prototype.divY = ice.physics.Vector.prototype.divideY;
-	ice.physics.Vector.prototype.divXY = ice.physics.Vector.prototype.divideXY;
+	ice.physics.Vector.prototype.rand = ice.physics.Vector.prototype.randomize;
+	ice.physics.Vector.prototype.randX = ice.physics.Vector.prototype.randomizeX;
+	ice.physics.Vector.prototype.randY = ice.physics.Vector.prototype.randomizeY;
+	ice.physics.Vector.prototype.randXY = ice.physics.Vector.prototype.randomizeXY;
+	ice.physics.Vector.prototype.randAngle = ice.physics.Vector.prototype.randomizeAngle;
+	ice.physics.Vector.prototype.randRandians = ice.physics.Vector.prototype.randomizeAngle;
+	ice.physics.Vector.prototype.randRad = ice.physics.Vector.prototype.randomizeAngle;
+	ice.physics.Vector.prototype.randDegrees = ice.physics.Vector.prototype.randomizeDegrees;
+	ice.physics.Vector.prototype.randDeg = ice.physics.Vector.prototype.randomizeDegrees;
+	ice.physics.Vector.prototype.randMagnitude = ice.physics.Vector.prototype.randomizeMagnitude;
+	ice.physics.Vector.prototype.randMag = ice.physics.Vector.prototype.randomizeMagnitude;
+	ice.physics.Vector.prototype.randLength = ice.physics.Vector.prototype.randomizeMagnitude;
+	ice.physics.Vector.prototype.randAny = ice.physics.Vector.prototype.randomizeAny;
+	ice.physics.Vector.prototype.scale = ice.physics.Vector.prototype.divide;
+	ice.physics.Vector.prototype.scaleX = ice.physics.Vector.prototype.divideX;
+	ice.physics.Vector.prototype.scaleY = ice.physics.Vector.prototype.divideY;
+	ice.physics.Vector.prototype.scaleXY = ice.physics.Vector.prototype.divideXY;
 
 	// Methods
 
 	ice.physics.origin = function() {
 		return new ice.physics.Vector(0, 0);
+	}
+	ice.physics.unitVec = function() {
+		return new ice.physics.Vector(1, 0);
+	}
+	ice.physics.randomVec = function() {
+		var angle = Math.random() * TAU;
+		return new ice.physics.Vector(Math.cos(angle), Math.sin(angle));
+	}
+	ice.physics.pointInPoint = function(p1Pos, p2Pos) {
+		return p1Pos.x === p2Pos.x && p1Pos.y === p2Pos.y;
+	}
+	ice.physics.pointOnPoint = function(p1Pos, p2Pos) {
+		return p1Pos.x === p2Pos.x && p1Pos.y === p2Pos.y;
+	}
+	ice.physics.pointInCircle = function(pPos, cPos, cRad) {
+		return distSq(pPos, cPos) < cRad * cRad;
+	}
+	ice.physics.pointOnCircle = function(pPos, cPos, cRad) {
+		return distSq(pPos, cPos) <= cRad * cRad;
+	}
+	ice.physics.pointInRect = function(pPos, rPos, rWid, rHgt) {
+		return (
+			pPos.x > rPos.x &&
+			pPos.y > rPos.y &&
+			pPos.x < rPos.x + rWid &&
+			pPos.y < rPos.y + rHgt
+		);
+	}
+	ice.physics.pointOnRect = function(pPos, rPos, rWid, rHgt) {
+		return (
+			pPos.x >= rPos.x &&
+			pPos.y >= rPos.y &&
+			pPos.x <= rPos.x + rWid &&
+			pPos.y <= rPos.y + rHgt
+		);
+	}
+	ice.physics.circleInPoint = function(cPos, cRad, pPos) {
+		return distSq(pPos, cPos) < cRad * cRad;
+	}
+	ice.physics.circleOnPoint = function(cPos, cRad, pPos) {
+		return distSq(pPos, cPos) <= cRad * cRad;
+	}
+	ice.physics.circleInCircle = function(c1Pos, c1Rad, c2Pos, c2Rad) {
+		var radii = c1Rad + c2Rad;
+		return distSq(c1Pos, c2Pos) < radii * radii;
+	}
+	ice.physics.circleOnCircle = function(c1Pos, c1Rad, c2Pos, c2Rad) {
+		var radii = c1Rad + c2Rad;
+		return distSq(c1Pos, c2Pos) <= radii * radii;
+	}
+	ice.physics.circleInRect = function(cPos, cRad, rPos, rWid, rHgt) {
+		var closestX = clamp(cPos.x, rPos.x, rPos.x + rWid);
+		var closestY = clamp(cPos.y, rPos.y, rPos.y + rHgt);
+		return distSqXYXY(cPos.x, cPos.y, closestX, closestY) < cRad * cRad;
+	}
+	ice.physics.circleOnRect = function(cPos, cRad, rPos, rWid, rHgt) {
+		var closestX = clamp(cPos.x, rPos.x, rPos.x + rWid);
+		var closestY = clamp(cPos.y, rPos.y, rPos.y + rHgt);
+		return distSqXYXY(cPos.x, cPos.y, closestX, closestY) <= cRad * cRad;
+	}
+	ice.physics.rectInPoint = function(rPos, rWid, rHgt, pPos) {
+			return (
+				pPos.x > rPos.x &&
+				pPos.y > rPos.y &&
+				pPos.x < rPos.x + rWid &&
+				pPos.y < rPos.y + rHgt
+			);
+	}
+	ice.physics.rectOnPoint = function(rPos, rWid, rHgt, pPos) {
+			return (
+				pPos.x >= rPos.x &&
+				pPos.y >= rPos.y &&
+				pPos.x <= rPos.x + rWid &&
+				pPos.y <= rPos.y + rHgt
+			);
+	}
+	ice.physics.rectInCircle = function(rPos, rWid, rHgt, cPos, cRad) {
+		var closestX = clamp(cPos.x, rPos.x, rPos.x + rWid);
+		var closestY = clamp(cPos.y, rPos.y, rPos.y + rHgt);
+		return distSqXYXY(cPos.x, cPos.y, closestX, closestY) < cRad * cRad;
+	}
+	ice.physics.rectOnCircle = function(rPos, rWid, rHgt, cPos, cRad) {
+		var closestX = clamp(cPos.x, rPos.x, rPos.x + rWid);
+		var closestY = clamp(cPos.y, rPos.y, rPos.y + rHgt);
+		return distSqXYXY(cPos.x, cPos.y, closestX, closestY) <= cRad * cRad;
+	}
+	ice.physics.rectInRect = function(r1Pos, r1Wid, r1Hgt, r2Pos, r2Wid, r2Hgt) {
+		return (
+			r1Pos.x < r2Pos.x + r2Wid &&
+			r2Pos.x < r1Pos.x + r1Wid &&
+			r1Pos.y < r2Pos.y + r2Hgt &&
+			r2Pos.y < r1Pos.y + r1Hgt
+		);
+	}
+	ice.physics.rectOnRect = function(r1Pos, r1Wid, r1Hgt, r2Pos, r2Wid, r2Hgt) {
+		return (
+			r1Pos.x <= r2Pos.x + r2Wid &&
+			r2Pos.x <= r1Pos.x + r1Wid &&
+			r1Pos.y <= r2Pos.y + r2Hgt &&
+			r2Pos.y <= r1Pos.y + r1Hgt
+		);
+	}
+	ice.physics.lineInLine = function(l1Pos1, l1Pos2, l2Pos1, l2Pos2) {
+		let l1Pos1A = lineHelper(l2Pos1, l2Pos2, l1Pos1);
+		let l1Pos2A = lineHelper(l2Pos1, l2Pos2, l1Pos2);
+		if((l1Pos1A > 0 && l1Pos2A < 0) || (l1Pos2A > 0 && l1Pos1A < 0)) {
+			let l2Pos1A = lineHelper(l1Pos1, l1Pos2, l2Pos1);
+			let l2Pos2A = lineHelper(l1Pos1, l1Pos2, l2Pos2);
+			return (l2Pos1A > 0 && l2Pos2A < 0) || (l2Pos2A > 0 && l2Pos1A < 0);
+		}
+		else {
+			return false;
+		}
+	}
+	ice.physics.lineOnLine = function(l1Pos1, l1Pos2, l2Pos1, l2Pos2) {
+		let l1Pos1A = lineHelper(l2Pos1, l2Pos2, l1Pos1);
+		let l1Pos2A = lineHelper(l2Pos1, l2Pos2, l1Pos2);
+		if((l1Pos1A >= 0 && l1Pos2A < 0) || (l1Pos2A >= 0 && l1Pos1A < 0)) {
+			let l2Pos1A = lineHelper(l1Pos1, l1Pos2, l2Pos1);
+			let l2Pos2A = lineHelper(l1Pos1, l1Pos2, l2Pos2);
+			return (l2Pos1A >= 0 && l2Pos2A < 0) || (l2Pos2A >= 0 && l2Pos1A < 0);
+		}
+		else {
+			return false;
+		}
 	}
 
 	return ice;
