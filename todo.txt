@@ -1,8 +1,7 @@
 ice.colors
 	translating colors (hex, rgb, hsl, hsv)
-	get/set/inc/dec red, green, blue, hue, sat, lightness, value, shade, tone, tint
+	get/set/inc/dec/invert red, green, blue, alpha, hue, sat, lightness, value, shade, tone, tint
 	blend
-	graph stuff
 
 ice.physics
 	collision detection between
@@ -12,10 +11,13 @@ ice.physics
 		line: point, circle, rectangle, polygon
 		polygon: point, circle, rectangle, line, polygon
 
+ice.graphics
+	graph stuff
+
 ice.dom
   createSlider, createButton, etc.
+  Keyboard/mouse stuff
 
 ice.math
   map(double n, min, max, newMin, newMax)
   new Map(double min, max, newMin, newMax)
-  map(double n, Map map)
