@@ -15,6 +15,19 @@ var ice = (function (ice) {
 	ice.math.PI = Math.PI;
 	ice.math.TAU = ice.math.PI * 2;
 
+	// Constructors
+
+	ice.math.Map = function(oldMin, oldMax, newMin, newMax) {
+		if(!(this instanceof ice.math.Map)) {
+			return new ice.math.Map(oldMin, oldMax, newMin, newMax);
+		}
+
+		this.oldMin = oldMin;
+		this.oldmax = oldmax;
+		this.newMin = newMin;
+		this.newMax = newMax;
+	}
+
 	// Methods
 
 	ice.math.randomInt = function(min, max) { // returns a random int from min (inclusive) to max (inclusive)
@@ -41,6 +54,9 @@ var ice = (function (ice) {
 	}
 	ice.math.pythag = function(dX, dY) { // returns the length of the hypotenuse from the two other side lengths
 		return Math.sqrt(dX * dX + dY * dY);
+	}
+	ice.math.map = function(n, oldMin, oldMax, newMin, newMax) {
+		return (n - oldMin) * (newMax - newMin) / (oldMax - oldMin) + newMin;
 	}
 
 	return ice;
