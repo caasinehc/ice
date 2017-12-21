@@ -31,6 +31,26 @@ var ice = (function (ice) {
 	function lineHelper(l1Pos1, l1Pos2, l2Pos1) {
 		return (l1Pos2.x - l1Pos1.x) * (l2Pos1.y - l1Pos1.y) - (l2Pos1.x - l1Pos1.x) * (l1Pos2.y - l1Pos1.y);
 	}
+	function closestPointOnSegment(pPos, lPos1, lPos2) {
+		var lineDistSq = distSq(lPos1, lPos2);
+		// If the two points are the same...
+		if(lineDistSq === 0) {
+			// Return the distanceSq between the "line" and the point.
+			return distSq(pPos, lPos1);
+		}
+		var closestPointLocation = (
+			(pPos.x - lPos1.x) * (lPos2.x - lPos1.x) +
+			(pPos.y - lPos1.y) * (lPos2.y - lPos1.y)
+		) / lineDistSq;
+		closestPointLocation = clamp(closestPointLocation, 0, 1);
+		return new ice.physics.Vector(
+			lPos1.x + closestPointLocation * (lPos2.x - lPos1.x),
+			lPos1.y + closestPointLocation * (lPos2.y - lPos1.y)
+		);
+	}
+	function distToSegmentSq(pPos, lPos1, lPos2) {
+		return distSq(pPos, closestPointOnSegment(pPos, lPos1, lPos2));
+	}
 
 	// Constructors
 
@@ -608,6 +628,14 @@ var ice = (function (ice) {
 			pPos.y <= rPos.y + rHgt
 		);
 	}
+	ice.physics.pointInLine = function(pPos, lPos1, lPos2) {
+		var closestPoint = closestPointOnSegment(lPos1, lPos2, pPos);
+		return closestPoint.x === pPos.x && closestPoint.y === pPos.y;
+	}
+	ice.physics.pointOnLine = function(pPos, lPos1, lPos2) {
+		var closestPoint = closestPointOnSegment(lPos1, lPos2, pPos);
+		return closestPoint.x === pPos.x && closestPoint.y === pPos.y;
+	}
 	ice.physics.circleInPoint = function(cPos, cRad, pPos) {
 		return distSq(pPos, cPos) < cRad * cRad;
 	}
@@ -631,6 +659,12 @@ var ice = (function (ice) {
 		var closestX = clamp(cPos.x, rPos.x, rPos.x + rWid);
 		var closestY = clamp(cPos.y, rPos.y, rPos.y + rHgt);
 		return distSqXYXY(cPos.x, cPos.y, closestX, closestY) <= cRad * cRad;
+	}
+	ice.physics.circleInLine = function(cPos, cRad, lPos1, lPos2) {
+		return distToSegmentSq(cPos, lPos1, lPos2) < cRad * cRad;
+	}
+	ice.physics.circleOnLine = function(cPos, cRad, lPos1, lPos2) {
+		return distToSegmentSq(cPos, lPos1, lPos2) <= cRad * cRad;
 	}
 	ice.physics.rectInPoint = function(rPos, rWid, rHgt, pPos) {
 			return (
@@ -674,12 +708,124 @@ var ice = (function (ice) {
 			r2Pos.y <= r1Pos.y + r1Hgt
 		);
 	}
+	ice.physics.rectInLine = function(rPos, rWid, rHgt, lPos1, lPos2) {
+		var bottomRight = {x: rPos.x + rWid, y: rPos.y + rHgt};
+		if(
+			(
+				lPos1.x > rPos.x &&
+				lPos1.y > rPos.y &&
+				lPos1.x < bottomRight.x &&
+				lPos1.y < bottomRight.y
+			) || (
+				lPos2.x > rPos.x &&
+				lPos2.y > rPos.y &&
+				lPos2.x < bottomRight.x &&
+				lPos2.y < bottomRight.y
+			)
+		) {
+			return true;
+		}
+		var topRight = {x: rPos.x + rWid, y: rPos.y};
+		var bottomLeft = {x: rPos.x, y: rPos.y + rHgt};
+		return (
+			ice.physics.lineInLine(lPos1, lPos2, rPos, topRight) ||
+			ice.physics.lineInLine(lPos1, lPos2, rPos, bottomLeft) ||
+			ice.physics.lineInLine(lPos1, lPos2, bottomRight, topRight) ||
+			ice.physics.lineInLine(lPos1, lPos2, bottomRight, bottomLeft)
+		);
+	}
+	ice.physics.rectOnLine = function(rPos, rWid, rHgt, lPos1, lPos2) {
+		var bottomRight = {x: rPos.x + rWid, y: rPos.y + rHgt};
+		if(
+			lPos1.x >= rPos.x &&
+			lPos1.y >= rPos.y &&
+			lPos2.x >= rPos.x &&
+			lPos2.y >= rPos.y &&
+			lPos1.x <= bottomRight.x &&
+			lPos1.y <= bottomRight.y &&
+			lPos2.x <= bottomRight.x &&
+			lPos2.y <= bottomRight.y
+		) {
+			return true;
+		}
+		var topRight = {x: rPos.x + rWid, y: rPos.y};
+		var bottomLeft = {x: rPos.x, y: rPos.y + rHgt};
+		return (
+			ice.physics.lineOnLine(lPos1, lPos2, rPos, topRight) ||
+			ice.physics.lineOnLine(lPos1, lPos2, rPos, bottomLeft) ||
+			ice.physics.lineOnLine(lPos1, lPos2, bottomRight, topRight) ||
+			ice.physics.lineOnLine(lPos1, lPos2, bottomRight, bottomLeft)
+		);
+	}
+	ice.physics.lineInPoint = function(lPos1, lPos2, pPos) {
+		var closestPoint = closestPointOnSegment(lPos1, lPos2, pPos);
+		return closestPoint.x === pPos.x && closestPoint.y === pPos.y;
+	}
+	ice.physics.lineOnPoint = function(lPos1, lPos2, pPos) {
+		var closestPoint = closestPointOnSegment(lPos1, lPos2, pPos);
+		return closestPoint.x === pPos.x && closestPoint.y === pPos.y;
+	}
+	ice.physics.lineInCircle = function(lPos1, lPos2, cPos, cRad) {
+		return distToSegmentSq(cPos, lPos1, lPos2) < cRad * cRad;
+	}
+	ice.physics.lineOnCircle = function(lPos1, lPos2, cPos, cRad) {
+		return distToSegmentSq(cPos, lPos1, lPos2) <= cRad * cRad;
+	}
+	ice.physics.lineInRect = function(lPos1, lPos2, rPos, rWid, rHgt) {
+		var bottomRight = {x: rPos.x + rWid, y: rPos.y + rHgt};
+		if(
+			(
+				lPos1.x > rPos.x &&
+				lPos1.y > rPos.y &&
+				lPos1.x < bottomRight.x &&
+				lPos1.y < bottomRight.y
+			) || (
+				lPos2.x > rPos.x &&
+				lPos2.y > rPos.y &&
+				lPos2.x < bottomRight.x &&
+				lPos2.y < bottomRight.y
+			)
+		) {
+			return true;
+		}
+		var topRight = {x: rPos.x + rWid, y: rPos.y};
+		var bottomLeft = {x: rPos.x, y: rPos.y + rHgt};
+		return (
+			ice.physics.lineInLine(lPos1, lPos2, rPos, topRight) ||
+			ice.physics.lineInLine(lPos1, lPos2, rPos, bottomLeft) ||
+			ice.physics.lineInLine(lPos1, lPos2, bottomRight, topRight) ||
+			ice.physics.lineInLine(lPos1, lPos2, bottomRight, bottomLeft)
+		);
+	}
+	ice.physics.lineOnRect = function(lPos1, lPos2, rPos, rWid, rHgt) {
+		var bottomRight = {x: rPos.x + rWid, y: rPos.y + rHgt};
+		if(
+			lPos1.x <= rPos.x &&
+			lPos1.y <= rPos.y &&
+			lPos2.x <= rPos.x &&
+			lPos2.y <= rPos.y &&
+			lPos1.x >= bottomRight.x &&
+			lPos1.y >= bottomRight.y &&
+			lPos2.x >= bottomRight.x &&
+			lPos2.y >= bottomRight.y
+		) {
+			return true;
+		}
+		var topRight = {x: rPos.x + rWid, y: rPos.y};
+		var bottomLeft = {x: rPos.x, y: rPos.y + rHgt};
+		return (
+			ice.physics.lineOnLine(lPos1, lPos2, rPos, topRight) ||
+			ice.physics.lineOnLine(lPos1, lPos2, rPos, bottomLeft) ||
+			ice.physics.lineOnLine(lPos1, lPos2, bottomRight, topRight) ||
+			ice.physics.lineOnLine(lPos1, lPos2, bottomRight, bottomLeft)
+		);
+	}
 	ice.physics.lineInLine = function(l1Pos1, l1Pos2, l2Pos1, l2Pos2) {
-		let l1Pos1A = lineHelper(l2Pos1, l2Pos2, l1Pos1);
-		let l1Pos2A = lineHelper(l2Pos1, l2Pos2, l1Pos2);
+		var l1Pos1A = lineHelper(l2Pos1, l2Pos2, l1Pos1);
+		var l1Pos2A = lineHelper(l2Pos1, l2Pos2, l1Pos2);
 		if((l1Pos1A > 0 && l1Pos2A < 0) || (l1Pos2A > 0 && l1Pos1A < 0)) {
-			let l2Pos1A = lineHelper(l1Pos1, l1Pos2, l2Pos1);
-			let l2Pos2A = lineHelper(l1Pos1, l1Pos2, l2Pos2);
+			var l2Pos1A = lineHelper(l1Pos1, l1Pos2, l2Pos1);
+			var l2Pos2A = lineHelper(l1Pos1, l1Pos2, l2Pos2);
 			return (l2Pos1A > 0 && l2Pos2A < 0) || (l2Pos2A > 0 && l2Pos1A < 0);
 		}
 		else {
@@ -687,11 +833,11 @@ var ice = (function (ice) {
 		}
 	}
 	ice.physics.lineOnLine = function(l1Pos1, l1Pos2, l2Pos1, l2Pos2) {
-		let l1Pos1A = lineHelper(l2Pos1, l2Pos2, l1Pos1);
-		let l1Pos2A = lineHelper(l2Pos1, l2Pos2, l1Pos2);
+		var l1Pos1A = lineHelper(l2Pos1, l2Pos2, l1Pos1);
+		var l1Pos2A = lineHelper(l2Pos1, l2Pos2, l1Pos2);
 		if((l1Pos1A >= 0 && l1Pos2A < 0) || (l1Pos2A >= 0 && l1Pos1A < 0)) {
-			let l2Pos1A = lineHelper(l1Pos1, l1Pos2, l2Pos1);
-			let l2Pos2A = lineHelper(l1Pos1, l1Pos2, l2Pos2);
+			var l2Pos1A = lineHelper(l1Pos1, l1Pos2, l2Pos1);
+			var l2Pos2A = lineHelper(l1Pos1, l1Pos2, l2Pos2);
 			return (l2Pos1A >= 0 && l2Pos2A < 0) || (l2Pos2A >= 0 && l2Pos1A < 0);
 		}
 		else {
