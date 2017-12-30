@@ -3,7 +3,7 @@ var ice = (function (ice) {
 	ice.modules = ice.modules || [];
 	ice.modules.push("math");
 	ice.math = {};
-	ice.math.version = "v2.0.0"; // This version of the ice.math module
+	ice.math.version = "v2.0.1"; // This version of the ice.math module
 	console.log("%cice.math " + ice.math.version + " imported successfully.", "color: #008000");
 
 	/*
@@ -51,6 +51,9 @@ var ice = (function (ice) {
 			return arg1[Math.floor(Math.random() * arg1.length)];
 		}
 		if(arg2 === undefined) {
+			if(arg1 === undefined) {
+				return Math.random();
+			}
 			return Math.random() * arg1;
 		}
 		return Math.random() * (arg2 - arg1) + arg1;
