@@ -43,6 +43,18 @@ var ice = (function (ice) {
 	ice.math.randomFloat = function(min, max) { // returns a random float from min (inclusive) to max (exclusive)
 		return Math.random() * (max - min) + min;
 	}
+	ice.math.randomFrom = function(arr) { // returns a random element from an array
+		return arr[Math.floor(Math.random() * arr.length)];
+	}
+	ice.math.random = function(arg1, arg2) {
+		if(arg1 instanceof Array) {
+			return arg1[Math.floor(Math.random() * arg1.length)];
+		}
+		if(arg2 === undefined) {
+			return Math.random() * arg1;
+		}
+		return Math.random() * (arg2 - arg1) + arg1;
+	}
 	ice.math.chance = function(chance) { // returns true [chance] out of 1 times ([1] always returns true, [0.50] returns true 50% of the time, etc.)
 		return chance > Math.random();
 	}
