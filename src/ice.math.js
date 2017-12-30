@@ -3,7 +3,7 @@ var ice = (function (ice) {
 	ice.modules = ice.modules || [];
 	ice.modules.push("math");
 	ice.math = {};
-	ice.math.version = "v2.0.1"; // This version of the ice.math module
+	ice.math.version = "v2.0.2"; // This version of the ice.math module
 	console.log("%cice.math " + ice.math.version + " imported successfully.", "color: #008000");
 
 	/*
@@ -23,7 +23,7 @@ var ice = (function (ice) {
 		}
 
 		this.oldMin = oldMin;
-		this.oldmax = oldmax;
+		this.oldMax = oldMax;
 		this.newMin = newMin;
 		this.newMax = newMax;
 	}
@@ -72,6 +72,17 @@ var ice = (function (ice) {
 	}
 	ice.math.map = function(n, oldMin, oldMax, newMin, newMax) {
 		return (n - oldMin) * (newMax - newMin) / (oldMax - oldMin) + newMin;
+	}
+	ice.math.isPrime = function(n) { // returns whether or not a number is prime (0, 1, and Infinity are not prime)
+		if(isFinite(n)) {
+			for(var i = 2, sqrt = Math.sqrt(n); i <= sqrt; i++) {
+				if(n % i === 0) {
+					return false;
+				}
+			}
+			return n && n !== 1;
+		}
+		return false;
 	}
 
 	return ice;
