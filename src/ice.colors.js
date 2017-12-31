@@ -3,7 +3,7 @@ var ice = (function (ice) {
 	ice.modules = ice.modules || [];
 	ice.modules.push("colors");
 	ice.colors = {};
-	ice.colors.version = "v2.1.0"; // This version of the ice.colors module
+	ice.colors.version = "v2.1.1"; // This version of the ice.colors module
 	console.log("%cice.colors " + ice.colors.version + " imported successfully.", "color: #008000");
 
 	/*
