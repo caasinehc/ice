@@ -10,14 +10,6 @@ var ice = (function (ice) {
 	 *	================ Colors Module ================
 	 */
 
-	// Private variables/functions
-
-	function randomIntExcl(min, max) {
-		var minInt = Math.ceil(min);
-		var maxInt = Math.floor(max);
-		return Math.floor(Math.random() * (maxInt - minInt) + min);
-	}
-
 	// Properties
 
 	// Hues
@@ -69,6 +61,7 @@ var ice = (function (ice) {
 	ice.colors.BROWN = 											"#402000";
 	ice.colors.GOLD = 											"#D0B030";
 	ice.colors.SEPIA =											"#704214";
+	ice.colors.CLEAR =											"rgba(0, 0, 0, 0)";
 	// Duplicates
 	ice.colors.AQUA = 				ice.colors.CYAN;
 	ice.colors.VIOLET = 			ice.colors.PURPLE;
@@ -82,6 +75,8 @@ var ice = (function (ice) {
 	ice.colors.DARK_VIOLET = 		ice.colors.DARK_PURPLE;
 	ice.colors.DARK_FUCHSIA = 		ice.colors.DARK_MAGENTA;
 	ice.colors.DARK_GREY = 			ice.colors.DARK_GRAY;
+	ice.colors.TRANS = 				ice.colors.CLEAR;
+	ice.colors.TRANSPARENT = 		ice.colors.CLEAR;
 
 	ice.colors.hues = [
 		ice.colors.RED,
@@ -136,7 +131,8 @@ var ice = (function (ice) {
 	ice.colors.misc = [
 		ice.colors.BROWN,
 		ice.colors.GOLD,
-		ice.colors.SEPIA
+		ice.colors.SEPIA,
+		ice.colors.CLEAR
 	];
 	ice.colors.miscellaneous = ice.colors.misc;
 	ice.colors.other = ice.colors.misc;
@@ -144,7 +140,7 @@ var ice = (function (ice) {
 	ice.colors.all = [].concat(ice.colors.huesExt, ice.colors.grayscale, ice.colors.misc);
 	ice.colors.random = function(set) {
 		set = set || ice.colors.huesExt;
-		return set[randomIntExcl(0, set.length)];
+		return set[Math.floor(Math.random() * set.length)];
 	}
 
 	return ice;
