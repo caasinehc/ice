@@ -3,7 +3,7 @@ var ice = (function (ice) {
 	ice.modules = ice.modules || [];
 	ice.modules.push("math");
 	ice.math = {};
-	ice.math.version = "v2.0.2"; // This version of the ice.math module
+	ice.math.version = "v2.0.3"; // This version of the ice.math module
 	console.log("%cice.math " + ice.math.version + " imported successfully.", "color: #008000");
 
 	/*
@@ -14,19 +14,6 @@ var ice = (function (ice) {
 
 	ice.math.PI = Math.PI;
 	ice.math.TAU = ice.math.PI * 2;
-
-	// Constructors
-
-	ice.math.Map = function(oldMin, oldMax, newMin, newMax) {
-		if(!(this instanceof ice.math.Map)) {
-			return new ice.math.Map(oldMin, oldMax, newMin, newMax);
-		}
-
-		this.oldMin = oldMin;
-		this.oldMax = oldMax;
-		this.newMin = newMin;
-		this.newMax = newMax;
-	}
 
 	// Methods
 
@@ -69,6 +56,16 @@ var ice = (function (ice) {
 	}
 	ice.math.pythag = function(dX, dY) { // returns the length of the hypotenuse from the two other side lengths
 		return Math.sqrt(dX * dX + dY * dY);
+	}
+	ice.math.distSq = function(x1, y1, x2, y2) {
+		var dx = x1 - x2;
+		var dy = y1 - y2;
+		return dx * dx + dy * dy;
+	}
+	ice.math.dist = function(x1, y1, x2, y2) {
+		var dx = x1 - x2;
+		var dy = y1 - y2;
+		return Math.sqrt(dx * dx + dy * dy);
 	}
 	ice.math.map = function(n, oldMin, oldMax, newMin, newMax) {
 		return (n - oldMin) * (newMax - newMin) / (oldMax - oldMin) + newMin;
