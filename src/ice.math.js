@@ -3,7 +3,7 @@ var ice = (function (ice) {
 	ice.modules = ice.modules || [];
 	ice.modules.push("math");
 	ice.math = {};
-	ice.math.version = "v2.0.4"; // This version of the ice.math module
+	ice.math.version = "v2.0.5"; // This version of the ice.math module
 	console.log("%cice.math " + ice.math.version + " imported successfully.", "color: #008000");
 
 	/*
@@ -14,6 +14,7 @@ var ice = (function (ice) {
 
 	var RAD_TO_DEG = Math.PI / 180;
 	var DEG_TO_RAD = 180 / Math.PI;
+	var fibMem = {};
 
 	// Properties
 
@@ -91,6 +92,18 @@ var ice = (function (ice) {
 	}
 	ice.math.degToRad = function(deg) {
 		return deg * DEG_TO_RAD;
+	}
+	ice.math.fibonacci = function(i) {
+		if(i > 1475) { // anything above i = 1475 will return Infinity anyway, this is just faster
+			return Infinity;
+		}
+		if(fibMem[i] === undefined) {
+			if(i <= 1) {
+				return 1;
+			}
+			fibMem[i] = ice.math.fibonacci(i - 1) + ice.math.fibonacci(i - 2);
+		}
+		return fibMem[i];
 	}
 
 	return ice;
