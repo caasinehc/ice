@@ -3,12 +3,17 @@ var ice = (function (ice) {
 	ice.modules = ice.modules || [];
 	ice.modules.push("math");
 	ice.math = {};
-	ice.math.version = "v2.0.3"; // This version of the ice.math module
+	ice.math.version = "v2.0.4"; // This version of the ice.math module
 	console.log("%cice.math " + ice.math.version + " imported successfully.", "color: #008000");
 
 	/*
 	 *	================ Math Module ================
 	 */
+
+	// Private variables/functions
+
+	var RAD_TO_DEG = Math.PI / 180;
+	var DEG_TO_RAD = 180 / Math.PI;
 
 	// Properties
 
@@ -80,6 +85,12 @@ var ice = (function (ice) {
 			return n && n !== 1;
 		}
 		return false;
+	}
+	ice.math.radToDeg = function(rad) {
+		return rad * RAD_TO_DEG;
+	}
+	ice.math.degToRad = function(deg) {
+		return deg * DEG_TO_RAD;
 	}
 
 	return ice;
