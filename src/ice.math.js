@@ -3,7 +3,7 @@ var ice = (function (ice) {
 	ice.modules = ice.modules || [];
 	ice.modules.push("math");
 	ice.math = {};
-	ice.math.version = "v2.0.5"; // This version of the ice.math module
+	ice.math.version = "v2.0.6"; // This version of the ice.math module
 	console.log("%cice.math " + ice.math.version + " imported successfully.", "color: #008000");
 
 	/*
@@ -12,8 +12,8 @@ var ice = (function (ice) {
 
 	// Private variables/functions
 
-	var RAD_TO_DEG = Math.PI / 180;
-	var DEG_TO_RAD = 180 / Math.PI;
+	var RAD_TO_DEG = 180 / Math.PI;
+	var DEG_TO_RAD = Math.PI / 180;
 	var fibMem = {};
 
 	// Properties
@@ -24,16 +24,25 @@ var ice = (function (ice) {
 	// Methods
 
 	ice.math.randomInt = function(min, max) { // returns a random int from min (inclusive) to max (inclusive)
+		if(max === undefined) {
+			Math.floor(return Math.random() * min + 1);
+		}
 		var minInt = Math.ceil(min);
 		var maxInt = Math.floor(max);
 		return Math.floor(Math.random() * (maxInt - minInt + 1) + min);
 	}
 	ice.math.randomIntExcl = function(min, max) { // returns a random int from min (inclusive) to max (exclusive)
+		if(max === undefined) {
+			Math.floor(return Math.random() * min);
+		}
 		var minInt = Math.ceil(min);
 		var maxInt = Math.floor(max);
 		return Math.floor(Math.random() * (maxInt - minInt) + min);
 	}
 	ice.math.randomFloat = function(min, max) { // returns a random float from min (inclusive) to max (exclusive)
+		if(max === undefined) {
+			return Math.random() * min;
+		}
 		return Math.random() * (max - min) + min;
 	}
 	ice.math.randomFrom = function(arr) { // returns a random element from an array
@@ -104,6 +113,15 @@ var ice = (function (ice) {
 			fibMem[i] = ice.math.fibonacci(i - 1) + ice.math.fibonacci(i - 2);
 		}
 		return fibMem[i];
+	}
+	ice.math.clamp(n, min, max) {
+		if(n < min) {
+			return min;
+		}
+		if(n > max) {
+			return max;
+		}
+		return n;
 	}
 
 	return ice;
