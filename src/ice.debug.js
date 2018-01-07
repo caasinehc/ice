@@ -3,7 +3,7 @@ var ice = (function (ice) {
 	ice.modules = ice.modules || [];
 	ice.modules.push("debug");
 	ice.debug = {};
-	ice.debug.version = "v2.1.14"; // This version of the ice.debug module
+	ice.debug.version = "v2.1.15"; // This version of the ice.debug module
 	console.log("%cice.debug " + ice.debug.version + " imported successfully.", "color: #008000");
 
 	/*
@@ -183,6 +183,60 @@ var ice = (function (ice) {
 		console.table(resultsText);
 		console.groupEnd();
 		returnObject["Results"] = resultsText;
+		return returnObject;
+	}
+
+	// Very similar to testFunction, but much more accurate timing (also way slower)
+	ice.debug.testPerf = function(func, sampleSize, args, abortTime) {
+		abortTime = abortTime === undefined ? 60000 : abortTime;
+		// Stores info on results
+		var totalResults = 0;
+		var percent = Math.floor(sampleSize / 100);
+		var clearString = Array(100).join("\n");
+		var runtime = 0;
+		console.clear();
+		var before = performance.now();
+		// Runs the function [sampleSize] times, incrementing results[(the result)]
+		for(var i = 0; i < sampleSize; i++) {
+			var beforeCall = performance.now();
+			var result = func.apply(null, args);
+			var afterCall = performance.now();
+			runtime += afterCall - beforeCall;
+			totalResults++;
+			if(afterCall - before > abortTime) {
+				console.log(clearString);
+				console.log("%cAborting!%c progress: %c" + Math.floor(i / percent) + "%", "font-size: 36px; color: #FF0000", "font-size: 36px; color: #808080", "font-size: 36px; font-weight: bold");
+				break;
+			}
+			if(i % percent === 0) {
+				console.log(clearString);
+				console.log("%cTest progress: %c" + Math.floor(i / percent) + "%", "font-size: 36px; color: #808080", "font-size: 36px; font-weight: bold");
+			}
+		}
+		var after = performance.now();
+		console.clear();
+		var totalSeconds = (after - before) / 1000;
+		var totalTime = "";
+		if(totalSeconds >= 60) {
+			totalTime += Math.floor(totalSeconds / 60) + Math.floor(totalSeconds / 60) > 1 ? " Minutes, " : " Minute, ";
+		}
+		totalTime += totalSeconds.toFixed(4) % 60 + " Seconds";
+		var runtimeSeconds = runtime / 1000;
+		var runtimeText = "";
+		if(runtimeSeconds >= 60) {
+			runtimeText += Math.floor(runtimeSeconds / 60) + Math.floor(runtimeSeconds / 60) > 1 ? " Minutes, " : " Minute, ";
+		}
+		runtimeText += runtimeSeconds.toFixed(4) % 60 + " Seconds";
+		// The information to be returned
+		var returnObject = {
+			"Function tested": func.toString(),
+			"Target sample size": sampleSize,
+			"Actual sample size": totalResults,
+			"Total time": totalTime,
+			"Total call time": runtimeText,
+			"Average time": ((runtime / totalResults) * 1000000).toFixed(4) + " nanoseconds"
+		}
+		console.table(returnObject);
 		return returnObject;
 	}
 
