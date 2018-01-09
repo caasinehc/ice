@@ -315,7 +315,7 @@ var ice = (function (ice) {
 		this.y = clamp(this.y, min, max);
 		return this;
 	}
-	ice.physics.Vector.prototype.clampXY = function(minX, minY, maxX, maxY) {
+	ice.physics.Vector.prototype.clampXY = function(minX, maxX, minY, maxY) {
 		if(minX > maxX) {
 				var temp = maxX;
 				maxX = minX;
