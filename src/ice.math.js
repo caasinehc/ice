@@ -3,7 +3,7 @@ var ice = (function (ice) {
 	ice.modules = ice.modules || [];
 	ice.modules.push("math");
 	ice.math = {};
-	ice.math.version = "v2.0.6"; // This version of the ice.math module
+	ice.math.version = "v2.0.7"; // This version of the ice.math module
 	console.log("%cice.math " + ice.math.version + " imported successfully.", "color: #008000");
 
 	/*
@@ -25,22 +25,21 @@ var ice = (function (ice) {
 
 	ice.math.randomInt = function(min, max) { // returns a random int from min (inclusive) to max (inclusive)
 		if(max === undefined) {
-			Math.floor(return Math.random() * min + 1);
+			if(min === undefined) {
+				return Math.random();
+			}
+			var maxInt = Math.floor(min);
+			return Math.floor(Math.random() * (maxInt + 1));
 		}
 		var minInt = Math.ceil(min);
 		var maxInt = Math.floor(max);
-		return Math.floor(Math.random() * (maxInt - minInt + 1) + min);
-	}
-	ice.math.randomIntExcl = function(min, max) { // returns a random int from min (inclusive) to max (exclusive)
-		if(max === undefined) {
-			Math.floor(return Math.random() * min);
-		}
-		var minInt = Math.ceil(min);
-		var maxInt = Math.floor(max);
-		return Math.floor(Math.random() * (maxInt - minInt) + min);
+		return Math.floor(Math.random() * (maxInt - minInt + 1) + minInt);
 	}
 	ice.math.randomFloat = function(min, max) { // returns a random float from min (inclusive) to max (exclusive)
 		if(max === undefined) {
+			if(min === undefined) {
+				return Math.random() < 0.50;
+			}
 			return Math.random() * min;
 		}
 		return Math.random() * (max - min) + min;
@@ -61,28 +60,48 @@ var ice = (function (ice) {
 		return Math.random() * (arg2 - arg1) + arg1;
 	}
 	ice.math.chance = function(chance) { // returns true [chance] out of 1 times ([1] always returns true, [0.50] returns true 50% of the time, etc.)
-		return chance > Math.random();
+		return Math.random() < chance;
 	}
 	ice.math.percentChance = function(chance) { // returns true [chance] percent of the time
-		return chance > Math.random() * 100;
+		return Math.random() * 100 < chance;
 	}
 	ice.math.coinFlip = function() { // returns true 50% of the time
-		return 0.50 > Math.random();
+		return Math.random() < 0.50;
 	}
 	ice.math.pythag = function(dX, dY) { // returns the length of the hypotenuse from the two other side lengths
 		return Math.sqrt(dX * dX + dY * dY);
 	}
 	ice.math.distSq = function(x1, y1, x2, y2) {
+		if(x2 === undefined) {
+			var dx = x1.x - y1.x;
+			var dy = x1.y - y1.y;
+			return dx * dx + dy * dy;
+		}
 		var dx = x1 - x2;
 		var dy = y1 - y2;
 		return dx * dx + dy * dy;
 	}
 	ice.math.dist = function(x1, y1, x2, y2) {
+		if(x2 === undefined) {
+			var dx = x1.x - y1.x;
+			var dy = x1.y - y1.y;
+			return Math.sqrt(dx * dx + dy * dy);
+		}
 		var dx = x1 - x2;
 		var dy = y1 - y2;
 		return Math.sqrt(dx * dx + dy * dy);
 	}
 	ice.math.map = function(n, oldMin, oldMax, newMin, newMax) {
+		/*
+		 * A note to future me:
+		 * STOP TRYING TO OPTIMIZE THIS!!!
+		 * MAYBE it can be sped up, but how much?
+		 * A few milliseconds? And don't you even
+		 * think about a lookup table/Map constructor,
+		 * you know better than that! Don't overcomplicate.
+		 * Just let it go. Woo-sah, wooooo-saaaahh
+		 */
+		if(newMin === newMax) return newMin;
 		return (n - oldMin) * (newMax - newMin) / (oldMax - oldMin) + newMin;
 	}
 	ice.math.isPrime = function(n) { // returns whether or not a number is prime (0, 1, and Infinity are not prime)
@@ -102,25 +121,27 @@ var ice = (function (ice) {
 	ice.math.degToRad = function(deg) {
 		return deg * DEG_TO_RAD;
 	}
-	ice.math.fibonacci = function(i) {
-		if(i > 1475) { // anything above i = 1475 will return Infinity anyway, this is just faster
+	ice.math.fibonacci = function(n) {
+		if(n > 1475) { // any n above 1475 will return Infinity anyway, this is just faster
 			return Infinity;
 		}
-		if(fibMem[i] === undefined) {
-			if(i <= 1) {
+		n = Math.floor(n);
+		if(fibMem[n] === undefined) {
+			if(n <= 1) {
 				return 1;
 			}
-			fibMem[i] = ice.math.fibonacci(i - 1) + ice.math.fibonacci(i - 2);
+			fibMem[n] = ice.math.fibonacci(n - 1) + ice.math.fibonacci(n - 2);
 		}
-		return fibMem[i];
+		return fibMem[n];
 	}
 	ice.math.clamp(n, min, max) {
-		if(n < min) {
-			return min;
+		if(min > max) {
+			var temp = min;
+			min = max;
+			max = temp;
 		}
-		if(n > max) {
-			return max;
-		}
+		if(n < min) return min;
+		if(n > max) return max;
 		return n;
 	}
 
