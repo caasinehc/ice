@@ -1,3 +1,74 @@
+/*	TO ADD
+
+var charts = {};
+charts.pie = function(x, y, rad, data, rotation) {
+
+	rotation = (rotation === undefined ? 0 : rotation) - Math.PI / 2;
+
+	if(data.rings === undefined) {
+		data.rings = [{slices: data.slices}];
+	}
+
+	data._ringTotal = 0;
+	for(let ring of data.rings) {
+		ring._sliceTotal = 0;
+		for(let slice of ring.slices) {
+			slice.size = slice.size === undefined ? 1 : slice.size;
+			ring._sliceTotal += slice.size;
+		}
+		ring.size = ring.size === undefined ? 1 : ring.size;
+		data._ringTotal += ring.size;
+	}
+
+	data.rings.reverse();
+	let offsetRad = rad;
+	for(let ring of data.rings) {
+		let thisRad = rad * (ring.size / data._ringTotal);
+		let offsetAngle = rotation;
+		for(let slice of ring.slices) {
+			let thisAngle = TAU * (slice.size / ring._sliceTotal);
+			ctx.beginPath();
+			ctx.moveTo(x, y);
+			ctx.arc(x, y, offsetRad, offsetAngle, offsetAngle + thisAngle);
+			ctx.fillStyle = slice.color;
+			ctx.fill();
+			offsetAngle += thisAngle;
+		}
+		offsetRad -= thisRad;
+	}
+}
+
+// Usage:
+// 	charts.pie(200, 200, 100, {
+// 		rings: [
+// 			{ // Innermost ring
+// 				size: 5,
+// 				slices: [
+// 					{size: 2, color: colorList[0]},
+// 					{size: 8, color: colorList[1]},
+// 					{size: 1, color: colorList[2]}
+// 				]
+// 			},
+// 			{ // You can have as many rings as you want
+// 				size: 12,
+// 				slices: [
+// 					{size: 2, color: colorList[3]},
+// 					{size: 4, color: colorList[4]},
+// 					{size: 4, color: colorList[5]}
+// 				]
+// 			},
+// 			{ // Outer ring
+// 				size: 25,
+// 				slices: [
+// 					{size: 45, color: colorList[6]},
+// 					{size: 55, color: colorList[7]}
+// 				]
+// 			}
+// 		]
+// 	}, 0);
+
+*/
+
 var ice = (function (ice) {
 
 	ice.modules = ice.modules || [];
