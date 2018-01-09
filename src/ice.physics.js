@@ -3,7 +3,7 @@ var ice = (function (ice) {
 	ice.modules = ice.modules || [];
 	ice.modules.push("physics");
 	ice.physics = {};
-	ice.physics.version = "v2.2.0"; // This version of the ice.physics module
+	ice.physics.version = "v2.2.1"; // This version of the ice.physics module
 	console.log("%cice.physics " + ice.physics.version + " imported successfully.", "color: #008000");
 
 	/*
@@ -108,7 +108,7 @@ var ice = (function (ice) {
 
 	// Returns the angle of the vector from another (In non-negative degrees)
 	ice.physics.Vector.prototype.degreesCCW = function(vec) {
-		return (360 + this.radians(vec) * radToDeg) % 360;
+		return (360 + this.degrees(vec)) % 360;
 	}
 
 	// Returns the euclidian distance between the vector and another
@@ -173,7 +173,7 @@ var ice = (function (ice) {
 
 	// Moves the vector towards another (By absolute distance)
 	ice.physics.Vector.prototype.towards = function(vec, dist) {
-		return this.add(vec.clone().subtract(this).normalize().multiply(dist || (dist === undefined ? 1 : dist)));
+		return this.add(vec.clone().subtract(this).normalize().multiply(dist === undefined ? 1 : dist));
 	}
 
 	// Moves the vector towards another (By relative distance)
@@ -299,49 +299,59 @@ var ice = (function (ice) {
 	}
 	ice.physics.Vector.prototype.clampX = function(min, max) {
 		if(min > max) {
-				var newMin = max;
-				max = min;
-				min = newMin;
+			var temp = max;
+			max = min;
+			min = temp;
 		}
 		this.x = clamp(this.x, min, max);
 		return this;
 	}
 	ice.physics.Vector.prototype.clampY = function(min, max) {
 		if(min > max) {
-				var newMin = max;
+				var temp = max;
 				max = min;
-				min = newMin;
+				min = temp;
 		}
 		this.y = clamp(this.y, min, max);
 		return this;
 	}
-	ice.physics.Vector.prototype.clampXY = function(minX, maxX, minY, maxY) {
+	ice.physics.Vector.prototype.clampXY = function(minX, minY, maxX, maxY) {
 		if(minX > maxX) {
-				var newMinX = maxX;
+				var temp = maxX;
 				maxX = minX;
-				minX = newMinX;
+				minX = temp;
+		}
+		if(maxX === undefined) {
+			this.x = clamp(this.x, minX, minY);
+			this.y = clamp(this.y, minX, minY);
+			return this;
 		}
 		if(minY > maxY) {
-				var newMinY = maxY;
-				maxY = minY;
-				minY = newMinY;
+			var temp = maxY;
+			maxY = minY;
+			minY = temp;
 		}
-		this.x = clamp(this.x, min, max);
-		this.y = clamp(this.y, min, max);
+		this.x = clamp(this.x, minX, maxX);
+		this.y = clamp(this.y, minY, maxY);
 		return this;
 	}
 
 	// Clamps the vector's magnitude
 	ice.physics.Vector.prototype.clampMagnitude = function(min, max) {
-		if(max < min) {
-			var oldMax = max;
+		if(max === undefined) {
 			max = min;
-			min = oldMax;
+			min = 0;
 		}
-		if(this.magnitude() < min) {
+		else if(max < min) {
+			var temp = max;
+			max = min;
+			min = temp;
+		}
+		var magSq = this.magnitudeSq();
+		if(magSq < min * min) {
 			return this.setMagnitude(min);
 		}
-		if(this.magnitude() > max) {
+		if(magSq > max * max) {
 			return this.setMagnitude(max);
 		}
 		return this;
@@ -349,33 +359,36 @@ var ice = (function (ice) {
 
 	// Randomizes the vector's x and y
 	ice.physics.Vector.prototype.randomize = function(topLeft, bottomRight) {
+		if(bottomRight === undefined) {
+			return this.randomizeAngle();
+		}
 		this.x = Math.random() * (bottomRight.x - topLeft.x) + topLeft.x;
 		this.y = Math.random() * (topLeft.y - bottomRight.y) + bottomRight.y;
 		return this;
 	}
 	ice.physics.Vector.prototype.randomizeX = function(min, max) {
 		if(max < min) {
-			var oldMax = max;
+			var temp = max;
 			max = min;
-			min = oldMax;
+			min = temp;
 		}
 		this.x = Math.random() * (max - min) + min;
 		return this;
 	}
 	ice.physics.Vector.prototype.randomizeY = function(min, max) {
 		if(max < min) {
-			var oldMax = max;
+			var temp = max;
 			max = min;
-			min = oldMax;
+			min = temp;
 		}
 		this.y = Math.random() * (max - min) + min;
 		return this;
 	}
 	ice.physics.Vector.prototype.randomizeXY = function(min, max) {
 		if(max < min) {
-			var oldMax = max;
+			var temp = max;
 			max = min;
-			min = oldMax;
+			min = temp;
 		}
 		this.x = Math.random() * (max - min) + min;
 		this.y = Math.random() * (max - min) + min;
@@ -390,31 +403,45 @@ var ice = (function (ice) {
 		}
 	}
 	ice.physics.Vector.prototype.randomizeAngle = function(min, max) {
-		min = min || (min === undefined ? 0 : 0);
-		max = max || (max === undefined ? TAU : 0);
+		if(max === undefined) {
+			if(min === undefined) {
+				return this.setAngle(Math.random() * TAU);
+			}
+			return this.setAngle(Math.random() * min);
+		}
 		return this.setAngle(Math.random() * (max - min) + min);
 	}
 	ice.physics.Vector.prototype.randomizeDegrees = function(min, max) {
-		min = min || (min === undefined ? 0 : 0);
-		max = max || (max === undefined ? 360 : 0);
+		if(max === undefined) {
+			if(min === undefined) {
+				return this.setDegrees(Math.random() * 360);
+			}
+			return this.setDegrees(Math.random() * min);
+		}
 		return this.setDegrees(Math.random() * (max - min) + min);
 	}
 	ice.physics.Vector.prototype.randomizeMagnitude = function(min, max) {
+		if(max === undefined) {
+			if(min === undefined) {
+				return this.setMagnitude(Math.random());
+			}
+			return this.setMagnitude(Math.random() * min);
+		}
 		return this.setMagnitude(Math.random() * (max - min) + min);
 	}
 
 	// Sets the vectors x and y
 	ice.physics.Vector.prototype.set = function(vec) {
-		this.x = vec.x || (vec.x === undefined ? vec : 0);
-		this.y = vec.y || (vec.y === undefined ? vec : 0);
+		this.x = vec.x === undefined ? vec : vec.x;
+		this.y = vec.y === undefined ? vec : vec.y;
 		return this;
 	}
 	ice.physics.Vector.prototype.setX = function(vec) {
-		this.x = vec.x || (vec.x === undefined ? vec : 0);
+		this.x = vec.x === undefined ? vec : vec.x;
 		return this;
 	}
 	ice.physics.Vector.prototype.setY = function(vec) {
-		this.y = vec.y || (vec.y === undefined ? vec : 0);
+		this.y = vec.y === undefined ? vec : vec.y;
 		return this;
 	}
 	ice.physics.Vector.prototype.setXY = function(x, y) {
@@ -425,16 +452,16 @@ var ice = (function (ice) {
 
 	// Adds to the vectors x and y
 	ice.physics.Vector.prototype.add = function(vec) {
-		this.x += vec.x || (vec.x === undefined ? vec : 0);
-		this.y += vec.y || (vec.y === undefined ? vec : 0);
+		this.x += vec.x === undefined ? vec : 0;
+		this.y += vec.y === undefined ? vec : 0;
 		return this;
 	}
 	ice.physics.Vector.prototype.addX = function(vec) {
-		this.x += vec.x || (vec.x === undefined ? vec : 0);
+		this.x += vec.x === undefined ? vec : 0;
 		return this;
 	}
 	ice.physics.Vector.prototype.addY = function(vec) {
-		this.y += vec.y || (vec.y === undefined ? vec : 0);
+		this.y += vec.y === undefined ? vec : 0;
 		return this;
 	}
 	ice.physics.Vector.prototype.addXY = function(x, y) {
@@ -445,16 +472,16 @@ var ice = (function (ice) {
 
 	// Subtracts from the vectors x and y
 	ice.physics.Vector.prototype.subtract = function(vec) {
-		this.x -= vec.x || (vec.x === undefined ? vec : 0);
-		this.y -= vec.y || (vec.y === undefined ? vec : 0);
+		this.x -= vec.x === undefined ? vec : 0;
+		this.y -= vec.y === undefined ? vec : 0;
 		return this;
 	}
 	ice.physics.Vector.prototype.subtractX = function(vec) {
-		this.x -= vec.x || (vec.x === undefined ? vec : 0);
+		this.x -= vec.x === undefined ? vec : 0;
 		return this;
 	}
 	ice.physics.Vector.prototype.subtractY = function(vec) {
-		this.y -= vec.y || (vec.y === undefined ? vec : 0);
+		this.y -= vec.y === undefined ? vec : 0;
 		return this;
 	}
 	ice.physics.Vector.prototype.subtractXY = function(x, y) {
@@ -465,16 +492,16 @@ var ice = (function (ice) {
 
 	// Multiplies the vectors x and y
 	ice.physics.Vector.prototype.multiply = function(vec) {
-		this.x *= vec.x || (vec.x === undefined ? vec : 0);
-		this.y *= vec.y || (vec.y === undefined ? vec : 0);
+		this.x *= vec.x === undefined ? vec : 0;
+		this.y *= vec.y === undefined ? vec : 0;
 		return this;
 	}
 	ice.physics.Vector.prototype.multiplyX = function(vec) {
-		this.x *= vec.x || (vec.x === 0 ? 0 : vec);
+		this.x *= vec.x === 0 ? 0 : vec;
 		return this;
 	}
 	ice.physics.Vector.prototype.multiplyY = function(vec) {
-		this.y *= vec.y || (vec.y === undefined ? vec : 0);
+		this.y *= vec.y === undefined ? vec : 0;
 		return this;
 	}
 	ice.physics.Vector.prototype.multiplyXY = function(x, y) {
@@ -485,16 +512,16 @@ var ice = (function (ice) {
 
 	// Divides the vectors x and y
 	ice.physics.Vector.prototype.divide = function(vec) {
-		this.x /= vec.x || (vec.x === undefined ? vec : 0);
-		this.y /= vec.y || (vec.y === undefined ? vec : 0);
+		this.x /= vec.x === undefined ? vec : 0;
+		this.y /= vec.y === undefined ? vec : 0;
 		return this;
 	}
 	ice.physics.Vector.prototype.divideX = function(vec) {
-		this.x /= vec.x || (vec.x === undefined ? vec : 0);
+		this.x /= vec.x === undefined ? vec : 0;
 		return this;
 	}
 	ice.physics.Vector.prototype.divideY = function(vec) {
-		this.y /= vec.y || (vec.y === undefined ? vec : 0);
+		this.y /= vec.y === undefined ? vec : 0;
 		return this;
 	}
 	ice.physics.Vector.prototype.divideXY = function(x, y) {
@@ -505,16 +532,16 @@ var ice = (function (ice) {
 
 	// Mods the vectors x and y
 	ice.physics.Vector.prototype.mod = function(vec) {
-		this.x %= vec.x || (vec.x === undefined ? vec : 0);
-		this.y %= vec.y || (vec.y === undefined ? vec : 0);
+		this.x %= vec.x === undefined ? vec : 0;
+		this.y %= vec.y === undefined ? vec : 0;
 		return this;
 	}
 	ice.physics.Vector.prototype.modX = function(vec) {
-		this.x %= vec.x || (vec.x === undefined ? vec : 0);
+		this.x %= vec.x === undefined ? vec : 0;
 		return this;
 	}
 	ice.physics.Vector.prototype.modY = function(vec) {
-		this.y %= vec.y || (vec.y === undefined ? vec : 0);
+		this.y %= vec.y === undefined ? vec : 0;
 		return this;
 	}
 	ice.physics.Vector.prototype.modXY = function(x, y) {
@@ -583,6 +610,18 @@ var ice = (function (ice) {
 	ice.physics.Vector.prototype.randMag = ice.physics.Vector.prototype.randomizeMagnitude;
 	ice.physics.Vector.prototype.randLength = ice.physics.Vector.prototype.randomizeMagnitude;
 	ice.physics.Vector.prototype.randAny = ice.physics.Vector.prototype.randomizeAny;
+	ice.physics.Vector.prototype.sub = ice.physics.Vector.prototype.subtract;
+	ice.physics.Vector.prototype.subX = ice.physics.Vector.prototype.subtractX;
+	ice.physics.Vector.prototype.subY = ice.physics.Vector.prototype.subtractY;
+	ice.physics.Vector.prototype.subXY = ice.physics.Vector.prototype.subtractXY;
+	ice.physics.Vector.prototype.mult = ice.physics.Vector.prototype.multiply;
+	ice.physics.Vector.prototype.multX = ice.physics.Vector.prototype.multiplyX;
+	ice.physics.Vector.prototype.multY = ice.physics.Vector.prototype.multiplyY;
+	ice.physics.Vector.prototype.multXY = ice.physics.Vector.prototype.multiplyXY;
+	ice.physics.Vector.prototype.div = ice.physics.Vector.prototype.divide;
+	ice.physics.Vector.prototype.divX = ice.physics.Vector.prototype.divideX;
+	ice.physics.Vector.prototype.divY = ice.physics.Vector.prototype.divideY;
+	ice.physics.Vector.prototype.divXY = ice.physics.Vector.prototype.divideXY;
 	ice.physics.Vector.prototype.scale = ice.physics.Vector.prototype.divide;
 	ice.physics.Vector.prototype.scaleX = ice.physics.Vector.prototype.divideX;
 	ice.physics.Vector.prototype.scaleY = ice.physics.Vector.prototype.divideY;
@@ -593,10 +632,10 @@ var ice = (function (ice) {
 	ice.physics.origin = function() {
 		return new ice.physics.Vector(0, 0);
 	}
-	ice.physics.unitVec = function() {
+	ice.physics.unit = function() {
 		return new ice.physics.Vector(1, 0);
 	}
-	ice.physics.randomVec = function() {
+	ice.physics.random = function() {
 		var angle = Math.random() * TAU;
 		return new ice.physics.Vector(Math.cos(angle), Math.sin(angle));
 	}
