@@ -74,7 +74,7 @@ var ice = (function (ice) {
 	ice.modules = ice.modules || [];
 	ice.modules.push("graphics");
 	ice.graphics = {};
-	ice.graphics.version = "v2.2.0"; // This version of the ice.graphics module
+	ice.graphics.version = "v2.2.1"; // This version of the ice.graphics module
 	console.log("%cice.graphics " + ice.graphics.version + " imported successfully.", "color: #008000");
 
 	/*
@@ -121,6 +121,7 @@ var ice = (function (ice) {
 	}
 	function applyCssFilter(ctx, filter, value) {
 		ctx.save();
+		// THIS DOESN'T WORK, PROBABLY NEEDS AN OFFSCREEN CANVAS...
 		ctx.clearRect(0, 0, ctx.canvas.width, ctx.canvas.height);
 		ctx.filter = filter + "(" + value + ")"
 		ctx.drawImage(ctx.canvas, 0, 0);
@@ -156,6 +157,7 @@ var ice = (function (ice) {
 		settings.textAlign = "start";
 		settings.textBaseline = "alphabetic";
 		settings.colorMode = "rgb";
+		// settings.angleMode = "radians"; // TODO
 
 		function interpretColor(arg1, arg2, arg3, arg4, defaultColor) {
 			if(arg1 === undefined) {
@@ -247,7 +249,7 @@ var ice = (function (ice) {
 			settings.fill = false;
 		}
 		this.noStroke = function() {
-			settings.fill = false;
+			settings.stroke = false;
 		}
 		this.font = function(arg1, arg2) {
 			if(typeof arg1 === "string") {
@@ -281,6 +283,13 @@ var ice = (function (ice) {
 				}
 			}
 		}
+		this.colorMode = function(mode) {
+			mode = mode.toLowerCase();
+			if(mode === "rgb" || mode === "hsl") {
+				settings.colorMode = mode;
+			}
+			return mode;
+		}
 		this.rect = function(x, y, w, h) {
 			h = h === undefined ? w : h;
 			if(prepFill()) this.ctx.fillRect(x, y, w, h);
@@ -290,7 +299,7 @@ var ice = (function (ice) {
 			ang = ang === undefined ? 0 : ang;
 			h = h === undefined ? w : h;
 			this.ctx.beginPath();
-			this.ctx.ellipse(x, y, w, h, -ang, 0, TAU)
+			this.ctx.ellipse(x, y, w, h, ang, 0, TAU)
 			renderPath();
 		}
 		this.circle = function(x, y, rad) {
