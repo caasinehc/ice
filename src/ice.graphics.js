@@ -74,7 +74,7 @@ var ice = (function (ice) {
 	ice.modules = ice.modules || [];
 	ice.modules.push("graphics");
 	ice.graphics = {};
-	ice.graphics.version = "v2.2.1"; // This version of the ice.graphics module
+	ice.graphics.version = "v2.2.2"; // This version of the ice.graphics module
 	console.log("%cice.graphics " + ice.graphics.version + " imported successfully.", "color: #008000");
 
 	/*
@@ -121,10 +121,14 @@ var ice = (function (ice) {
 	}
 	function applyCssFilter(ctx, filter, value) {
 		ctx.save();
-		// THIS DOESN'T WORK, PROBABLY NEEDS AN OFFSCREEN CANVAS...
+		var buffer = document.createElement("canvas");
+		buffer.width = ctx.canvas.width;
+		buffer.height = ctx.canvas.height;
+		var bufferCtx = buffer.getContext("2d");
+		bufferCtx.drawImage(ctx.canvas, 0, 0);
 		ctx.clearRect(0, 0, ctx.canvas.width, ctx.canvas.height);
 		ctx.filter = filter + "(" + value + ")"
-		ctx.drawImage(ctx.canvas, 0, 0);
+		ctx.drawImage(buffer, 0, 0);
 		ctx.restore();
 	}
 
@@ -391,44 +395,34 @@ var ice = (function (ice) {
 			}
 			if(prepStroke()) ctx.stroke();
 		}
-	}
-	this.image = function(img, x, y, w, h, sx, sy, sw, sh, taintCanvas) {
-		if(typeof img === "string") {
-			if(imgMem[img] === undefined) {
-				var tempImg = new Image();
-				tempImg.src = img;
-				if(!taintCanvas) {
-					image.crossOrigin = "anonymous";
+		this.image = function(img, x, y, w, h, sx, sy, sw, sh, taintCanvas) {
+			if(typeof img === "string") {
+				if(imgMem[img] === undefined) {
+					var tempImg = new Image();
+					tempImg.src = img;
+					if(!taintCanvas) {
+						tempImg.crossOrigin = "anonymous";
+					}
+					tempImg.onload = (e) => {
+						imgMem[img] = tempImg;
+						console.log("this: ", this);
+						this.image(img, x, y, w, h, sx, sy, sw, sh, taintCanvas);
+					}
+					return;
 				}
-				image.onload = function(e) {
-					imgMem[img] = tempImg;
-					this.image(img, x, y, w, h, sx, sy, sw, sh, taintCanvas)
-				}
-				return;
+				img = imgMem[img];
 			}
-			img = imgMem[img];
+			x = x === undefined ? 0 : x;
+			y = y === undefined ? 0 : y;
+			w = w === undefined ? this.width : w;
+			h = h === undefined ? this.height : h;
+			if(sx === undefined) {
+				this.ctx.drawImage(img, x, y, w, h);
+			}
+			else {
+				this.ctx.drawImage(img, sx, sy, sw, sh, x, y, w, h);
+			}
 		}
-		if(x === undefined) {
-			this.ctx.drawImage(img, 0, 0);
-			return;
-		}
-		if(y === undefined) {
-			this.ctx.drawImage(img, x, x);
-			return;
-		}
-		if(w === undefined) {
-			this.ctx.drawImage(img, x, y);
-			return;
-		}
-		if(h === undefined) {
-			this.ctx.drawImage(img, x, y, w, w);
-			return;
-		}
-		if(sx === undefined) {
-			this.ctx.drawImage(img, x, y, w, h);
-			return;
-		}
-		this.ctx.drawImage(img, sx, sy, sw, sh, x, y, w, h);
 	}
 	// -----------------------------------------------------
 	ice.graphics.Scene.prototype.clear = function() {
