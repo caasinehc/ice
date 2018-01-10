@@ -74,7 +74,7 @@ var ice = (function (ice) {
 	ice.modules = ice.modules || [];
 	ice.modules.push("graphics");
 	ice.graphics = {};
-	ice.graphics.version = "v2.1.3"; // This version of the ice.graphics module
+	ice.graphics.version = "v2.2.0"; // This version of the ice.graphics module
 	console.log("%cice.graphics " + ice.graphics.version + " imported successfully.", "color: #008000");
 
 	/*
@@ -83,13 +83,27 @@ var ice = (function (ice) {
 
 	/*
 	 *	TODO:
-	 *		draw many shapes (pixel, ellipse, regPoly, polygon, parabola, quadratic curve, bezier curve)
+	 *		pixel, curve
 	 *		scale, transform, rotate, and all that unnecessarily complicated bullsh*t
+	 *		Charts
 	 */
 
 	// Private variables/functions
 
 	var TAU = Math.PI * 2;
+	var WHITE = "#FFFFFF";
+	var BLACK = "#000000";
+	var SILVER = "#C0C0C0";
+	var DEG120 = degToRad(120);
+	var DEG240 = degToRad(240);
+	var SIN120 = Math.sin(DEG120);
+	var COS120 = Math.cos(DEG120);
+	var SIN240 = Math.sin(DEG240);
+	var COS240 = Math.cos(DEG240);
+
+	function degToRad(n) {
+		return n * (Math.PI / 180);
+	}
 	function interpretCtx(input) {
 		if(typeof input === "string") {
 			var possibleCanvas = document.querySelector(input);
@@ -103,60 +117,14 @@ var ice = (function (ice) {
 		else if(input instanceof HTMLCanvasElement) {
 			return input;
 		}
-		document.querySelector("canvas");
+		return document.querySelector("canvas").getContext("2d");
 	}
-	var WHITE = "#FFFFFF";
-	var BLACK = "#000000";
-	var SILVER = "#C0C0C0";
 	function applyCssFilter(ctx, filter, value) {
 		ctx.save();
 		ctx.clearRect(0, 0, ctx.canvas.width, ctx.canvas.height);
 		ctx.filter = filter + "(" + value + ")"
 		ctx.drawImage(ctx.canvas, 0, 0);
 		ctx.restore();
-	}
-	function interpretColor(arg1, arg2, arg3, arg4, defaultColor, modeIsRGB) {
-		if(arg1 === undefined) {
-			return defaultColor === undefined ? WHITE : defaultColor;
-		}
-		modeIsRGB = modeIsRGB === undefined ? true : modeIsRGB;
-		var arg1IsNumber = typeof arg1 === "number";
-		if(arg2 === undefined) {
-			if(arg1IsNumber) {
-				if(modeIsRGB) {
-					return "rgb(" + arg1 + ", " + arg1 + ", " + arg1 + ")";
-				}
-				return "hsl(" + arg1 + ", 100%, 50%)";
-			}
-			if(arg1 instanceof Array) {
-				return interpretColor(arg1[0], arg1[1], arg1[2], arg1[3], defaultColor, modeIsRGB);
-			}
-			return arg1;
-		}
-		else if(arg3 === undefined) {
-			if(modeIsRGB) {
-				return "rgba(" + arg1 + ", " + arg1 + ", " + arg1 + ", " + arg2 + ")";
-			}
-			return "hsla(" + arg1 + ", 100%, 50%, " + arg2 + ")";
-		}
-		else if(arg4 === undefined) {
-			if(modeIsRGB) {
-				return "rgb(" + arg1 + ", " + arg2 + ", " + arg3 + ")";
-			}
-			var typeofArg2 = typeof arg2;
-			var typeofArg3 = typeof arg3;
-			if(typeofArg2 === "number" || (typeofArg2 === "string" && !arg2.endsWith("%"))) arg2 += "%";
-			if(typeofArg3 === "number" || (typeofArg3 === "string" && !arg3.endsWith("%"))) arg3 += "%";
-			return "hsl(" + arg1 + ", " + arg2 + ", " + arg3 + ")";
-		}
-		if(modeIsRGB) {
-			return "rgba(" + arg1 + ", " + arg2 + ", " + arg3 + ", " + arg4 + ")";
-		}
-		var typeofArg2 = typeof arg2;
-		var typeofArg3 = typeof arg3;
-		if(typeofArg2 === "number" || (typeofArg2 === "string" && !arg2.endsWith("%"))) arg2 += "%";
-		if(typeofArg3 === "number" || (typeofArg3 === "string" && !arg3.endsWith("%"))) arg3 += "%";
-		return "hsla(" + arg1 + ", " + arg2 + ", " + arg3 + ", " + arg4 + ")";
 	}
 
 	// Constructors
@@ -173,6 +141,10 @@ var ice = (function (ice) {
 		this.midWidth = this.width / 2;
 		this.midHeight = this.height / 2;
 
+		var ctx = this.ctx;
+
+		var imgMem = {};
+
 		var settings = {};
 		settings.bgColor = WHITE;
 		settings.fill = SILVER;
@@ -181,45 +153,277 @@ var ice = (function (ice) {
 		settings.strokePattern = [];
 		settings.fontFamily = "Verdana";
 		settings.fontSize = 24;
-		settings.textAlign: "start";
+		settings.textAlign = "start";
 		settings.textBaseline = "alphabetic";
 		settings.colorMode = "rgb";
 
+		function interpretColor(arg1, arg2, arg3, arg4, defaultColor) {
+			if(arg1 === undefined) {
+				return defaultColor === undefined ? WHITE : defaultColor;
+			}
+			modeIsRGB = settings.colorMode === "rgb";
+			var arg1IsNumber = typeof arg1 === "number";
+			if(arg2 === undefined) {
+				if(arg1IsNumber) {
+					if(modeIsRGB) {
+						return "rgb(" + arg1 + ", " + arg1 + ", " + arg1 + ")";
+					}
+					return "hsl(" + arg1 + ", 100%, 50%)";
+				}
+				if(arg1 instanceof Array) {
+					return interpretColor(arg1[0], arg1[1], arg1[2], arg1[3], defaultColor, modeIsRGB);
+				}
+				return arg1;
+			}
+			else if(arg3 === undefined) {
+				if(modeIsRGB) {
+					return "rgba(" + arg1 + ", " + arg1 + ", " + arg1 + ", " + arg2 + ")";
+				}
+				return "hsla(" + arg1 + ", 100%, 50%, " + arg2 + ")";
+			}
+			else if(arg4 === undefined) {
+				if(modeIsRGB) {
+					return "rgb(" + arg1 + ", " + arg2 + ", " + arg3 + ")";
+				}
+				var typeofArg2 = typeof arg2;
+				var typeofArg3 = typeof arg3;
+				if(typeofArg2 === "number" || (typeofArg2 === "string" && !arg2.endsWith("%"))) arg2 += "%";
+				if(typeofArg3 === "number" || (typeofArg3 === "string" && !arg3.endsWith("%"))) arg3 += "%";
+				return "hsl(" + arg1 + ", " + arg2 + ", " + arg3 + ")";
+			}
+			if(modeIsRGB) {
+				return "rgba(" + arg1 + ", " + arg2 + ", " + arg3 + ", " + arg4 + ")";
+			}
+			var typeofArg2 = typeof arg2;
+			var typeofArg3 = typeof arg3;
+			if(typeofArg2 === "number" || (typeofArg2 === "string" && !arg2.endsWith("%"))) arg2 += "%";
+			if(typeofArg3 === "number" || (typeofArg3 === "string" && !arg3.endsWith("%"))) arg3 += "%";
+			return "hsla(" + arg1 + ", " + arg2 + ", " + arg3 + ", " + arg4 + ")";
+		}
 		function prepFill() {
 			if(settings.fill) {
-				this.ctx.fillStyle = settings.fill;
+				ctx.fillStyle = settings.fill;
 				return true;
 			}
 			return false;
 		}
 		function prepStroke() {
 			if(settings.stroke) {
-				this.ctx.strokeStyle = settings.stroke;
-				this.ctx.lineWidth = settings.lineWidth;
-				this.ctx.setLineDash(settings.strokePattern);
+				ctx.strokeStyle = settings.stroke;
+				ctx.lineWidth = settings.lineWidth;
+				ctx.setLineDash(settings.strokePattern);
 				return true;
 			}
 			return false;
 		}
 		function renderPath() {
 			if(prepFill()) {
-				this.ctx.fill();
+				ctx.fill();
 			}
-			if(prepStroke) {
-				this.ctx.stroke();
+			if(prepStroke()) {
+				ctx.stroke();
 			}
 		}
+		this.background = function(arg1, arg2, arg3, arg4) {
+			this.ctx.fillStyle = interpretColor(arg1, arg2, arg3, arg4, settings.bgColor);
+			this.ctx.fillRect(0, 0, this.width, this.height);
+		}
+		this.setBackground = function(arg1, arg2, arg3, arg4) {
+			return settings.bgColor = interpretColor(arg1, arg2, arg3, arg4, settings.bgColor);
+		}
+		this.fill = function(arg1, arg2, arg3, arg4) {
+			return settings.fill = interpretColor(arg1, arg2, arg3, arg4, settings.fill);
+		}
+		this.stroke = function(arg1, arg2, arg3, arg4) {
+			return settings.stroke = interpretColor(arg1, arg2, arg3, arg4, settings.stroke);
+		}
+		this.lineWidth = function(width) {
+			return settings.lineWidth = width === undefined ? settings.lineWidth : width;
+		}
+		this.strokePattern = function(pattern) {
+			return settings.strokePattern = pattern === undefined ? settings.strokePattern : pattern;
+		}
+		this.noFill = function() {
+			settings.fill = false;
+		}
+		this.noStroke = function() {
+			settings.fill = false;
+		}
+		this.font = function(arg1, arg2) {
+			if(typeof arg1 === "string") {
+				settings.fontFamily = arg1;
+				if(typeof arg2 === "number") {
+					settings.fontSize = arg2;
+				}
+			}
+			else if(typeof arg1 === "number") {
+				settings.fontSize = arg1;
+				if(typeof arg2 === "string") {
+					settings.fontFamily = arg2;
+				}
+			}
+			return getFont();
+		}
+		function getFont() {
+			return settings.fontSize + "px " + settings.fontFamily;
+		}
+		this.textAlign = function(arg1, arg2) {
+			if(arg1 === "left" || arg1 === "right" || arg1 === "center" || arg1 === "start" || arg1 === "end") {
+				settings.textAlign = arg1;
+				if(arg2 === "top" || arg2 === "hanging" || arg2 === "middle" || arg2 === "alpabetic" || arg2 === "ideographic" || arg2 === "bottom") {
+					settings.textBaseline = arg2;
+				}
+			}
+			else if(arg1 === "top" || arg1 === "hanging" || arg1 === "middle" || arg1 === "alpabetic" || arg1 === "ideographic" || arg1 === "bottom") {
+				settings.textBaseline = arg1;
+				if(arg2 === "left" || arg2 === "right" || arg2 === "center" || arg2 === "start" || arg2 === "end") {
+					settings.textAlign = arg2;
+				}
+			}
+		}
+		this.rect = function(x, y, w, h) {
+			h = h === undefined ? w : h;
+			if(prepFill()) this.ctx.fillRect(x, y, w, h);
+			if(prepStroke()) this.ctx.strokeRect(x, y, w, h);
+		}
+		this.ellipse = function(x, y, w, h, ang) {
+			ang = ang === undefined ? 0 : ang;
+			h = h === undefined ? w : h;
+			this.ctx.beginPath();
+			this.ctx.ellipse(x, y, w, h, -ang, 0, TAU)
+			renderPath();
+		}
+		this.circle = function(x, y, rad) {
+			rad = rad === undefined ? 8 : rad;
+			this.ctx.beginPath();
+			this.ctx.arc(x, y, rad, 0, TAU);
+			renderPath();
+		}
+		this.point = function(pos, size) {
+			size = size === undefined ? 1 : size;
+			this.circle(pos.x, pos.y, size);
+		}
+		this.line = function(x1, y1, x2, y2) {
+			this.ctx.beginPath();
+			if(x2 === undefined) {
+				this.ctx.moveTo(x1.x, x1.y);
+				this.ctx.lineTo(y1.x, y1.y);
+			}
+			else {
+				this.ctx.moveTo(x1, y1);
+				this.ctx.lineTo(x2, y2);
+			}
+			renderPath();
+		}
+		this.triangle = function(cx, cy, v1x, v1y) {
+			if(v1y === undefined) {
+				v1y = v1x;
+				v1x = 0;
+			}
+
+			var v2x = v1x * COS120 - v1y * SIN120;
+			var v2y = v1x * SIN120 + v1y * COS120;
+			var v3x = v1x * COS240 - v1y * SIN240;
+			var v3y = v1x * SIN240 + v1y * COS240;
+
+			this.ctx.beginPath();
+			this.ctx.moveTo(cx + v1x, cy + v1y);
+			this.ctx.lineTo(cx + v2x, cy + v2y);
+			this.ctx.lineTo(cx + v3x, cy + v3y);
+			this.ctx.closePath();
+			renderPath();
+		}
+		this.regPolygon = function(x, y, sides, rad, rotation) {
+			sides = Math.floor(sides);
+			if(sides <= 1) {
+				this.circle(x, y, rad);
+				return;
+			}
+			rotation = (rotation || 0) - (TAU / 4);
+			this.ctx.beginPath();
+			this.ctx.moveTo(x + (Math.cos(rotation) * rad), y + (Math.sin(rotation) * rad));
+			for(let angle = TAU / sides; angle < TAU; angle += TAU / sides) {
+				this.ctx.lineTo(
+					x + (Math.cos(angle + rotation) * rad),
+					y + (Math.sin(angle + rotation) * rad)
+				);
+			}
+			this.ctx.closePath();
+			renderPath();
+		}
+		this.polygon = function(points) {
+			if(!points instanceof Array || points.length <= 0) {
+				return;
+			}
+			if(points.length === 1) {
+				this.point(points[0]);
+				return;
+			}
+			this.ctx.beginPath();
+			this.ctx.moveTo(points[0].x, points[0].y);
+			for(let i = 1; i < points.length; i++) {
+				this.ctx.lineTo(points[i].x, points[i].y);
+			}
+			this.ctx.closePath();
+			renderPath();
+		}
+		this.lines = function(points) {
+			if(!points instanceof Array || points.length <= 0) {
+				return;
+			}
+			if(points.length === 1) {
+				this.point(points[0]);
+				return;
+			}
+			this.ctx.beginPath();
+			this.ctx.moveTo(points[0].x, points[0].y);
+			for(let i = 1; i < points.length; i++) {
+				this.ctx.lineTo(points[i].x, points[i].y);
+			}
+			if(prepStroke()) ctx.stroke();
+		}
 	}
-	ice.graphics.Scene.prototype.background = function(arg1, arg2, arg3, arg4) {
-		this.ctx.fillStyle = interpretColor(arg1, arg2, arg3, arg4, settings.bgColor, settings.colorMode === "rgb");
-		this.ctx.fillRect(0, 0, this.width, this.height);
+	this.image = function(img, x, y, w, h, sx, sy, sw, sh, taintCanvas) {
+		if(typeof img === "string") {
+			if(imgMem[img] === undefined) {
+				var tempImg = new Image();
+				tempImg.src = img;
+				if(!taintCanvas) {
+					image.crossOrigin = "anonymous";
+				}
+				image.onload = function(e) {
+					imgMem[img] = tempImg;
+					this.image(img, x, y, w, h, sx, sy, sw, sh, taintCanvas)
+				}
+				return;
+			}
+			img = imgMem[img];
+		}
+		if(x === undefined) {
+			this.ctx.drawImage(img, 0, 0);
+			return;
+		}
+		if(y === undefined) {
+			this.ctx.drawImage(img, x, x);
+			return;
+		}
+		if(w === undefined) {
+			this.ctx.drawImage(img, x, y);
+			return;
+		}
+		if(h === undefined) {
+			this.ctx.drawImage(img, x, y, w, w);
+			return;
+		}
+		if(sx === undefined) {
+			this.ctx.drawImage(img, x, y, w, h);
+			return;
+		}
+		this.ctx.drawImage(img, sx, sy, sw, sh, x, y, w, h);
 	}
-	// YOU JUST STOPPED HERE
+	// -----------------------------------------------------
 	ice.graphics.Scene.prototype.clear = function() {
-		this.ctx.save();
-		this.ctx.fillStyle = this.bgColor;
-		this.ctx.fillRect(0, 0, this.width, this.height);
-		this.ctx.restore();
+		this.ctx.clearRect(0, 0, this.width, this.height);
 	}
 	ice.graphics.Scene.prototype.download = function(name) {
 		/*
@@ -232,11 +436,6 @@ var ice = (function (ice) {
 		link.href = this.canvas.toDataURL();
 		link.download = name || "download";
 		link.click();
-	}
-	ice.graphics.Scene.prototype.move = function(x, y) {
-		var content = this.ctx.getImageData(0, 0, this.width, this.height);
-		this.clear();
-		this.ctx.putImageData(content, x, y);
 	}
 	ice.graphics.Scene.prototype.invert = function(percent) {
 		percent = percent === undefined ? "100%"  : percent + "%";
@@ -280,93 +479,6 @@ var ice = (function (ice) {
 		this.ctx.fillStyle = color || this.color;
 		this.ctx.fillRect(0, 0, this.width, this.height);
 		this.ctx.restore();
-	}
-	ice.graphics.Scene.prototype.drawPoint = function(x, y, color, thickness) {
-		thickness = thickness || this.thickness;
-		this.ctx.beginPath();
-		this.ctx.arc(x, y, thickness, 0, TAU);
-		this.ctx.fillStyle = color || this.color;
-		this.ctx.fill();
-	}
-	ice.graphics.Scene.prototype.drawLine = function(x1, y1, x2, y2, color, thickness, cap) {
-		this.ctx.lineWidth = thickness || this.thickness;
-		this.ctx.strokeStyle = color || this.color;
-		this.ctx.lineCap = cap || "butt";
-		this.ctx.beginPath();
-		this.ctx.moveTo(x1, y1);
-		this.ctx.lineTo(x2, y2);
-		this.ctx.stroke();
-	}
-	ice.graphics.Scene.prototype.fillCircle = function(x, y, rad, color) {
-		this.ctx.beginPath();
-		this.ctx.arc(x, y, rad, 0, TAU);
-		this.ctx.fillStyle = color || this.color;
-		this.ctx.fill();
-	}
-	ice.graphics.Scene.prototype.strokeCircle = function(x, y, rad, color, thickness) {
-		this.ctx.beginPath();
-		this.ctx.arc(x, y, rad, 0, TAU);
-		this.ctx.lineWidth = thickness || this.thickness;
-		this.ctx.strokeStyle = color || this.color;
-		this.ctx.stroke();
-	}
-	ice.graphics.Scene.prototype.fillRect = function(x, y, width, height, color) {
-		this.ctx.fillStyle = color || this.color;
-		this.ctx.fillRect(x, y, width, height);
-	}
-	ice.graphics.Scene.prototype.strokeRect = function(x, y, width, height, color, thickness) {
-		ctx.lineWidth = thickness || this.thickness;
-		ctx.strokeStyle = color || this.color;
-		ctx.strokeRect(x, y, width, height);
-	}
-	ice.graphics.Scene.prototype.fillPoly = function(points, color) {
-		this.ctx.beginPath();
-		this.ctx.moveTo(points[0].x, points[0].y);
-		for(var i = 1; i < points.length; i++) {
-			this.ctx.lineTo(points[i].x, points[i].y);
-		}
-		this.ctx.fillStyle = color || this.color;
-		this.ctx.fill();
-	}
-	ice.graphics.Scene.prototype.strokePoly = function(points, color, thickness) {
-		this.ctx.beginPath();
-		this.ctx.moveTo(points[0].x, points[0].y);
-		for(var i = 1; i < points.length; i++) {
-			this.ctx.lineTo(points[i].x, points[i].y);
-		}
-		this.ctx.strokeStyle = color || this.color;
-		this.ctx.lineWidth = thickness || this.thickness;
-		this.ctx.stroke();
-	}
-	ice.graphics.Scene.prototype.fillText = function(text, x, y, family, size, color, align, bold, italic, base, maxWidth) {
-		this.ctx.font = (italic ? "italic " : "") + (bold ? "bold " : "") + size + "px " + family;
-		this.ctx.textAlign = align || "start";
-		this.ctx.textBaseline = base || "alphabetic";
-		this.ctx.fillStyle = color || this.color;
-		this.ctx.fillText(text, x, y, maxWidth);
-	}
-	ice.graphics.Scene.prototype.fillText = function(text, x, y, family, size, color, align, bold, italic, base, maxWidth) {
-		this.ctx.font = (italic ? "italic " : "") + (bold ? "bold " : "") + size + "px " + family;
-		this.ctx.textAlign = align || "start";
-		this.ctx.textBaseline = base || "alphabetic";
-		this.ctx.fillStyle = color || this.color;
-		this.ctx.lineWidth = thickness || this.thickness;
-		this.ctx.strokeText(text, x, y, maxWidth);
-	}
-	ice.graphics.Scene.prototype.drawImage = function(img, x, y, width, height, clipX, clipY, clipWidth, clipHeight, taintCanvas) {
-		if(typeof img === "string") {
-			var image = new Image();
-			image.src = img;
-			if(!taintCanvas) {
-				image.crossOrigin = "anonymous";
-			}
-			image.onload = function(e) {
-				this.ctx.drawImage(image, clipX, clipY, clipWidth, clipHeight, x, y, width, height);
-			}
-		}
-		else {
-			this.ctx.drawImage(img, clipX, clipY, clipWidth, clipHeight, x, y, width, height);
-		}
 	}
 	ice.graphics.Scene.prototype.save = function() {
 		return this.ctx.getImageData(0, 0, this.width, this.height);
