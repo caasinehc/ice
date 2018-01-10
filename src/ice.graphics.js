@@ -107,36 +107,119 @@ var ice = (function (ice) {
 	}
 	var WHITE = "#FFFFFF";
 	var BLACK = "#000000";
+	var SILVER = "#C0C0C0";
 	function applyCssFilter(ctx, filter, value) {
-		var oldFilter = ctx.filter;
+		ctx.save();
+		ctx.clearRect(0, 0, ctx.canvas.width, ctx.canvas.height);
 		ctx.filter = filter + "(" + value + ")"
 		ctx.drawImage(ctx.canvas, 0, 0);
-		ctx.filter = oldFilter;
+		ctx.restore();
+	}
+	function interpretColor(arg1, arg2, arg3, arg4, defaultColor, modeIsRGB) {
+		if(arg1 === undefined) {
+			return defaultColor === undefined ? WHITE : defaultColor;
+		}
+		modeIsRGB = modeIsRGB === undefined ? true : modeIsRGB;
+		var arg1IsNumber = typeof arg1 === "number";
+		if(arg2 === undefined) {
+			if(arg1IsNumber) {
+				if(modeIsRGB) {
+					return "rgb(" + arg1 + ", " + arg1 + ", " + arg1 + ")";
+				}
+				return "hsl(" + arg1 + ", 100%, 50%)";
+			}
+			if(arg1 instanceof Array) {
+				return interpretColor(arg1[0], arg1[1], arg1[2], arg1[3], defaultColor, modeIsRGB);
+			}
+			return arg1;
+		}
+		else if(arg3 === undefined) {
+			if(modeIsRGB) {
+				return "rgba(" + arg1 + ", " + arg1 + ", " + arg1 + ", " + arg2 + ")";
+			}
+			return "hsla(" + arg1 + ", 100%, 50%, " + arg2 + ")";
+		}
+		else if(arg4 === undefined) {
+			if(modeIsRGB) {
+				return "rgb(" + arg1 + ", " + arg2 + ", " + arg3 + ")";
+			}
+			var typeofArg2 = typeof arg2;
+			var typeofArg3 = typeof arg3;
+			if(typeofArg2 === "number" || (typeofArg2 === "string" && !arg2.endsWith("%"))) arg2 += "%";
+			if(typeofArg3 === "number" || (typeofArg3 === "string" && !arg3.endsWith("%"))) arg3 += "%";
+			return "hsl(" + arg1 + ", " + arg2 + ", " + arg3 + ")";
+		}
+		if(modeIsRGB) {
+			return "rgba(" + arg1 + ", " + arg2 + ", " + arg3 + ", " + arg4 + ")";
+		}
+		var typeofArg2 = typeof arg2;
+		var typeofArg3 = typeof arg3;
+		if(typeofArg2 === "number" || (typeofArg2 === "string" && !arg2.endsWith("%"))) arg2 += "%";
+		if(typeofArg3 === "number" || (typeofArg3 === "string" && !arg3.endsWith("%"))) arg3 += "%";
+		return "hsla(" + arg1 + ", " + arg2 + ", " + arg3 + ", " + arg4 + ")";
 	}
 
 	// Constructors
 
-	ice.graphics.Scene = function(ctxInput, bgColorInput) {
+	ice.graphics.Scene = function(ctxInput) {
 		if(!(this instanceof ice.graphics.Scene)) {
-			return new ice.graphics.Scene(ctxInput, bgColorInput);
+			return new ice.graphics.Scene(ctxInput);
 		}
 
 		this.ctx = interpretCtx(ctxInput);
 		this.canvas = this.ctx.canvas;
-		this.bgColor = bgColorInput || WHITE;
 		this.width = this.canvas.width;
 		this.height = this.canvas.height;
 		this.midWidth = this.width / 2;
 		this.midHeight = this.height / 2;
 
-		this.color = BLACK;
-		this.thickness = 1;
+		var settings = {};
+		settings.bgColor = WHITE;
+		settings.fill = SILVER;
+		settings.stroke = BLACK;
+		settings.lineWidth = 2;
+		settings.strokePattern = [];
+		settings.fontFamily = "Verdana";
+		settings.fontSize = 24;
+		settings.textAlign: "start";
+		settings.textBaseline = "alphabetic";
+		settings.colorMode = "rgb";
+
+		function prepFill() {
+			if(settings.fill) {
+				this.ctx.fillStyle = settings.fill;
+				return true;
+			}
+			return false;
+		}
+		function prepStroke() {
+			if(settings.stroke) {
+				this.ctx.strokeStyle = settings.stroke;
+				this.ctx.lineWidth = settings.lineWidth;
+				this.ctx.setLineDash(settings.strokePattern);
+				return true;
+			}
+			return false;
+		}
+		function renderPath() {
+			if(prepFill()) {
+				this.ctx.fill();
+			}
+			if(prepStroke) {
+				this.ctx.stroke();
+			}
+		}
 	}
+	ice.graphics.Scene.prototype.background = function(arg1, arg2, arg3, arg4) {
+		this.ctx.fillStyle = interpretColor(arg1, arg2, arg3, arg4, settings.bgColor, settings.colorMode === "rgb");
+		this.ctx.fillRect(0, 0, this.width, this.height);
+	}
+	// YOU JUST STOPPED HERE
 	ice.graphics.Scene.prototype.clear = function() {
-		ctx.save();
+		this.ctx.save();
 		this.ctx.fillStyle = this.bgColor;
 		this.ctx.fillRect(0, 0, this.width, this.height);
-		ctx.restore();
+		this.ctx.restore();
 	}
 	ice.graphics.Scene.prototype.download = function(name) {
 		/*
