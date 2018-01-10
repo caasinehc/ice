@@ -134,7 +134,7 @@ var ice = (function (ice) {
 		}
 		return fibMem[n];
 	}
-	ice.math.clamp(n, min, max) {
+	ice.math.clamp = function(n, min, max) {
 		if(min > max) {
 			var temp = min;
 			min = max;
