@@ -3,7 +3,7 @@ var ice = (function (ice) {
 	ice.modules = ice.modules || [];
 	ice.modules.push("colors");
 	ice.colors = {};
-	ice.colors.version = "v2.1.2"; // This version of the ice.colors module
+	ice.colors.version = "v2.1.3"; // This version of the ice.colors module
 	console.log("%cice.colors " + ice.colors.version + " imported successfully.", "color: #008000");
 
 	/*
@@ -45,7 +45,7 @@ var ice = (function (ice) {
 	ice.colors.LIGHT_CERULEAN = 	ice.colors.CORNFLOWER = 	"#80C0FF";
 	ice.colors.LIGHT_BLUE = 		ice.colors.PERIWINKLE = 	"#8080FF";
 	ice.colors.LIGHT_PURPLE = 		ice.colors.LAVENDER = 		"#C080FF";
-	ice.colors.LIGHT_MAGENTA = 		ice.colors.ORCHID = 		"#FF00FF";
+	ice.colors.LIGHT_MAGENTA = 		ice.colors.ORCHID = 		"#FF80FF";
 	ice.colors.LIGHT_PINK = 		ice.colors.CARNATION = 		"#FF80C0";
 	// Shades
 	ice.colors.DARK_RED = 			ice.colors.MAROON = 		"#800000";
