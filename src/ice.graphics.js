@@ -3,7 +3,7 @@ var ice = (function (ice) {
 	ice.modules = ice.modules || [];
 	ice.modules.push("graphics");
 	ice.graphics = {};
-	ice.graphics.version = "v2.1.3"; // This version of the ice.graphics module
+	ice.graphics.version = "v2.1.4"; // This version of the ice.graphics module
 	console.log("%cice.graphics " + ice.graphics.version + " imported successfully.", "color: #008000");
 
 	/*
@@ -32,7 +32,7 @@ var ice = (function (ice) {
 		else if(input instanceof HTMLCanvasElement) {
 			return input;
 		}
-		document.querySelector("canvas");
+		return document.querySelector("canvas");
 	}
 	var WHITE = "#FFFFFF";
 	var BLACK = "#000000";
