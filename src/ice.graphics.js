@@ -34,6 +34,9 @@ var ice = (function (ice) {
 		return n * (Math.PI / 180);
 	}
 	function interpretCtx(input) {
+		if(input === undefined) {
+			return document.querySelector("canvas").getContext("2d");
+		}
 		if(typeof input === "string") {
 			var possibleCanvas = document.querySelector(input);
 			if(possibleCanvas instanceof HTMLCanvasElement) {
@@ -43,10 +46,7 @@ var ice = (function (ice) {
 		else if(input instanceof HTMLCanvasElement) {
 			return input.getContext("2d");
 		}
-		else if(input instanceof HTMLCanvasElement) {
-			return input;
-		}
-		return document.querySelector("canvas").getContext("2d");
+		return input;
 	}
 	function applyCssFilter(ctx, filter, value) {
 		ctx.save();
@@ -353,7 +353,7 @@ var ice = (function (ice) {
 			}
 		}
 		this.charts = {};
-		this.charts.pie = function(x, y, rad, data, rotation) {
+		this.charts.pie = function(x, y, rad, data, rotation, transparency) {
 			rotation = (rotation === undefined ? 0 : rotation) - Math.PI / 2;
 
 			if(data.rings === undefined) {
@@ -396,8 +396,10 @@ var ice = (function (ice) {
 					var angle2 = thisAngle + offsetAngle;
 					ctx.beginPath();
 					ctx.moveTo(x, y);
-					ctx.arc(x, y, offsetRad, offsetAngle, angle2, false);
-					ctx.arc(x, y, offsetRad - thisRad, angle2, offsetAngle, true);
+					ctx.arc(x, y, offsetRad, offsetAngle, angle2);
+					if(transparency) {
+						ctx.arc(x, y, offsetRad - thisRad, angle2, offsetAngle, true);
+					}
 					ctx.fillStyle = slice.color;
 					ctx.fill();
 					offsetAngle += thisAngle;
@@ -406,7 +408,6 @@ var ice = (function (ice) {
 			}
 		}
 	}
-	// -----------------------------------------------------
 	ice.graphics.Scene.prototype.clear = function() {
 		this.ctx.clearRect(0, 0, this.width, this.height);
 	}
