@@ -1,9 +1,9 @@
-var ice = (function (ice) {
+var ice = (function(ice) {
 
 	ice.modules = ice.modules || [];
 	ice.modules.push("graphics");
 	ice.graphics = {};
-	ice.graphics.version = "v2.2.3"; // This version of the ice.graphics module
+	ice.graphics.version = "v2.2.4"; // This version of the ice.graphics module
 	console.log("%cice.graphics " + ice.graphics.version + " imported successfully.", "color: #008000");
 
 	/*
@@ -14,7 +14,7 @@ var ice = (function (ice) {
 	 *	TODO:
 	 *		pixel, curve
 	 *		scale, transform, rotate, and all that unnecessarily complicated bullsh*t
-	 *		Charts
+	 *		charts: bar, line, scatter
 	 */
 
 	// Private variables/functions
@@ -23,6 +23,7 @@ var ice = (function (ice) {
 	var WHITE = "#FFFFFF";
 	var BLACK = "#000000";
 	var SILVER = "#C0C0C0";
+	var TRANSPARENT = "rgba(0, 0, 0, 0)";
 	var DEG120 = degToRad(120);
 	var DEG240 = degToRad(240);
 	var SIN120 = Math.sin(DEG120);
@@ -33,6 +34,7 @@ var ice = (function (ice) {
 	function degToRad(n) {
 		return n * (Math.PI / 180);
 	}
+
 	function interpretCtx(input) {
 		if(input === undefined) {
 			return document.querySelector("canvas").getContext("2d");
@@ -47,18 +49,6 @@ var ice = (function (ice) {
 			return input.getContext("2d");
 		}
 		return input;
-	}
-	function applyCssFilter(ctx, filter, value) {
-		ctx.save();
-		var buffer = document.createElement("canvas");
-		buffer.width = ctx.canvas.width;
-		buffer.height = ctx.canvas.height;
-		var bufferCtx = buffer.getContext("2d");
-		bufferCtx.drawImage(ctx.canvas, 0, 0);
-		ctx.clearRect(0, 0, ctx.canvas.width, ctx.canvas.height);
-		ctx.filter = filter + "(" + value + ")"
-		ctx.drawImage(buffer, 0, 0);
-		ctx.restore();
 	}
 
 	// Constructors
@@ -75,8 +65,8 @@ var ice = (function (ice) {
 		this.midWidth = this.width / 2;
 		this.midHeight = this.height / 2;
 
+		var canvas = this.canvas;
 		var ctx = this.ctx;
-
 		var imgMem = {};
 
 		var settings = {};
@@ -91,6 +81,11 @@ var ice = (function (ice) {
 		settings.textBaseline = "alphabetic";
 		settings.colorMode = "rgb";
 		// settings.angleMode = "radians"; // TODO
+
+		var bufferCanvas = document.createElement("canvas");
+		bufferCanvas.width = this.width;
+		bufferCanvas.height = this.height;
+		var bufferCtx = bufferCanvas.getContext("2d");
 
 		function interpretColor(arg1, arg2, arg3, arg4, defaultColor) {
 			if(arg1 === undefined) {
@@ -135,6 +130,16 @@ var ice = (function (ice) {
 			if(typeofArg3 === "number" || (typeofArg3 === "string" && !arg3.endsWith("%"))) arg3 += "%";
 			return "hsla(" + arg1 + ", " + arg2 + ", " + arg3 + ", " + arg4 + ")";
 		}
+
+		function applyCssFilter(filter, value) {
+			ctx.save();
+			bufferCtx.drawImage(canvas, 0, 0);
+			ctx.clearRect(0, 0, canvas.width, canvas.height);
+			ctx.filter = filter + "(" + value + ")";
+			ctx.drawImage(bufferCanvas, 0, 0);
+			ctx.restore();
+		}
+
 		function prepFill() {
 			if(settings.fill) {
 				ctx.fillStyle = settings.fill;
@@ -142,6 +147,7 @@ var ice = (function (ice) {
 			}
 			return false;
 		}
+
 		function prepStroke() {
 			if(settings.stroke) {
 				ctx.strokeStyle = settings.stroke;
@@ -151,6 +157,7 @@ var ice = (function (ice) {
 			}
 			return false;
 		}
+
 		function renderPath() {
 			if(prepFill()) {
 				ctx.fill();
@@ -199,6 +206,7 @@ var ice = (function (ice) {
 			}
 			return getFont();
 		}
+
 		function getFont() {
 			return settings.fontSize + "px " + settings.fontFamily;
 		}
@@ -334,7 +342,6 @@ var ice = (function (ice) {
 					}
 					tempImg.onload = (e) => {
 						imgMem[img] = tempImg;
-						console.log("this: ", this);
 						this.image(img, x, y, w, h, sx, sy, sw, sh, taintCanvas);
 					}
 					return;
@@ -353,129 +360,261 @@ var ice = (function (ice) {
 			}
 		}
 		this.charts = {};
-		this.charts.pie = function(x, y, rad, data, rotation, transparency) {
+		this.charts.pie = function(x, y, rad, dataIn, rotation) {
 			rotation = (rotation === undefined ? 0 : rotation) - Math.PI / 2;
 
-			if(data.rings === undefined) {
-				data.rings = [{slices: data.slices}];
-			}
-
-			data.rings.reverse();
-
-			data._ringTotal = 0;
-			for(var ring of data.rings) {
-				ring._sliceTotal = 0;
-				for(var key of ring.slices.keys()) {
-					var slice = ring.slices[key];
-					if(typeof slice === "string") {
-						ring.slices[key] = {color: slice};
-					}
-					if(slice.size === undefined) {
-						if(slice.data !== undefined) {
-							slice.size = slice.data;
-						}
-						else if(slice.value !== undefined) {
-							slice.size = slice.value;
-						}
-						else {
-							slice.size = 1;
-						}
-					}
-					ring._sliceTotal += slice.size;
+			var data = {
+				rings: [],
+				ringTotal: 0
+			};
+			var ringsIn = dataIn.rings === undefined ? [{
+				slices: dataIn.slices
+			}] : dataIn.rings;
+			for(var ring of ringsIn) {
+				var slices = [];
+				var total = 0;
+				var lineWidth = 0;
+				if(ring.lineWidth !== undefined) lineWidth = ring.lineWidth;
+				else if(ring.width !== undefined) lineWidth = ring.width;
+				var size = 1;
+				if(ring.size !== undefined) size = ring.size;
+				else if(ring.value !== undefined) size = ring.value;
+				else if(ring.data !== undefined) size = ring.data;
+				var slicesIn = ring.slices === undefined ? [] : ring.slices;
+				for(var slice of slicesIn) {
+					var sliceSize = slice.size === undefined ? 1 : slice.size;
+					var color = slice.color === undefined ? typeof slice === "string" ? slice : TRANSPARENT : slice.color;
+					var border = slice.border === undefined ? BLACK : slice.border;
+					var sliceLineWidth = 0;
+					if(slice.lineWidth !== undefined) sliceLineWidth = slice.lineWidth;
+					else if(slice.width !== undefined) sliceLineWidth = slice.width;
+					slices.push({
+						size: sliceSize,
+						color: color,
+						border: border,
+						lineWidth: sliceLineWidth
+					});
+					total += sliceSize;
 				}
-				ring.size = ring.size === undefined ? 1 : ring.size;
-				data._ringTotal += ring.size;
+				data.rings.push({
+					size: size,
+					slices: slices,
+					lineWidth: lineWidth,
+					sliceTotal: total
+				});
+				data.ringTotal += size;
 			}
 
 			var offsetRad = rad;
+			bufferCtx.clearRect(0, 0, bufferCanvas.width, bufferCanvas.height);
 			for(var ring of data.rings) {
-				var thisRad = rad * (ring.size / data._ringTotal);
+				var thisRad = rad * (ring.size / data.ringTotal);
 				var offsetAngle = rotation;
 				for(var slice of ring.slices) {
-					var thisAngle = (TAU * slice.size / ring._sliceTotal);
-					var angle2 = thisAngle + offsetAngle;
-					ctx.beginPath();
-					ctx.moveTo(x, y);
-					ctx.arc(x, y, offsetRad, offsetAngle, angle2);
-					if(transparency) {
-						ctx.arc(x, y, offsetRad - thisRad, angle2, offsetAngle, true);
+					var thisAngle = (TAU * slice.size / ring.sliceTotal);
+					bufferCtx.beginPath();
+					bufferCtx.moveTo(x, y);
+					bufferCtx.arc(x, y, offsetRad, offsetAngle, thisAngle + offsetAngle);
+					bufferCtx.closePath();
+					bufferCtx.fillStyle = slice.color;
+					bufferCtx.fill();
+					if(slice.lineWidth) {
+						bufferCtx.strokeStyle = slice.border;
+						bufferCtx.lineWidth = slice.lineWidth;
+						bufferCtx.stroke();
 					}
-					ctx.fillStyle = slice.color;
-					ctx.fill();
 					offsetAngle += thisAngle;
 				}
+				bufferCtx.save();
+				if(ring.lineWidth) {
+					bufferCtx.beginPath();
+					bufferCtx.arc(x, y, offsetRad, 0, TAU);
+					bufferCtx.strokeStyle = ring.border;
+					bufferCtx.lineWidth = ring.lineWidth;
+					bufferCtx.stroke();
+				}
 				offsetRad -= thisRad;
+				if(offsetRad < 0) offsetRad = 0;
+				bufferCtx.beginPath();
+				bufferCtx.arc(x, y, offsetRad, 0, TAU);
+				bufferCtx.globalCompositeOperation = "destination-out";
+				bufferCtx.fillStyle = "black";
+				bufferCtx.fill();
+				bufferCtx.restore();
 			}
+			ctx.drawImage(bufferCanvas, 0, 0);
 		}
-	}
-	ice.graphics.Scene.prototype.clear = function() {
-		this.ctx.clearRect(0, 0, this.width, this.height);
-	}
-	ice.graphics.Scene.prototype.download = function(name) {
-		/*
-		 *	Quick warning: This will NOT work on a "tainted" canvas (ie: one that used an image without CORS approval)
-		 *	This is a security issue. It's annoying, but necessary.
-		 *	(un)Fortunately, there is no work-around if the canvas has already been tainted.
-		 *	For more info, visit: https://developer.mozilla.org/en-US/docs/Web/HTML/CORS_enabled_image
-		 */
-		var link = document.createElement("a");
-		link.href = this.canvas.toDataURL();
-		link.download = name || "download";
-		link.click();
-	}
-	ice.graphics.Scene.prototype.invert = function(percent) {
-		percent = percent === undefined ? "100%"  : percent + "%";
-		applyCssFilter(this.ctx, "invert", percent);
-	}
-	ice.graphics.Scene.prototype.grayscale = function(percent) {
-		percent = percent === undefined ? "100%"  : percent + "%";
-		applyCssFilter(this.ctx, "grayscale", percent);
-	}
-	ice.graphics.Scene.prototype.sepia = function(percent) {
-		percent = percent === undefined ? "100%"  : percent + "%";
-		applyCssFilter(this.ctx, "sepia", percent);
-	}
-	ice.graphics.Scene.prototype.brightness = function(percent) {
-		percent = percent === undefined ? "100%"  : percent + "%";
-		applyCssFilter(this.ctx, "brightness", percent);
-	}
-	ice.graphics.Scene.prototype.contrast = function(percent) {
-		percent = percent === undefined ? "100%"  : percent + "%";
-		applyCssFilter(this.ctx, "contrast", percent);
-	}
-	ice.graphics.Scene.prototype.blur = function(px) {
-		px = px === undefined ? "1px" : px + "px";
-		applyCssFilter(this.ctx, "blur", px);
-	}
-	ice.graphics.Scene.prototype.saturate = function(percent) {
-		percent = percent === undefined ? "100%"  : percent + "%";
-		applyCssFilter(this.ctx, "saturate", percent);
-	}
-	ice.graphics.Scene.prototype.opacity = function(percent) {
-		percent = percent === undefined ? "100%"  : percent + "%";
-		applyCssFilter(this.ctx, "opacity", percent);
-	}
-	ice.graphics.Scene.prototype.colorshift = function(degrees) {
-		degrees = degrees === undefined ? "180deg"  : degrees + "deg";
-		applyCssFilter(this.ctx, "hue-rotate", degrees);
-	}
-	ice.graphics.Scene.prototype.recolor = function(color) {
-		this.ctx.save();
-		this.ctx.globalCompositeOperation = "color";
-		this.ctx.fillStyle = color || this.color;
-		this.ctx.fillRect(0, 0, this.width, this.height);
-		this.ctx.restore();
-	}
-	ice.graphics.Scene.prototype.save = function() {
-		return this.ctx.getImageData(0, 0, this.width, this.height);
-	}
-	ice.graphics.Scene.prototype.restore = function(imageData) {
-		this.ctx.putImageData(imageData, 0, 0);
-	}
 
-	// Duplicates
+		this.charts.presets = {};
+		// These are just for the lols
+		this.charts.presets.PYRAMID = {
+			rings: [
+				{
+					lineWidth: 1,
+					slices: [
+						{
+							color: "#80C0FF",
+							size: 6
+						}, // Sky
+						{
+							color: "#705000",
+							size: 1,
+							lineWidth: 1
+						}, // Shady side
+						{
+							color: "#FFD060",
+							size: 3,
+							lineWidth: 1
+						}, // Sunny side
+						{
+							color: "#80C0FF",
+							size: 6
+						} // Sky
+					]
+				}
+			]
+		};
+		this.charts.presets.PACMAN = {
+			slices: [
+				{
+					color: "yellow",
+					size: 3
+				}, // Eyes area (yellow)
+				{
+					color: "black",
+					size: 4
+				}, // Mouth
+				{
+					color: "yellow",
+					size: 3
+				}, // Chin area (yellow)
+				{
+					color: "yellow",
+					size: 10
+				} // Body area (yellow)
+			]
+		};
+		this.charts.presets.PACMAN2 = {
+			slices: [
+				{
+					color: "yellow",
+					size: 3
+				}, // Eyes area (yellow)
+				{
+					color: "#FE0000",
+					size: 1
+				}, // Blinky
+				{
+					color: "#00CDFF",
+					size: 1
+				}, // Inky
+				{
+					color: "#FFA800",
+					size: 1
+				}, // Clyde
+				{
+					color: "#FFA7DD",
+					size: 1
+				}, // Pinky
+				{
+					color: "yellow",
+					size: 3
+				}, // Chin area (yellow)
+				{
+					color: "yellow",
+					size: 10
+				} // Body area (yellow)
+			]
+		};
+		this.charts.presets.BUTT = {
+			rings: [
+				{
+					slices: [
+						{
+							color: "#FFCB99",
+							size: 50
+						}, // Right cheek
+						{
+							color: "black",
+							size: 1
+						}, // Crack
+						{
+							color: "#FFCB99",
+							size: 50
+						}, // Left cheek
+					]
+				}
+			]
+		};
+		this.clear = function() {
+			ctx.clearRect(0, 0, this.width, this.height);
+		}
+		this.download = function(name) {
+			/*
+			 *	Quick warning: This will NOT work on a "tainted" canvas (ie: one that used an image without CORS approval)
+			 *	This is a security issue. It's annoying, but necessary.
+			 *	(un)Fortunately, there is no work-around if the canvas has already been tainted.
+			 *	For more info, visit: https://developer.mozilla.org/en-US/docs/Web/HTML/CORS_enabled_image
+			 */
+			var link = document.createElement("a");
+			link.href = canvas.toDataURL();
+			link.download = name || "download";
+			link.click();
+		}
+		this.invert = function(percent) {
+			percent = percent === undefined ? "100%" : percent + "%";
+			applyCssFilter("invert", percent);
+		}
+		this.grayscale = function(percent) {
+			percent = percent === undefined ? "100%" : percent + "%";
+			applyCssFilter("grayscale", percent);
+		}
+		ice.graphics.Scene.prototype.sepia = function(percent) {
+			percent = percent === undefined ? "100%" : percent + "%";
+			applyCssFilter("sepia", percent);
+		}
+		this.brightness = function(percent) {
+			percent = percent === undefined ? "100%" : percent + "%";
+			applyCssFilter("brightness", percent);
+		}
+		this.contrast = function(percent) {
+			percent = percent === undefined ? "100%" : percent + "%";
+			applyCssFilter("contrast", percent);
+		}
+		this.blur = function(px) {
+			px = px === undefined ? "1px" : px + "px";
+			applyCssFilter("blur", px);
+		}
+		this.saturate = function(percent) {
+			percent = percent === undefined ? "100%" : percent + "%";
+			applyCssFilter("saturate", percent);
+		}
+		this.opacity = function(percent) {
+			percent = percent === undefined ? "100%" : percent + "%";
+			applyCssFilter("opacity", percent);
+		}
+		this.colorshift = function(degrees) {
+			degrees = degrees === undefined ? "180deg" : degrees + "deg";
+			applyCssFilter("hue-rotate", degrees);
+		}
+		this.recolor = function(color) {
+			ctx.save();
+			ctx.globalCompositeOperation = "color";
+			ctx.fillStyle = color || this.color;
+			ctx.fillRect(0, 0, this.width, this.height);
+			ctx.restore();
+		}
+		this.save = function() {
+			return ctx.getImageData(0, 0, this.width, this.height);
+		}
+		this.restore = function(imageData) {
+			ctx.putImageData(imageData, 0, 0);
+		}
 
-	ice.graphics.Scene.prototype.greyscale = ice.graphics.Scene.prototype.grayscale;
+		// Duplicates
+
+		this.greyscale = ice.graphics.Scene.prototype.grayscale;
+	}
 
 	// Methods
 
