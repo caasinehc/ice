@@ -3,7 +3,7 @@ var ice = (function(ice) {
 	ice.modules = ice.modules || [];
 	ice.modules.push("graphics");
 	ice.graphics = {};
-	ice.graphics.version = "v2.2.5"; // This version of the ice.graphics module
+	ice.graphics.version = "v2.2.6"; // This version of the ice.graphics module
 	console.log("%cice.graphics " + ice.graphics.version + " imported successfully.", "color: #008000");
 
 	/*
@@ -101,7 +101,7 @@ var ice = (function(ice) {
 					return "hsl(" + arg1 + ", 100%, 50%)";
 				}
 				if(arg1 instanceof Array || arg1 instanceof Uint8ClampedArray) {
-					return interpretColor(arg1[0], arg1[1], arg1[2], arg1[3], defaultColor, modeIsRGB);
+					return interpretColor(arg1[0], arg1[1], arg1[2], arg1[3], defaultColor);
 				}
 				return arg1;
 			}
@@ -119,6 +119,7 @@ var ice = (function(ice) {
 				var typeofArg3 = typeof arg3;
 				if(typeofArg2 === "number" || (typeofArg2 === "string" && !arg2.endsWith("%"))) arg2 += "%";
 				if(typeofArg3 === "number" || (typeofArg3 === "string" && !arg3.endsWith("%"))) arg3 += "%";
+				console.log("hsl(" + arg1 + ", " + arg2 + ", " + arg3 + ")");
 				return "hsl(" + arg1 + ", " + arg2 + ", " + arg3 + ")";
 			}
 			if(modeIsRGB) {
@@ -129,6 +130,167 @@ var ice = (function(ice) {
 			if(typeofArg2 === "number" || (typeofArg2 === "string" && !arg2.endsWith("%"))) arg2 += "%";
 			if(typeofArg3 === "number" || (typeofArg3 === "string" && !arg3.endsWith("%"))) arg3 += "%";
 			return "hsla(" + arg1 + ", " + arg2 + ", " + arg3 + ", " + arg4 + ")";
+		}
+
+		function rgbToHsl(r, g, b, a) {
+			if(r === undefined) {
+				return [0, 0, 0, 0];
+			}
+			else if(g === undefined) {
+				if(typeof r === "string") {
+					var rgbaArray = r.replace(/[^\d,.]/g, "").split(",");
+					for(var i = 0; i < rgbaArray.length; i++) {
+						rgbaArray[i] = parseFloat(rgbaArray[i]);
+					}
+					return rgbToHsl(rgbaArray[0], rgbaArray[1], rgbaArray[2], rgbaArray[3]);
+				}
+				if(r instanceof Array || r instanceof Uint8ClampedArray) {
+					return rgbToHsl(r[0], r[1], r[2], r[3]);
+				}
+				g = r;
+				b = r;
+				a = 1;
+			}
+			else if(b === undefined) {
+				g = r;
+				b = r;
+				a = g;
+			}
+			else if(a === undefined) {
+				a = 1;
+			}
+			r /= 255;
+			g /= 255;
+			b /= 255;
+
+			var max = Math.max(r, g, b);
+			var min = Math.min(r, g, b);
+			var l = (max + min) * 50;
+
+			if(max == min) return [0, 0, l, a];
+
+			var diff = max - min;
+			s = 100 * diff / (l > 50 ? 2 - max - min : max + min);
+			if(max === r) h = 60 * (g - b) / diff + (g < b ? 360 : 0);
+			else if(max === g) h = 60 * (b - r) / diff + 120;
+			else if(max === b) h = 60 * (r - g) / diff + 240;
+
+			return [h, s, l, a];
+		}
+
+		function hslToRgb(h, s, l, a) {
+			if(h === undefined) {
+				return [0, 0, 0, 0];
+			}
+			else if(s === undefined) {
+				if(typeof h === "string") {
+					var hslaArray = h.replace(/[^\d,.]/g, "").split(",");
+					for(var i = 0; i < hslaArray.length; i++) {
+						hslaArray[i] = parseFloat(hslaArray[i]);
+					}
+					return hslToRgb(hslaArray[0], hslaArray[1], hslaArray[2], hslaArray[3], );
+				}
+				if(h instanceof Array || h instanceof Uint8ClampedArray) {
+					return hslToRgb(h[0], h[1], h[2], h[3]);
+				}
+				s = 100;
+				l = 50;
+				a = 1;
+			}
+			else if(l === undefined) {
+				a = s;
+				s = 100;
+				l = 50;
+			}
+			else if(a === undefined) {
+				a = 1;
+			}
+
+			if(s === 0) {
+				l *= 255;
+				return [l, l, l, a];
+			}
+
+			h /= 360;
+			s /= 100;
+			l /= 100;
+
+			function hue2rgb(p, q, t) {
+				t = (t + 1) % 1;
+				if(t < 1 / 6) return p + (q - p) * 6 * t;
+				if(t < 1 / 2) return q;
+				if(t < 2 / 3) return p + (q - p) * (2 / 3 - t) * 6;
+				return p;
+			}
+
+			var q = l < 0.5 ? l * (1 + s) : l + s - l * s;
+			var p = 2 * l - q;
+
+			return [
+				Math.round(hue2rgb(p, q, h + 1 / 3) * 255),
+				Math.round(hue2rgb(p, q, h) * 255),
+				Math.round(hue2rgb(p, q, h - 1 / 3) * 255),
+				a
+			];
+		}
+
+		function hexToRgb(hex) {
+			hex = hex.replace(/^#?([a-f\d])([a-f\d])([a-f\d])([a-f\d])?$/i, (m, r, g, b, a) => {
+				a = a === undefined ? "F" : a;
+				return r + r + g + g + b + b + a + a;
+			});
+
+			var result = /^#?([a-f\d]{2})([a-f\d]{2})([a-f\d]{2})([a-f\d]{2})?$/i.exec(hex);
+			if(result === null) return [0, 0, 0, 0];
+			result[4] = result[4] === undefined ? "FF" : result[4]
+			return [
+				parseInt(result[1], 16),
+				parseInt(result[2], 16),
+				parseInt(result[3], 16),
+				parseInt(result[4], 16) / 255
+			];
+		}
+
+		function rgbToHex(r, g, b, a) {
+			if(r === undefined) return "#00000000";
+			else if(g === undefined) {
+				if(typeof r === "string") {
+					var rgbaArray = r.replace(/[^\d,.]/g, "").split(",");
+					for(var i = 0; i < rgbaArray.length; i++) {
+						rgbaArray[i] = parseFloat(rgbaArray[i]);
+					}
+					return rgbToHex(rgbaArray[0], rgbaArray[1], rgbaArray[2], rgbaArray[3]);
+				}
+				if(r instanceof Array || r instanceof Uint8ClampedArray) {
+					return rgbToHex(r[0], r[1], r[2], r[3]);
+				}
+			}
+			else if(b === undefined) {
+				a = g;
+				g = r;
+				b = r;
+			}
+			r = r.toString(16);
+			r = r.length === 1 ? "0" + r : r;
+			g = g.toString(16);
+			g = g.length === 1 ? "0" + g : g;
+			b = b.toString(16);
+			b = b.length === 1 ? "0" + b : b;
+			var rgb = "#" + r + g + b;
+			if(a !== undefined) {
+				a = parseInt(a * 255).toString(16);
+				a = a.length === 1 ? "0" + a : a;
+				rgb += a;
+			}
+			return rgb;
+		}
+
+		function hslToHex(h, s, l, a) {
+			return rgbToHex(hslToRgb(h, s, l, a));
+		}
+
+		function hexToHsl(hex) {
+			return rgbToHsl(hexToRgb(hex));
 		}
 
 		function applyCssFilter(filter, value) {
@@ -223,13 +385,16 @@ var ice = (function(ice) {
 					settings.textAlign = arg2;
 				}
 			}
+			return [settings.textBaseline, settings.textAlign];
 		}
 		this.colorMode = function(mode) {
-			mode = mode.toLowerCase();
+			if(typeof mode === "string") {
+				mode = mode.toLowerCase();
+			}
 			if(mode === "rgb" || mode === "hsl") {
 				settings.colorMode = mode;
 			}
-			return mode;
+			return settings.colorMode;
 		}
 		this.rect = function(x, y, w, h) {
 			h = h === undefined ? w : h;
@@ -317,8 +482,18 @@ var ice = (function(ice) {
 			this.ctx.closePath();
 			renderPath();
 		}
+		this.points = function(points, size) {
+			size = size === undefined ? 1 : size;
+			for(var point of points) {
+				this.circle(point.x, point.y, size);
+			}
+		}
 		this.lines = function(points) {
-			if(!points instanceof Array || points.length <= 0) {
+			if(!points instanceof Array) {
+				this.lines(arguments);
+				return;
+			}
+			if(points.length <= 0) {
 				return;
 			}
 			if(points.length === 1) {
@@ -336,14 +511,14 @@ var ice = (function(ice) {
 			if(typeof img === "string") {
 				if(imgMem[img] === undefined) {
 					var tempImg = new Image();
-					tempImg.src = img;
 					if(!taintCanvas) {
-						tempImg.crossOrigin = "anonymous";
+						tempImg.crossOrigin = "Anonymous";
 					}
 					tempImg.onload = (e) => {
 						imgMem[img] = tempImg;
 						this.image(img, x, y, w, h, sx, sy, sw, sh, taintCanvas);
 					}
+					tempImg.src = img;
 					return;
 				}
 				img = imgMem[img];
@@ -438,7 +613,7 @@ var ice = (function(ice) {
 				bufferCtx.beginPath();
 				bufferCtx.arc(x, y, offsetRad, 0, TAU);
 				bufferCtx.globalCompositeOperation = "destination-out";
-				bufferCtx.fillStyle = "black";
+				bufferCtx.fillStyle = BLACK;
 				bufferCtx.fill();
 				bufferCtx.restore();
 			}
@@ -550,7 +725,13 @@ var ice = (function(ice) {
 			ctx.clearRect(0, 0, this.width, this.height);
 		}
 		this.getPixel = function(x, y) {
-			return ctx.getImageData(x, y, 1, 1).data;
+			var data = ctx.getImageData(x, y, 1, 1).data;
+			if(settings.colorMode === "rgb") {
+				return data;
+			}
+			else {
+				return rgbToHsl(data);
+			}
 		}
 
 		this.setPixels = function(func, x, y, w, h) {
@@ -564,11 +745,13 @@ var ice = (function(ice) {
 			var data = imageData.data;
 
 			for(var i = 0; i < data.length; i += 4) {
-				var results = func((i / 4) % w, (i / 4) / w, data[i], data[i + 1], data[i + 2], data[i + 3]);
+				thisData = settings.colorMode === "rgb" ? [data[i], data[i + 1], data[i + 2], data[i + 3]] : rgbToHsl(data[i], data[i + 1], data[i + 2], data[i + 3]);
+				var results = func((i / 4) % w, (i / 4) / w, thisData[0], thisData[1], thisData[2], thisData[3]);
+				if(settings.colorMode === "hsl") results = hslToRgb(results);
 				data[i] = results[0];
 				data[i + 1] = results[1];
 				data[i + 2] = results[2];
-				data[i + 3] = results[3];
+				data[i + 3] = results[3] * 255;
 			}
 
 			if(x === 0 && y === 0 && w === this.width && h === this.height) {
@@ -628,10 +811,10 @@ var ice = (function(ice) {
 			degrees = degrees === undefined ? "180deg" : degrees + "deg";
 			applyCssFilter("hue-rotate", degrees);
 		}
-		this.recolor = function(color) {
+		this.recolor = function(arg1, arg2, arg3, arg4) {
 			ctx.save();
 			ctx.globalCompositeOperation = "color";
-			ctx.fillStyle = color || this.color;
+			ctx.fillStyle = interpretColor(arg1, arg2, arg3, arg4, this.color);
 			ctx.fillRect(0, 0, this.width, this.height);
 			ctx.restore();
 		}
