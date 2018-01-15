@@ -3,7 +3,7 @@ var ice = (function(ice) {
 	ice.modules = ice.modules || [];
 	ice.modules.push("graphics");
 	ice.graphics = {};
-	ice.graphics.version = "v2.2.4"; // This version of the ice.graphics module
+	ice.graphics.version = "v2.2.5"; // This version of the ice.graphics module
 	console.log("%cice.graphics " + ice.graphics.version + " imported successfully.", "color: #008000");
 
 	/*
@@ -100,7 +100,7 @@ var ice = (function(ice) {
 					}
 					return "hsl(" + arg1 + ", 100%, 50%)";
 				}
-				if(arg1 instanceof Array) {
+				if(arg1 instanceof Array || arg1 instanceof Uint8ClampedArray) {
 					return interpretColor(arg1[0], arg1[1], arg1[2], arg1[3], defaultColor, modeIsRGB);
 				}
 				return arg1;
@@ -548,6 +548,37 @@ var ice = (function(ice) {
 		};
 		this.clear = function() {
 			ctx.clearRect(0, 0, this.width, this.height);
+		}
+		this.getPixel = function(x, y) {
+			return ctx.getImageData(x, y, 1, 1).data;
+		}
+
+		this.setPixels = function(func, x, y, w, h) {
+			if(x === undefined) {
+				x = 0;
+				y = 0;
+				w = this.width;
+				h = this.height;
+			}
+			var imageData = ctx.getImageData(x, y, w, h);
+			var data = imageData.data;
+
+			for(var i = 0; i < data.length; i += 4) {
+				var results = func((i / 4) % w, (i / 4) / w, data[i], data[i + 1], data[i + 2], data[i + 3]);
+				data[i] = results[0];
+				data[i + 1] = results[1];
+				data[i + 2] = results[2];
+				data[i + 3] = results[3];
+			}
+
+			if(x === 0 && y === 0 && w === this.width && h === this.height) {
+				ctx.putImageData(imageData, 0, 0);
+			}
+			else {
+				bufferCtx.clearRect(0, 0, bufferCanvas.width, bufferCanvas.height);
+				bufferCtx.putImageData(imageData, 0, 0);
+				ctx.drawImage(bufferCanvas, 0, 0, w, h, x, y, w, h)
+			}
 		}
 		this.download = function(name) {
 			/*
