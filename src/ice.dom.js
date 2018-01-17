@@ -3,7 +3,7 @@ var ice = (function (ice) {
 	ice.modules = ice.modules || [];
 	ice.modules.push("dom");
 	ice.dom = {};
-	ice.dom.version = "v1.0.1"; // This version of the ice.dom module
+	ice.dom.version = "v1.0.2"; // This version of the ice.dom module
 	console.log("%cice.dom " + ice.dom.version + " imported successfully.", "color: #008000");
 	init();
 
@@ -352,7 +352,6 @@ var ice = (function (ice) {
 		if(key === "rightClick" || key === "rightMouse") {
 			return downButtons["right"];
 		}
-		return downButtons[button];
 
 		if(key === "alt" || key === "ctrl" || key === "meta" || key === "shift") {
 			return ice.dom.isDown("l" + key) || ice.dom.isDown("r" + key);
