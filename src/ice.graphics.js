@@ -761,6 +761,74 @@ var ice = (function(ice) {
 				if(prepStroke()) ctx.strokeText(text, x, y, maxWidth);
 			}
 		}
+		function lineChart(x, y, w, h, dataIn, line) {
+			var data = {};
+			data.groups = dataIn.groups === undefined ? [{points: dataIn.points}] : dataIn.groups;
+			data.borderColor = dataIn.borderColor === undefined ? BLACK : dataIn.borderColor;
+			data.borderWidth = dataIn.borderWidth === undefined ? 2 : dataIn.borderWidth;
+			data.backgroundColor = dataIn.backgroundColor === undefined ? WHITE : dataIn.backgroundColor;
+			data.scaleX = dataIn.scaleX === undefined ? 1 : dataIn.scaleX;
+			data.scaleY = dataIn.scaleY === undefined ? 1 : dataIn.scaleY;
+			data.gridSize = dataIn.gridSize === undefined ? 0 : dataIn.gridSize;
+			data.gridColor = dataIn.gridColor === undefined ? SILVER : dataIn.gridColor;
+			data.gridWidth = dataIn.gridWidth === undefined ? 1 : dataIn.gridWidth;
+
+			bufferCtx.clearRect(0, 0, bufferCanvas.width, bufferCanvas.height);
+
+			bufferCtx.strokeStyle = data.borderColor;
+			bufferCtx.lineWidth = data.borderWidth * 2;
+			bufferCtx.strokeRect(x, y, w, h);
+			bufferCtx.fillStyle = data.backgroundColor;
+			bufferCtx.fillRect(x, y, w, h);
+
+			if(data.gridSize > 0) {
+				bufferCtx.strokeStyle = data.gridColor;
+				bufferCtx.lineWidth = data.gridWidth;
+				bufferCtx.beginPath();
+				for(let i = y; i < y + h; i += data.gridSize * data.scaleY) {
+					bufferCtx.moveTo(x, i);
+					bufferCtx.lineTo(x + w, i);
+				}
+				for(let i = x; i < x + w; i += data.gridSize * data.scaleX) {
+					bufferCtx.moveTo(i, y);
+					bufferCtx.lineTo(i, y + h);
+				}
+				bufferCtx.stroke();
+			}
+
+			y += h;
+			bufferCtx.lineJoin = "round";
+			for(let group of data.groups) {
+				group.color = group.color === undefined ? BLACK : group.color;
+				group.size = group.size === undefined ? 2 : group.size;
+				group.lineColor = group.lineColor === undefined ? group.color : group.lineColor;
+				group.lineWidth = group.lineWidth === undefined ? 1 : group.lineWidth;
+				if(line) {
+					bufferCtx.strokeStyle = group.lineColor;
+					bufferCtx.lineWidth = group.lineWidth;
+					bufferCtx.beginPath();
+					for(let point of group.points) {
+						bufferCtx.lineTo(point.x * data.scaleX + x, y - data.scaleY * point.y);
+					}
+					bufferCtx.stroke();
+				}
+
+				bufferCtx.fillStyle = group.color;
+				bufferCtx.beginPath();
+				for(let point of group.points) {
+					bufferCtx.moveTo(point.x * data.scaleX + x, y - data.scaleY * point.y);
+					bufferCtx.arc(point.x * data.scaleX + x, y - data.scaleY * point.y, group.size, 0, TAU);
+				}
+				bufferCtx.fill();
+			}
+			ctx.drawImage(bufferCanvas, x, y - h, w, h, x, y - h, w, h);
+		}
+		this.charts.scatter = function(x, y, w, h, dataIn) {
+			lineChart(x, y, w, h, dataIn, false);
+		}
+		this.charts.line = function(x, y, w, h, dataIn) {
+			lineChart(x, y, w, h, dataIn, true);
+		}
 		this.charts.presets = {};
 		// These are just for the lols
 		this.charts.presets.PYRAMID = {
