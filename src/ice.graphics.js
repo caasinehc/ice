@@ -3,7 +3,7 @@ var ice = (function(ice) {
 	ice.modules = ice.modules || [];
 	ice.modules.push("graphics");
 	ice.graphics = {};
-	ice.graphics.version = "v2.2.6"; // This version of the ice.graphics module
+	ice.graphics.version = "v2.2.7"; // This version of the ice.graphics module
 	console.log("%cice.graphics " + ice.graphics.version + " imported successfully.", "color: #008000");
 
 	/*
@@ -12,9 +12,10 @@ var ice = (function(ice) {
 
 	/*
 	 *	TODO:
-	 *		pixel, curve
+	 *		curve
 	 *		scale, transform, rotate, and all that unnecessarily complicated bullsh*t
 	 *		charts: bar, line, scatter
+	 *		renew (un-taints canvas by scrapping it and creating a new one)
 	 */
 
 	// Private variables/functions
@@ -30,6 +31,9 @@ var ice = (function(ice) {
 	var COS120 = Math.cos(DEG120);
 	var SIN240 = Math.sin(DEG240);
 	var COS240 = Math.cos(DEG240);
+	var DEG45 = degToRad(45);
+	var SIN45 = Math.sin(DEG45);
+	var COS45 = Math.cos(DEG45);
 
 	function degToRad(n) {
 		return n * (Math.PI / 180);
@@ -68,6 +72,7 @@ var ice = (function(ice) {
 		var canvas = this.canvas;
 		var ctx = this.ctx;
 		var imgMem = {};
+		var tainted = false;
 
 		var settings = {};
 		settings.bgColor = WHITE;
@@ -79,8 +84,10 @@ var ice = (function(ice) {
 		settings.fontSize = 24;
 		settings.textAlign = "start";
 		settings.textBaseline = "alphabetic";
+		settings.bold = false;
+		settings.italic = false;
 		settings.colorMode = "rgb";
-		// settings.angleMode = "radians"; // TODO
+		settings.angleMode = "radians";
 
 		var bufferCanvas = document.createElement("canvas");
 		bufferCanvas.width = this.width;
@@ -119,7 +126,6 @@ var ice = (function(ice) {
 				var typeofArg3 = typeof arg3;
 				if(typeofArg2 === "number" || (typeofArg2 === "string" && !arg2.endsWith("%"))) arg2 += "%";
 				if(typeofArg3 === "number" || (typeofArg3 === "string" && !arg3.endsWith("%"))) arg3 += "%";
-				console.log("hsl(" + arg1 + ", " + arg2 + ", " + arg3 + ")");
 				return "hsl(" + arg1 + ", " + arg2 + ", " + arg3 + ")";
 			}
 			if(modeIsRGB) {
@@ -188,7 +194,7 @@ var ice = (function(ice) {
 					for(var i = 0; i < hslaArray.length; i++) {
 						hslaArray[i] = parseFloat(hslaArray[i]);
 					}
-					return hslToRgb(hslaArray[0], hslaArray[1], hslaArray[2], hslaArray[3], );
+					return hslToRgb(hslaArray[0], hslaArray[1], hslaArray[2], hslaArray[3]);
 				}
 				if(h instanceof Array || h instanceof Uint8ClampedArray) {
 					return hslToRgb(h[0], h[1], h[2], h[3]);
@@ -296,7 +302,7 @@ var ice = (function(ice) {
 		function applyCssFilter(filter, value) {
 			ctx.save();
 			bufferCtx.drawImage(canvas, 0, 0);
-			ctx.clearRect(0, 0, canvas.width, canvas.height);
+			ctx.clearRect(0, 0, this.width, this.height);
 			ctx.filter = filter + "(" + value + ")";
 			ctx.drawImage(bufferCanvas, 0, 0);
 			ctx.restore();
@@ -335,6 +341,15 @@ var ice = (function(ice) {
 		this.setBackground = function(arg1, arg2, arg3, arg4) {
 			return settings.bgColor = interpretColor(arg1, arg2, arg3, arg4, settings.bgColor);
 		}
+		this.resize = function(w, h) {
+			h = h === undefined ? w : h;
+			this.width = this.canvas.width = w;
+			this.height = this.canvas.height = h;
+			this.midWidth = this.width / 2;
+			this.midHeight = this.height / 2;
+			bufferCanvas.width = this.width;
+			bufferCanvas.height = this.height;
+		}
 		this.fill = function(arg1, arg2, arg3, arg4) {
 			return settings.fill = interpretColor(arg1, arg2, arg3, arg4, settings.fill);
 		}
@@ -366,26 +381,46 @@ var ice = (function(ice) {
 					settings.fontFamily = arg2;
 				}
 			}
-			return getFont();
+			return getFont(false);
 		}
 
-		function getFont() {
-			return settings.fontSize + "px " + settings.fontFamily;
+		function getFont(asString) {
+			if(asString) {
+				var font = "";
+				if(settings.italic) font += "italic ";
+				if(settings.bold) font += "bold ";
+				font += settings.fontSize + "px ";
+				font += settings.fontFamily;
+				return font;
+			}
+			return [settings.fontSize, settings.fontFamily, settings.italic, settings.bold];
 		}
 		this.textAlign = function(arg1, arg2) {
 			if(arg1 === "left" || arg1 === "right" || arg1 === "center" || arg1 === "start" || arg1 === "end") {
 				settings.textAlign = arg1;
-				if(arg2 === "top" || arg2 === "hanging" || arg2 === "middle" || arg2 === "alpabetic" || arg2 === "ideographic" || arg2 === "bottom") {
+				if(arg2 === "top" || arg2 === "hanging" || arg2 === "middle" || arg2 === "alphabetic" || arg2 === "ideographic" || arg2 === "bottom") {
 					settings.textBaseline = arg2;
 				}
 			}
-			else if(arg1 === "top" || arg1 === "hanging" || arg1 === "middle" || arg1 === "alpabetic" || arg1 === "ideographic" || arg1 === "bottom") {
+			else if(arg1 === "top" || arg1 === "hanging" || arg1 === "middle" || arg1 === "alphabetic" || arg1 === "ideographic" || arg1 === "bottom") {
 				settings.textBaseline = arg1;
 				if(arg2 === "left" || arg2 === "right" || arg2 === "center" || arg2 === "start" || arg2 === "end") {
 					settings.textAlign = arg2;
 				}
 			}
 			return [settings.textBaseline, settings.textAlign];
+		}
+		this.bold = function(bold) {
+			if(bold === undefined) {
+				return settings.bold;
+			}
+			settings.bold = bold;
+		}
+		this.italic = function(italic) {
+			if(italic === undefined) {
+				return settings.italic;
+			}
+			settings.italic = italic;
 		}
 		this.colorMode = function(mode) {
 			if(typeof mode === "string") {
@@ -396,6 +431,15 @@ var ice = (function(ice) {
 			}
 			return settings.colorMode;
 		}
+		this.angleMode = function(mode) {
+			if(typeof mode === "string") {
+				mode = mode.toLowerCase();
+			}
+			if(mode === "radians" || mode === "degrees") {
+				settings.angleMode = mode;
+			}
+			return settings.angleMode;
+		}
 		this.rect = function(x, y, w, h) {
 			h = h === undefined ? w : h;
 			if(prepFill()) this.ctx.fillRect(x, y, w, h);
@@ -403,6 +447,7 @@ var ice = (function(ice) {
 		}
 		this.ellipse = function(x, y, w, h, ang) {
 			ang = ang === undefined ? 0 : ang;
+			if(settings.angleMode === "degrees") ang = degToRad(ang);
 			h = h === undefined ? w : h;
 			this.ctx.beginPath();
 			this.ctx.ellipse(x, y, w, h, ang, 0, TAU)
@@ -454,7 +499,9 @@ var ice = (function(ice) {
 				this.circle(x, y, rad);
 				return;
 			}
-			rotation = (rotation || 0) - (TAU / 4);
+			rotation = rotation === undefined ? 0 : rotation;
+			if(settings.angleMode === "degrees") rotation = degToRad(rotation);
+			rotation -= TAU / 4;
 			this.ctx.beginPath();
 			this.ctx.moveTo(x + (Math.cos(rotation) * rad), y + (Math.sin(rotation) * rad));
 			for(let angle = TAU / sides; angle < TAU; angle += TAU / sides) {
@@ -482,6 +529,13 @@ var ice = (function(ice) {
 			this.ctx.closePath();
 			renderPath();
 		}
+		this.text = function(text, x, y, maxWidth) {
+			ctx.font = getFont(true);
+			ctx.textAlign = settings.textAlign;
+			ctx.textBaseline = settings.textBaseline;
+			if(prepFill()) ctx.fillText(text, x, y, maxWidth);
+			if(prepStroke()) ctx.strokeText(text, x, y, maxWidth);
+		}
 		this.points = function(points, size) {
 			size = size === undefined ? 1 : size;
 			for(var point of points) {
@@ -507,21 +561,72 @@ var ice = (function(ice) {
 			}
 			if(prepStroke()) ctx.stroke();
 		}
-		this.image = function(img, x, y, w, h, sx, sy, sw, sh, taintCanvas) {
+
+		function cachedImage(src) {
+			this.src = src;
+			this.img = new Image();
+			this.ready = false;
+
+			var callbacks = [];
+
+			function executeCallbacks() {
+				for(var callback of callbacks) {
+					callback();
+				}
+				callbacks = [];
+			}
+
+			this.img.onload = (e) => {
+				this.ready = true;
+				executeCallbacks();
+			}
+			if(!tainted) {
+				this.img.crossOrigin = "anonymous";
+			}
+			this.img.src = this.src;
+
+			this.addCallback = function(callback) {
+				if(typeof callback !== "function") return;
+				if(this.ready) {
+					callback();
+				}
+				else {
+					if(callbacks.length > 100) {
+						return;
+					}
+					callbacks.push(callback);
+				}
+			}
+
+			this.reload = function() {
+				this.img = new Image();
+				this.ready = false;
+
+				this.img.onload = function() {
+					this.ready = true;
+					executeCallbacks();
+				}
+				if(!tainted) {
+					this.img.crossOrigin = "anonymous";
+				}
+				this.img.src = this.src;
+			}
+		}
+		this.taint = function() {
+			tainted = true;
+		}
+		this.image = function(img, x, y, w, h, sx, sy, sw, sh) {
 			if(typeof img === "string") {
 				if(imgMem[img] === undefined) {
-					var tempImg = new Image();
-					if(!taintCanvas) {
-						tempImg.crossOrigin = "Anonymous";
-					}
-					tempImg.onload = (e) => {
-						imgMem[img] = tempImg;
-						this.image(img, x, y, w, h, sx, sy, sw, sh, taintCanvas);
-					}
-					tempImg.src = img;
+					imgMem[img] = new cachedImage(img);
+				}
+				if(!imgMem[img].ready) {
+					imgMem[img].addCallback(() => {
+						this.image(img, x, y, w, h, sx, sy, sw, sh);
+					});
 					return;
 				}
-				img = imgMem[img];
+				img = imgMem[img].img;
 			}
 			x = x === undefined ? 0 : x;
 			y = y === undefined ? 0 : y;
@@ -534,10 +639,8 @@ var ice = (function(ice) {
 				this.ctx.drawImage(img, sx, sy, sw, sh, x, y, w, h);
 			}
 		}
-		this.charts = {};
-		this.charts.pie = function(x, y, rad, dataIn, rotation) {
-			rotation = (rotation === undefined ? 0 : rotation) - Math.PI / 2;
 
+		function pieChart(x, y, rad, dataIn, rotation, donut, meter) {
 			var data = {
 				rings: [],
 				ringTotal: 0
@@ -555,9 +658,14 @@ var ice = (function(ice) {
 				if(ring.size !== undefined) size = ring.size;
 				else if(ring.value !== undefined) size = ring.value;
 				else if(ring.data !== undefined) size = ring.data;
+				if(size < 0) size = 0;
 				var slicesIn = ring.slices === undefined ? [] : ring.slices;
 				for(var slice of slicesIn) {
-					var sliceSize = slice.size === undefined ? 1 : slice.size;
+					var sliceSize = 1;
+					if(slice.size !== undefined) sliceSize = slice.size;
+					else if(slice.value !== undefined) sliceSize = slice.value;
+					else if(slice.data !== undefined) sliceSize = slice.data;
+					if(sliceSize < 0) sliceSize = 0;
 					var color = slice.color === undefined ? typeof slice === "string" ? slice : TRANSPARENT : slice.color;
 					var border = slice.border === undefined ? BLACK : slice.border;
 					var sliceLineWidth = 0;
@@ -571,6 +679,7 @@ var ice = (function(ice) {
 					});
 					total += sliceSize;
 				}
+				if(meter) total *= 2;
 				data.rings.push({
 					size: size,
 					slices: slices,
@@ -579,6 +688,7 @@ var ice = (function(ice) {
 				});
 				data.ringTotal += size;
 			}
+			if(donut) data.ringTotal *= 2;
 
 			var offsetRad = rad;
 			bufferCtx.clearRect(0, 0, bufferCanvas.width, bufferCanvas.height);
@@ -619,7 +729,38 @@ var ice = (function(ice) {
 			}
 			ctx.drawImage(bufferCanvas, 0, 0);
 		}
-
+		this.charts = {};
+		this.charts.pie = function(x, y, rad, dataIn, rotation) {
+			rotation = rotation === undefined ? 0 : rotation;
+			if(settings.angleMode === "degrees") rotation = degToRad(rotation);
+			rotation -= TAU / 4;
+			pieChart(x, y, rad, dataIn, rotation);
+		}
+		this.charts.donut = function(x, y, rad, dataIn, rotation) {
+			rotation = rotation === undefined ? 0 : rotation;
+			if(settings.angleMode === "degrees") rotation = degToRad(rotation);
+			rotation -= TAU / 4;
+			pieChart(x, y, rad, dataIn, rotation, true);
+		}
+		this.charts.meter = function(x, y, rad, dataIn, rotation, text) {
+			rotation = rotation === undefined ? 0 : rotation;
+			if(settings.angleMode === "degrees") rotation = degToRad(rotation);
+			rotation -= TAU / 2;
+			pieChart(x, y, rad, dataIn, rotation, true, true);
+			if(text !== undefined) {
+				var font = "";
+				if(settings.italic) font += "italic ";
+				if(settings.bold) font += "bold ";
+				font += rad / 2 + "px ";
+				font += settings.fontFamily;
+				ctx.font = font;
+				ctx.textAlign = "center";
+				ctx.textBaseline = "alphabetic";
+				var maxWidth = rad * COS45;
+				if(prepFill()) ctx.fillText(text, x, y, maxWidth);
+				if(prepStroke()) ctx.strokeText(text, x, y, maxWidth);
+			}
+		}
 		this.charts.presets = {};
 		// These are just for the lols
 		this.charts.presets.PYRAMID = {
@@ -760,7 +901,7 @@ var ice = (function(ice) {
 			else {
 				bufferCtx.clearRect(0, 0, bufferCanvas.width, bufferCanvas.height);
 				bufferCtx.putImageData(imageData, 0, 0);
-				ctx.drawImage(bufferCanvas, 0, 0, w, h, x, y, w, h)
+				ctx.drawImage(bufferCanvas, 0, 0, w, h, x, y, w, h);
 			}
 		}
 		this.download = function(name) {
@@ -774,6 +915,7 @@ var ice = (function(ice) {
 			link.href = canvas.toDataURL();
 			link.download = name || "download";
 			link.click();
+			// window.open(canvas.toDataURL());
 		}
 		this.invert = function(percent) {
 			percent = percent === undefined ? "100%" : percent + "%";
@@ -783,7 +925,7 @@ var ice = (function(ice) {
 			percent = percent === undefined ? "100%" : percent + "%";
 			applyCssFilter("grayscale", percent);
 		}
-		ice.graphics.Scene.prototype.sepia = function(percent) {
+		this.sepia = function(percent) {
 			percent = percent === undefined ? "100%" : percent + "%";
 			applyCssFilter("sepia", percent);
 		}
