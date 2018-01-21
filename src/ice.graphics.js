@@ -213,7 +213,7 @@ var ice = (function(ice) {
 			}
 
 			if(s === 0) {
-				l *= 255;
+				l *= 255 / 100;
 				return [l, l, l, a];
 			}
 
@@ -952,23 +952,25 @@ var ice = (function(ice) {
 			}
 			var imageData = ctx.getImageData(x, y, w, h);
 			var data = imageData.data;
+			var newData = new ImageData(w, h);
+			wholeData = ctx.getImageData(0, 0, this.width, this.height).data;
 
 			for(var i = 0; i < data.length; i += 4) {
-				thisData = settings.colorMode === "rgb" ? [data[i], data[i + 1], data[i + 2], data[i + 3]] : rgbToHsl(data[i], data[i + 1], data[i + 2], data[i + 3]);
-				var results = func((i / 4) % w, (i / 4) / w, thisData[0], thisData[1], thisData[2], thisData[3]);
+				thisData = settings.colorMode === "rgb" ? [data[i], data[i + 1], data[i + 2], data[i + 3] / 255] : rgbToHsl(data[i], data[i + 1], data[i + 2], data[i + 3] / 255);
+				var results = func((i / 4) % w, Math.floor((i / 4) / w), thisData[0], thisData[1], thisData[2], thisData[3], wholeData, i);
 				if(settings.colorMode === "hsl") results = hslToRgb(results);
-				data[i] = results[0];
-				data[i + 1] = results[1];
-				data[i + 2] = results[2];
-				data[i + 3] = results[3] * 255;
+				newData.data[i] = results[0];
+				newData.data[i + 1] = results[1];
+				newData.data[i + 2] = results[2];
+				newData.data[i + 3] = results[3] * 255;
 			}
 
 			if(x === 0 && y === 0 && w === this.width && h === this.height) {
-				ctx.putImageData(imageData, 0, 0);
+				ctx.putImageData(newData, 0, 0);
 			}
 			else {
 				bufferCtx.clearRect(0, 0, bufferCanvas.width, bufferCanvas.height);
-				bufferCtx.putImageData(imageData, 0, 0);
+				bufferCtx.putImageData(newData, 0, 0);
 				ctx.drawImage(bufferCanvas, 0, 0, w, h, x, y, w, h);
 			}
 		}
