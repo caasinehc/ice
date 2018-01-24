@@ -3,7 +3,7 @@ var ice = (function (ice) {
 	ice.modules = ice.modules || [];
 	ice.modules.push("debug");
 	ice.debug = {};
-	ice.debug.version = "v2.1.15"; // This version of the ice.debug module
+	ice.debug.version = "v2.1.16"; // This version of the ice.debug module
 	console.log("%cice.debug " + ice.debug.version + " imported successfully.", "color: #008000");
 
 	/*
@@ -172,7 +172,11 @@ var ice = (function (ice) {
 			"Sample size": sampleSize,
 			"Total unique results": totalResults,
 			"Total time": totalTime,
-			"Average time": (((after - before) / sampleSize) * 1000000).toFixed(4) + " nanoseconds",
+			// Interesting facts from wikipedia:
+			// 1.016703362164 nanoseconds – 1 light foot.
+			// 0.330 nanoseconds – The time it takes a common 3.0 GHz CPU to add two integers
+			// approx 1 million nanoseconds - The average duration of a camera flash.
+			"Average time": (1000000 * (after - before) / sampleSize).toFixed(4) + " nanoseconds",
 			"Total unique results": totalResults,
 			"Expected frequency (assuming even distribution)": sampleSize / totalResults + "(" + (100 / totalResults).toFixed(2) + "%)",
 			"Most common": max + ", occuring a whopping " + results[max] + " times (" + ((results[max] / sampleSize) * 100).toFixed(2) + "%)",

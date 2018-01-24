@@ -3,7 +3,7 @@ var ice = (function (ice) {
 	ice.modules = ice.modules || [];
 	ice.modules.push("physics");
 	ice.physics = {};
-	ice.physics.version = "v2.2.1"; // This version of the ice.physics module
+	ice.physics.version = "v2.2.2"; // This version of the ice.physics module
 	console.log("%cice.physics " + ice.physics.version + " imported successfully.", "color: #008000");
 
 	/*
@@ -452,16 +452,16 @@ var ice = (function (ice) {
 
 	// Adds to the vectors x and y
 	ice.physics.Vector.prototype.add = function(vec) {
-		this.x += vec.x === undefined ? vec : 0;
-		this.y += vec.y === undefined ? vec : 0;
+		this.x += vec.x === undefined ? vec : vec.x;
+		this.y += vec.y === undefined ? vec : vec.y;
 		return this;
 	}
 	ice.physics.Vector.prototype.addX = function(vec) {
-		this.x += vec.x === undefined ? vec : 0;
+		this.x += vec.x === undefined ? vec : vec.x;
 		return this;
 	}
 	ice.physics.Vector.prototype.addY = function(vec) {
-		this.y += vec.y === undefined ? vec : 0;
+		this.y += vec.y === undefined ? vec : vec.y;
 		return this;
 	}
 	ice.physics.Vector.prototype.addXY = function(x, y) {
@@ -472,16 +472,16 @@ var ice = (function (ice) {
 
 	// Subtracts from the vectors x and y
 	ice.physics.Vector.prototype.subtract = function(vec) {
-		this.x -= vec.x === undefined ? vec : 0;
-		this.y -= vec.y === undefined ? vec : 0;
+		this.x -= vec.x === undefined ? vec : vec.x;
+		this.y -= vec.y === undefined ? vec : vec.y;
 		return this;
 	}
 	ice.physics.Vector.prototype.subtractX = function(vec) {
-		this.x -= vec.x === undefined ? vec : 0;
+		this.x -= vec.x === undefined ? vec : vec.x;
 		return this;
 	}
 	ice.physics.Vector.prototype.subtractY = function(vec) {
-		this.y -= vec.y === undefined ? vec : 0;
+		this.y -= vec.y === undefined ? vec : vec.y;
 		return this;
 	}
 	ice.physics.Vector.prototype.subtractXY = function(x, y) {
@@ -492,16 +492,16 @@ var ice = (function (ice) {
 
 	// Multiplies the vectors x and y
 	ice.physics.Vector.prototype.multiply = function(vec) {
-		this.x *= vec.x === undefined ? vec : 0;
-		this.y *= vec.y === undefined ? vec : 0;
+		this.x *= vec.x === undefined ? vec : vec.x;
+		this.y *= vec.y === undefined ? vec : vec.y;
 		return this;
 	}
 	ice.physics.Vector.prototype.multiplyX = function(vec) {
-		this.x *= vec.x === 0 ? 0 : vec;
+		this.x *= vec.x === undefined ? vec : vec.x;
 		return this;
 	}
 	ice.physics.Vector.prototype.multiplyY = function(vec) {
-		this.y *= vec.y === undefined ? vec : 0;
+		this.y *= vec.y === undefined ? vec : vec.y;
 		return this;
 	}
 	ice.physics.Vector.prototype.multiplyXY = function(x, y) {
@@ -512,16 +512,16 @@ var ice = (function (ice) {
 
 	// Divides the vectors x and y
 	ice.physics.Vector.prototype.divide = function(vec) {
-		this.x /= vec.x === undefined ? vec : 0;
-		this.y /= vec.y === undefined ? vec : 0;
+		this.x /= vec.x === undefined ? vec : vec.x;
+		this.y /= vec.y === undefined ? vec : vec.y;
 		return this;
 	}
 	ice.physics.Vector.prototype.divideX = function(vec) {
-		this.x /= vec.x === undefined ? vec : 0;
+		this.x /= vec.x === undefined ? vec : vec.x;
 		return this;
 	}
 	ice.physics.Vector.prototype.divideY = function(vec) {
-		this.y /= vec.y === undefined ? vec : 0;
+		this.y /= vec.y === undefined ? vec :vec.y;
 		return this;
 	}
 	ice.physics.Vector.prototype.divideXY = function(x, y) {
@@ -532,16 +532,16 @@ var ice = (function (ice) {
 
 	// Mods the vectors x and y
 	ice.physics.Vector.prototype.mod = function(vec) {
-		this.x %= vec.x === undefined ? vec : 0;
-		this.y %= vec.y === undefined ? vec : 0;
+		this.x %= vec.x === undefined ? vec : vec.x;
+		this.y %= vec.y === undefined ? vec : vec.y;
 		return this;
 	}
 	ice.physics.Vector.prototype.modX = function(vec) {
-		this.x %= vec.x === undefined ? vec : 0;
+		this.x %= vec.x === undefined ? vec : vec.x;
 		return this;
 	}
 	ice.physics.Vector.prototype.modY = function(vec) {
-		this.y %= vec.y === undefined ? vec : 0;
+		this.y %= vec.y === undefined ? vec : vec.y;
 		return this;
 	}
 	ice.physics.Vector.prototype.modXY = function(x, y) {

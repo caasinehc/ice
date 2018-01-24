@@ -3,7 +3,7 @@ var ice = (function (ice) {
 	ice.modules = ice.modules || [];
 	ice.modules.push("math");
 	ice.math = {};
-	ice.math.version = "v2.0.7"; // This version of the ice.math module
+	ice.math.version = "v2.0.9"; // This version of the ice.math module
 	console.log("%cice.math " + ice.math.version + " imported successfully.", "color: #008000");
 
 	/*
@@ -91,7 +91,7 @@ var ice = (function (ice) {
 		var dy = y1 - y2;
 		return Math.sqrt(dx * dx + dy * dy);
 	}
-	ice.math.map = function(n, oldMin, oldMax, newMin, newMax) {
+	ice.math.map = function(n, oldMin, oldMax, newMin, newMax, clamp) {
 		/*
 		 * A note to future me:
 		 * STOP TRYING TO OPTIMIZE THIS!!!
@@ -102,7 +102,9 @@ var ice = (function (ice) {
 		 * Just let it go. Woo-sah, wooooo-saaaahh
 		 */
 		if(newMin === newMax) return newMin;
-		return (n - oldMin) * (newMax - newMin) / (oldMax - oldMin) + newMin;
+		var mapped = (n - oldMin) * (newMax - newMin) / (oldMax - oldMin) + newMin;
+		if(clamp) mapped = ice.math.clamp(mapped, newMin, newMax);
+		return mapped;
 	}
 	ice.math.isPrime = function(n) { // returns whether or not a number is prime (0, 1, and Infinity are not prime)
 		if(isFinite(n)) {

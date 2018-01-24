@@ -1,8 +1,8 @@
 var ice = (function (ice) {
 
-	ice.version = "v2.1.7"
+	ice.version = "v2.1.9"
 	ice.modules = [];
-	console.log("%c-------- Importing ice.js " + ice.version + "--------", "font-weight: bold; font-size: 24px");
+	console.log("%c-------- Importing ice.js " + ice.version + " --------", "font-weight: bold; font-size: 24px");
 
 	return ice;
 }(ice || {}));
@@ -25,18 +25,31 @@ if(document.head === null) {
 	function importError(e) {
 		console.log("%c" + getModuleName(e.target.src) + " import failed!", "color: #FF0000");
 	}
-	function importFile(file) {
-		var script = document.createElement("script");
-		script.src = "https://caasinehc.github.io/ice/" + file;
-		script.onerror = importError;
-		document.head.appendChild(script);
+	function importFiles(files) {
+		let div = document.createElement("div");
+		div.id = "iceLibrary";
+		for(let file of files) {
+			let script = document.createElement("script");
+			script.src = "https://caasinehc.github.io/ice/" + file;
+			script.onerror = importError;
+			div.appendChild(script);
+		}
+		let currentScript = document.currentScript;
+		if(currentScript) {
+			currentScript.parentElement.replaceChild(div, currentScript);
+		}
+		else {
+			document.head.appendChild(script);
+		}
 	}
 
-	importFile("src/ice.math.js");
-	importFile("src/ice.colors.js");
-	importFile("src/ice.graphics.js");
-	importFile("src/ice.debug.js");
-	importFile("src/ice.physics.js");
-	importFile("src/ice.dom.js");
-
+	let files = [
+		"src/ice.math.js",
+		"src/ice.colors.js",
+		"src/ice.graphics.js",
+		"src/ice.debug.js",
+		"src/ice.physics.js",
+		"src/ice.dom.js"
+	];
+	importFiles(files);
 })();
