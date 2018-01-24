@@ -3,7 +3,7 @@ var ice = (function(ice) {
 	ice.modules = ice.modules || [];
 	ice.modules.push("graphics");
 	ice.graphics = {};
-	ice.graphics.version = "v2.2.8"; // This version of the ice.graphics module
+	ice.graphics.version = "v2.2.9"; // This version of the ice.graphics module
 	console.log("%cice.graphics " + ice.graphics.version + " imported successfully.", "color: #008000");
 
 	/*
@@ -616,9 +616,6 @@ var ice = (function(ice) {
 				}
 				if(!tainted) {
 					this.img.crossOrigin = "anonymous";
-					if(settings.imagePrefix.length > 0) {
-						this.src += settings.imagePrefix;
-					}
 				}
 				this.img.src = this.src;
 			}
