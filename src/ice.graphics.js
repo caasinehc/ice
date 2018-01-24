@@ -3,7 +3,7 @@ var ice = (function(ice) {
 	ice.modules = ice.modules || [];
 	ice.modules.push("graphics");
 	ice.graphics = {};
-	ice.graphics.version = "v2.2.7"; // This version of the ice.graphics module
+	ice.graphics.version = "v2.2.8"; // This version of the ice.graphics module
 	console.log("%cice.graphics " + ice.graphics.version + " imported successfully.", "color: #008000");
 
 	/*
@@ -88,6 +88,7 @@ var ice = (function(ice) {
 		settings.italic = false;
 		settings.colorMode = "rgb";
 		settings.angleMode = "radians";
+		settings.imagePrefix = "https://cors-anywhere.herokuapp.com/";
 
 		var bufferCanvas = document.createElement("canvas");
 		bufferCanvas.width = this.width;
@@ -440,6 +441,10 @@ var ice = (function(ice) {
 			}
 			return settings.angleMode;
 		}
+		this.imagePrefix = function(prefix) {
+			if(prefix === undefined) return settings.imagePrefix;
+			return settings.imagePrefix = prefix;
+		}
 		this.rect = function(x, y, w, h) {
 			h = h === undefined ? w : h;
 			if(prepFill()) this.ctx.fillRect(x, y, w, h);
@@ -582,6 +587,9 @@ var ice = (function(ice) {
 			}
 			if(!tainted) {
 				this.img.crossOrigin = "anonymous";
+				if(settings.imagePrefix.length > 0) {
+					this.src += settings.imagePrefix;
+				}
 			}
 			this.img.src = this.src;
 
@@ -608,6 +616,9 @@ var ice = (function(ice) {
 				}
 				if(!tainted) {
 					this.img.crossOrigin = "anonymous";
+					if(settings.imagePrefix.length > 0) {
+						this.src += settings.imagePrefix;
+					}
 				}
 				this.img.src = this.src;
 			}
