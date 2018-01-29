@@ -3,7 +3,7 @@ var ice = (function (ice) {
 	ice.modules = ice.modules || [];
 	ice.modules.push("dom");
 	ice.dom = {};
-	ice.dom.version = "v1.0.4"; // This version of the ice.dom module
+	ice.dom.version = "v1.0.5"; // This version of the ice.dom module
 	console.log("%cice.dom " + ice.dom.version + " imported successfully.", "color: #008000");
 	init();
 
@@ -363,7 +363,7 @@ var ice = (function (ice) {
 
 	// Constructors
 
-	ice.dom.InputListener = function(elem = document) {
+	ice.dom.InputListener = function(elem = document.documentElement) {
 		if(!(this instanceof ice.dom.InputListener)) {
 			return new ice.dom.InputListener(elem);
 		}
