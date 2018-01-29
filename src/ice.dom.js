@@ -3,7 +3,7 @@ var ice = (function (ice) {
 	ice.modules = ice.modules || [];
 	ice.modules.push("dom");
 	ice.dom = {};
-	ice.dom.version = "v1.0.3"; // This version of the ice.dom module
+	ice.dom.version = "v1.0.4"; // This version of the ice.dom module
 	console.log("%cice.dom " + ice.dom.version + " imported successfully.", "color: #008000");
 	init();
 
@@ -335,6 +335,32 @@ var ice = (function (ice) {
 		}
 	}
 
+	function stop(e) {
+		e.preventDefault();
+		return false;
+	}
+	ice.dom.showMenu = function(elem, show) {
+		if(show === undefined) {
+			if(elem instanceof HTMLElement) {
+				show = true;
+			}
+			else if(typeof elem === "boolean") {
+				show = elem;
+				elem = document;
+			}
+			else {
+				elem = document;
+				show = true;
+			}
+		}
+		if(show) {
+			elem.removeEventListener("contextmenu", stop);
+		}
+		else {
+			elem.addEventListener("contextmenu", stop);
+		}
+	}
+
 	// Constructors
 
 	ice.dom.InputListener = function(elem = document) {
@@ -353,8 +379,8 @@ var ice = (function (ice) {
 		function getButton(which) {
 			return (
 				which === 1 ? "left" :
-				which === 2 : "middle" :
-				which === 3 : "right" :
+				which === 2 ? "middle" :
+				which === 3 ? "right" :
 				which
 			);
 		}
@@ -390,14 +416,14 @@ var ice = (function (ice) {
 		}
 
 		this.mouseDown = function(e, button) {};
-		this.elem.addEventListener("mousedown", function(e) {
+		this.elem.addEventListener("mousedown", (e) => {
 			let button = getButton(e.which);
 			downButtons[button] = true;
 			this.mouseDown(e, button);
 		});
 		this.mouseUp = function(e, button) {};
 		this.click = function(e, button) {};
-		this.elem.addEventListener("mouseup", function(e) {
+		this.elem.addEventListener("mouseup", (e) => {
 			let button = getButton(e.which);
 			let downBefore = downButtons[button];
 			downButtons[button] = false;
@@ -405,7 +431,7 @@ var ice = (function (ice) {
 			if(downBefore) this.click(e, button);
 		});
 		this.mouseMove = function(e) {};
-		this.elem.addEventListener("mousemove", function(e) {
+		this.elem.addEventListener("mousemove", (e) => {
 			this.prevMouseX = this.mouseX;
 			this.prevMouseY = this.mouseY;
 			this.mouseX = e.offsetX;
@@ -413,18 +439,18 @@ var ice = (function (ice) {
 			this.mouseMove(e);
 		});
 		this.wheel = function() {};
-		this.elem.addEventListener("wheel", function(e) {
+		this.elem.addEventListener("wheel", (e) => {
 			this.wheel(e, e.deltaY);
 		}, {
 			passive: true
 		});
 		this.keyDown = function() {};
-		this.elem.addEventListener("keydown", function(e) {
+		this.elem.addEventListener("keydown", (e) => {
 			setKey(e.code, true);
 			this.keyDown(e, e.key);
 		});
 		this.keyUp = function() {};
-		this.elem.addEventListener("keyup", function(e) {
+		this.elem.addEventListener("keyup", (e) => {
 			setKey(e.code, false);
 			this.keyUp(e, e.key);
 		});
