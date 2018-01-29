@@ -28,7 +28,7 @@ var ice = (function (ice) {
 				this.tick();
 			}
 		}
-		loop = setInterval(tick, 1000 / tps);
+		loop = setInterval(tick, 1000 / this.tps);
 		function updateTime() {
 			let now = performance.now();
 			this.dt = now - lastTick;
@@ -42,7 +42,7 @@ var ice = (function (ice) {
 		this.tickRate = tickRate;
 		this.tickCount = 0;
 		this.dt = performance.now();
-		this.mspt = 1000 / tps;
+		this.mspt = 1000 / this.tps;
 		this.tps = tickRate;
 		this.tpsSmoothing = 0.99;
 
