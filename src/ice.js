@@ -1,6 +1,6 @@
 var ice = (function (ice) {
 
-	ice.version = "v2.1.9"
+	ice.version = "v2.1.10"
 	ice.modules = [];
 	console.log("%c-------- Importing ice.js " + ice.version + " --------", "font-weight: bold; font-size: 24px");
 
@@ -49,7 +49,8 @@ if(document.head === null) {
 		"src/ice.graphics.js",
 		"src/ice.debug.js",
 		"src/ice.physics.js",
-		"src/ice.dom.js"
+		"src/ice.dom.js",
+		"src/ice.time.js"
 	];
 	importFiles(files);
 })();

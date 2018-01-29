@@ -12,12 +12,12 @@
 		<h1>ice.js</h1>
 		<p>A Multi-purpose Javascript library written by and for me, Isaac.</p>
 		<p>Here's a convenient tool to help you use ice.js!</p>
-		
+
 		<form id="importTool">
 			<fieldset onclick="updateModules();">
-				
+
 				<legend>Modules to include: </legend>
-				
+
 				<label>
 					<input type="radio" name="importAll" value="all" onclick="setSpecify(false);" id="importAll" checked />
 					All modules<br />
@@ -26,7 +26,7 @@
 					<input type="radio" name="importAll" value="specify" onclick="setSpecify(true);" />
 					Specify:
 				</label>
-		
+
 				<ul style="list-style: none; margin: 0px;">
 					<li>
 						<label>
@@ -70,17 +70,23 @@
 							Dom
 						</label>
 					</li>
+					<li>
+						<label>
+							<input type="checkbox" id="timeCB" disabled />
+							Time
+						</label>
+					</li>
 				</ul>
 			</fieldset>
 		</form>
-		
+
 		<label>
 			HTML embed:<br />
 			<textarea id="embedInput" rows="10" cols="80"></textarea>
 		</label><br />
-		
+
 		<a id="bookmarklet">Import ice.js</a><br />
-		
+
 		<label>
 			Javascript import:<br />
 			<textarea id="jsInput" rows="10" cols="80"></textarea>
@@ -93,14 +99,15 @@
 				colors: document.getElementById("colorsCB"),
 				debug: document.getElementById("debugCB"),
 				graphics: document.getElementById("graphicsCB"),
-				dom: document.getElementById("domCB")
+				dom: document.getElementById("domCB"),
+				time: document.getElementById("timeCB")
 			}
 			var allCB = document.getElementById("allCB");
 			var importAll = document.getElementById("importAll");
 			var embedInput = document.getElementById("embedInput");
 			var bookmarklet = document.getElementById("bookmarklet");
 			var jsInput = document.getElementById("jsInput");
-			
+
 			function toggleEverything() {
 				for(var module in modules) {
 					modules[module].checked = allCB.checked;
@@ -181,11 +188,11 @@
 			jsInput.onclick = function() {
 				jsInput.select();
 			}
-			
+
 			window.onload = function() {
 				updateOutput();
 			}
 		</script>
-	
+
 	</body>
 </html>
