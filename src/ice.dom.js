@@ -3,7 +3,7 @@ var ice = (function (ice) {
 	ice.modules = ice.modules || [];
 	ice.modules.push("dom");
 	ice.dom = {};
-	ice.dom.version = "v1.0.2"; // This version of the ice.dom module
+	ice.dom.version = "v1.0.3"; // This version of the ice.dom module
 	console.log("%cice.dom " + ice.dom.version + " imported successfully.", "color: #008000");
 	init();
 
@@ -29,130 +29,134 @@ var ice = (function (ice) {
 		throw "Failed to import stylesheet \"" + e.target.href + "\"!";
 	}
 
-	var downButtons = {
-		"left": false,
-		"right": false,
-		"middle": false
+	function getDownButtonsList() {
+		return {
+			"left": false,
+			"right": false,
+			"middle": false
+		};
 	}
-	var downKeys = {
-		"Digit1": false,
-		"Digit2": false,
-		"Digit3": false,
-		"Digit4": false,
-		"Digit5": false,
-		"Digit6": false,
-		"Digit7": false,
-		"Digit8": false,
-		"Digit9": false,
-		"Digit0": false,
-		"KeyA": false,
-		"KeyB": false,
-		"KeyC": false,
-		"KeyD": false,
-		"KeyE": false,
-		"KeyF": false,
-		"KeyG": false,
-		"KeyH": false,
-		"KeyI": false,
-		"KeyJ": false,
-		"KeyK": false,
-		"KeyL": false,
-		"KeyM": false,
-		"KeyN": false,
-		"KeyO": false,
-		"KeyP": false,
-		"KeyQ": false,
-		"KeyR": false,
-		"KeyS": false,
-		"KeyT": false,
-		"KeyU": false,
-		"KeyV": false,
-		"KeyW": false,
-		"KeyX": false,
-		"KeyY": false,
-		"KeyZ": false,
-		"Comma": false,
-		"Period": false,
-		"Semicolon": false,
-		"Quote": false,
-		"BracketLeft": false,
-		"BracketRight": false,
-		"Backquote": false,
-		"Backslash": false,
-		"Minus": false,
-		"Equal": false,
-		"AltLeft": false,
-		"AltRight": false,
-		"CapsLock": false,
-		"ControlLeft": false,
-		"ControlRight": false,
-		"MetaLeft": false,
-		"MetaRight": false,
-		"ShiftLeft": false,
-		"ShiftRight": false,
-		"ContextMenu": false,
-		"Enter": false,
-		"Space": false,
-		"Tab": false,
-		"Delete": false,
-		"End": false,
-		"Help": false,
-		"Home": false,
-		"Insert": false,
-		"PageDown": false,
-		"PageUp": false,
-		"ArrowDown": false,
-		"ArrowLeft": false,
-		"ArrowRight": false,
-		"ArrowUp": false,
-		"Escape": false,
-		"PrintScreen": false,
-		"ScrollLock": false,
-		"Pause": false,
-		"F1": false,
-		"F2": false,
-		"F3": false,
-		"F4": false,
-		"F5": false,
-		"F6": false,
-		"F7": false,
-		"F8": false,
-		"F9": false,
-		"F10": false,
-		"F11": false,
-		"F12": false,
-		"F13": false,
-		"F14": false,
-		"F15": false,
-		"F16": false,
-		"F17": false,
-		"F18": false,
-		"F19": false,
-		"F20": false,
-		"F21": false,
-		"F22": false,
-		"F23": false,
-		"F24": false,
-		"NumLock": false,
-		"Numpad0": false,
-		"Numpad1": false,
-		"Numpad2": false,
-		"Numpad3": false,
-		"Numpad4": false,
-		"Numpad5": false,
-		"Numpad6": false,
-		"Numpad7": false,
-		"Numpad8": false,
-		"Numpad9": false,
-		"NumpadAdd": false,
-		"NumpadComma": false,
-		"NumpadDecimal": false,
-		"NumpadDivide": false,
-		"NumpadEnter": false,
-		"NumpadEqual": false,
-		"NumpadMultiply": false,
-		"NumpadSubtract": false
-	};
+	function getDownKeysList() {
+		return {
+			"Digit1": false,
+			"Digit2": false,
+			"Digit3": false,
+			"Digit4": false,
+			"Digit5": false,
+			"Digit6": false,
+			"Digit7": false,
+			"Digit8": false,
+			"Digit9": false,
+			"Digit0": false,
+			"KeyA": false,
+			"KeyB": false,
+			"KeyC": false,
+			"KeyD": false,
+			"KeyE": false,
+			"KeyF": false,
+			"KeyG": false,
+			"KeyH": false,
+			"KeyI": false,
+			"KeyJ": false,
+			"KeyK": false,
+			"KeyL": false,
+			"KeyM": false,
+			"KeyN": false,
+			"KeyO": false,
+			"KeyP": false,
+			"KeyQ": false,
+			"KeyR": false,
+			"KeyS": false,
+			"KeyT": false,
+			"KeyU": false,
+			"KeyV": false,
+			"KeyW": false,
+			"KeyX": false,
+			"KeyY": false,
+			"KeyZ": false,
+			"Comma": false,
+			"Period": false,
+			"Semicolon": false,
+			"Quote": false,
+			"BracketLeft": false,
+			"BracketRight": false,
+			"Backquote": false,
+			"Backslash": false,
+			"Minus": false,
+			"Equal": false,
+			"AltLeft": false,
+			"AltRight": false,
+			"CapsLock": false,
+			"ControlLeft": false,
+			"ControlRight": false,
+			"MetaLeft": false,
+			"MetaRight": false,
+			"ShiftLeft": false,
+			"ShiftRight": false,
+			"ContextMenu": false,
+			"Enter": false,
+			"Space": false,
+			"Tab": false,
+			"Delete": false,
+			"End": false,
+			"Help": false,
+			"Home": false,
+			"Insert": false,
+			"PageDown": false,
+			"PageUp": false,
+			"ArrowDown": false,
+			"ArrowLeft": false,
+			"ArrowRight": false,
+			"ArrowUp": false,
+			"Escape": false,
+			"PrintScreen": false,
+			"ScrollLock": false,
+			"Pause": false,
+			"F1": false,
+			"F2": false,
+			"F3": false,
+			"F4": false,
+			"F5": false,
+			"F6": false,
+			"F7": false,
+			"F8": false,
+			"F9": false,
+			"F10": false,
+			"F11": false,
+			"F12": false,
+			"F13": false,
+			"F14": false,
+			"F15": false,
+			"F16": false,
+			"F17": false,
+			"F18": false,
+			"F19": false,
+			"F20": false,
+			"F21": false,
+			"F22": false,
+			"F23": false,
+			"F24": false,
+			"NumLock": false,
+			"Numpad0": false,
+			"Numpad1": false,
+			"Numpad2": false,
+			"Numpad3": false,
+			"Numpad4": false,
+			"Numpad5": false,
+			"Numpad6": false,
+			"Numpad7": false,
+			"Numpad8": false,
+			"Numpad9": false,
+			"NumpadAdd": false,
+			"NumpadComma": false,
+			"NumpadDecimal": false,
+			"NumpadDivide": false,
+			"NumpadEnter": false,
+			"NumpadEqual": false,
+			"NumpadMultiply": false,
+			"NumpadSubtract": false
+		};
+	}
 	var keyEncoder = {
 		"1": "Digit1",
 		"2": "Digit2",
@@ -303,10 +307,6 @@ var ice = (function (ice) {
 		"numpad-": "NumpadSubtract"
 	};
 
-	function setKey(key, down) {
-		downKeys[key] = down;
-	}
-
 	// Properties
 
 	ice.dom.styles = {};
@@ -335,95 +335,100 @@ var ice = (function (ice) {
 		}
 	}
 
-	ice.dom.isDown = function(key) {
-		if(key === "mouse" || key === "click") {
+	// Constructors
+
+	ice.dom.InputListener = function(elem = document) {
+		if(!(this instanceof ice.dom.InputListener)) {
+			return new ice.dom.InputListener(elem);
+		}
+		if(!(elem instanceof HTMLElement)) {
+			elem = document.querySelector(elem);
+		}
+
+		let downKeys = getDownKeysList();
+		let downButtons = getDownButtonsList();
+		function setKey(key, down) {
+			downKeys[key] = down;
+		}
+		function getButton(which) {
 			return (
-				downButtons["left"] ||
-				downButtons["middle"] ||
-				downButtons["right"]
+				which === 1 ? "left" :
+				which === 2 : "middle" :
+				which === 3 : "right" :
+				which
 			);
 		}
-		if(key === "leftClick" || key === "leftMouse") {
-			return downButtons["left"];
-		}
-		if(key === "middleClick" || key === "middleMouse") {
-			return downButtons["middle"];
-		}
-		if(key === "rightClick" || key === "rightMouse") {
-			return downButtons["right"];
+
+		this.elem = elem;
+		this.mouseX = 0;
+		this.mouseY = 0;
+		this.prevMouseX = 0;
+		this.prevMouseY = 0;
+
+		this.isDown = function(key) {
+			if(key === "mouse" || key === "click") {
+				return (
+					downButtons["left"] ||
+					downButtons["middle"] ||
+					downButtons["right"]
+				);
+			}
+			if(key === "leftClick" || key === "leftMouse") {
+				return downButtons["left"];
+			}
+			if(key === "middleClick" || key === "middleMouse") {
+				return downButtons["middle"];
+			}
+			if(key === "rightClick" || key === "rightMouse") {
+				return downButtons["right"];
+			}
+
+			if(key === "alt" || key === "ctrl" || key === "meta" || key === "shift") {
+				return this.isDown("l" + key) || this.isDown("r" + key);
+			}
+			return downKeys[keyEncoder[key]];
 		}
 
-		if(key === "alt" || key === "ctrl" || key === "meta" || key === "shift") {
-			return ice.dom.isDown("l" + key) || ice.dom.isDown("r" + key);
-		}
-		return downKeys[keyEncoder[key]];
+		this.mouseDown = function(e, button) {};
+		this.elem.addEventListener("mousedown", function(e) {
+			let button = getButton(e.which);
+			downButtons[button] = true;
+			this.mouseDown(e, button);
+		});
+		this.mouseUp = function(e, button) {};
+		this.click = function(e, button) {};
+		this.elem.addEventListener("mouseup", function(e) {
+			let button = getButton(e.which);
+			let downBefore = downButtons[button];
+			downButtons[button] = false;
+			this.mouseUp(e, button);
+			if(downBefore) this.click(e, button);
+		});
+		this.mouseMove = function(e) {};
+		this.elem.addEventListener("mousemove", function(e) {
+			this.prevMouseX = this.mouseX;
+			this.prevMouseY = this.mouseY;
+			this.mouseX = e.offsetX;
+			this.mouseY = e.offsetY;
+			this.mouseMove(e);
+		});
+		this.wheel = function() {};
+		this.elem.addEventListener("wheel", function(e) {
+			this.wheel(e, e.deltaY);
+		}, {
+			passive: true
+		});
+		this.keyDown = function() {};
+		this.elem.addEventListener("keydown", function(e) {
+			setKey(e.code, true);
+			this.keyDown(e, e.key);
+		});
+		this.keyUp = function() {};
+		this.elem.addEventListener("keyup", function(e) {
+			setKey(e.code, false);
+			this.keyUp(e, e.key);
+		});
 	}
-
-	ice.dom.click = function() {};
-	document.addEventListener("click", function(e) {
-		ice.dom.click(e, "left");
-	});
-	document.addEventListener("contextmenu", function(e) {
-		ice.dom.click(e, "right");
-	});
-
-	ice.dom.mouseDown = function() {};
-	document.addEventListener("mousedown", function(e) {
-		if(e.which === 1) {
-			downButtons["left"] = true;
-			ice.dom.mouseDown(e, "left");
-		}
-		if(e.which === 2) {
-			downButtons["middle"] = true;
-			ice.dom.mouseDown(e, "middle");
-		}
-		if(e.which === 3) {
-			downButtons["right"] = true;
-			ice.dom.mouseDown(e, "right");
-		}
-	});
-
-	ice.dom.mouseUp = function() {};
-	document.addEventListener("mouseup", function(e) {
-		if(e.which === 1) {
-			downButtons["left"] = false;
-			ice.dom.mouseUp(e, "left");
-		}
-		if(e.which === 2) {
-			downButtons["middle"] = false;
-			ice.dom.mouseUp(e, "middle");
-		}
-		if(e.which === 3) {
-			downButtons["right"] = false;
-			ice.dom.mouseUp(e, "right");
-		}
-	});
-
-	ice.dom.mouseMove = function() {};
-	document.addEventListener("mousemove", function(e) {
-		ice.dom.mouseX = e.offsetX;
-		ice.dom.mouseY = e.offsetY;
-		ice.dom.mouseMove(e);
-	});
-
-	ice.dom.wheel = function() {};
-	document.addEventListener("wheel", function(e) {
-		ice.dom.wheel(e, e.deltaY);
-	}, {
-		passive: true
-	});
-
-	ice.dom.keyDown = function() {};
-	document.addEventListener("keydown", function(e) {
-		setKey(e.code, true);
-		ice.dom.keyDown(e, e.key);
-	});
-
-	ice.dom.keyUp = function() {};
-	document.addEventListener("keyup", function(e) {
-		setKey(e.code, false);
-		ice.dom.keyUp(e, e.key);
-	});
 
 	// Init
 
