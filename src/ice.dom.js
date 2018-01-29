@@ -3,7 +3,7 @@ var ice = (function (ice) {
 	ice.modules = ice.modules || [];
 	ice.modules.push("dom");
 	ice.dom = {};
-	ice.dom.version = "v1.0.5"; // This version of the ice.dom module
+	ice.dom.version = "v1.0.6"; // This version of the ice.dom module
 	console.log("%cice.dom " + ice.dom.version + " imported successfully.", "color: #008000");
 	init();
 
@@ -22,12 +22,6 @@ var ice = (function (ice) {
 		"style": "css",
 		"stylesheet": "css"
 	};
-	function importErrorJs(e) {
-		throw "Failed to import script \"" + e.target.src + "\"!";
-	}
-	function importErrorCss(e) {
-		throw "Failed to import stylesheet \"" + e.target.href + "\"!";
-	}
 
 	function getDownButtonsList() {
 		return {
@@ -307,31 +301,29 @@ var ice = (function (ice) {
 		"numpad-": "NumpadSubtract"
 	};
 
-	// Properties
-
-	ice.dom.styles = {};
-
 	// Methods
 
-	ice.dom.import = function(src, type, onload) {
+	ice.dom.import = function(src, type) {
 		if(typeLookup[type] === "css") {
 			var stylesheet = document.createElement("link");
 			stylesheet.rel = "stylesheet";
 			stylesheet.href = src;
-			stylesheet.onerror = importErrorCss;
-			if(typeof onload === "function") {
-				stylesheet.onload = onload;
-			}
+			let prom = new Promise(function(resolve, reject) {
+				stylesheet.onload = resolve;
+				stylesheet.onerror = reject;
+			});
 			document.head.appendChild(stylesheet);
+			return prom;
 		}
 		else {
 			var script = document.createElement("script");
 			script.src = src;
-			script.onerror = importErrorJs;
-			if(typeof onload === "function") {
-				script.onload = onload;
-			}
+			let prom = new Promise(function(resolve, reject) {
+				script.onload = resolve;
+				script.onerror = reject;
+			});
 			document.head.appendChild(script);
+			return prom;
 		}
 	}
 
