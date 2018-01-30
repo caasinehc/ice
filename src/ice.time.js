@@ -1,9 +1,9 @@
-var ice = (function (ice) {
+var ice = (function(ice) {
 
 	ice.modules = ice.modules || [];
 	ice.modules.push("time");
 	ice.time = {};
-	ice.time.version = "v1.0.0"; // This version of the ice.time module
+	ice.time.version = "v1.0.1"; // This version of the ice.time module
 	console.log("%cice.time " + ice.time.version + " imported successfully.", "color: #008000");
 
 	/*
@@ -17,34 +17,54 @@ var ice = (function (ice) {
 			return new ice.time.Clock(tickRate);
 		}
 
+		this.tickRate = tickRate;
+		this.memorySize = tickRate;
+		this.smoothTps = true;
+
+		this.tps = tickRate;
+		this.mspt = 1000 / this.tps;
+		this.dt = performance.now();
+		this.tickCount = 0;
+		this.tpsHistory = [];
+
 		let noLoop = false;
 		let loop;
 		let lastTick = performance.now();
+		let dtMem = [];
 
-		function tick() {
+		let tick = () => {
 			if(!noLoop) {
-				this.tickCount++;
 				updateTime();
 				this.tick();
 			}
 		}
-		loop = setInterval(tick, 1000 / this.tps);
-		function updateTime() {
+		let updateTime = () => {
+			this.tickCount++;
 			let now = performance.now();
 			this.dt = now - lastTick;
 			lastTick = now;
-			this.mspt = (this.mspt * this.tpsSmoothing) + (this.dt * (1 - this.tpsSmoothing));
-			if(this.tickCount % this.tickRate === 0 || this.tickRate === 0) {
-				this.tps = Math.floor(1000 / this.mspt);
-			}
-		}
 
-		this.tickRate = tickRate;
-		this.tickCount = 0;
-		this.dt = performance.now();
-		this.mspt = 1000 / this.tps;
-		this.tps = tickRate;
-		this.tpsSmoothing = 0.99;
+			dtMem.unshift(this.dt); // Add this dt to dtMem (at start of array)
+			dtMem = dtMem.slice(0, this.memorySize); // cut off any extra entries from the end of the array
+			this.mspt = 0;
+			if(this.smoothTps) {
+				for(let i = dtMem.length - 1; i >= 0; i--) {
+					this.mspt += dtMem[i];
+					this.mspt /= 2;
+				}
+			}
+			else {
+				for(let i = 0; i < dtMem.length; i++) {
+					this.mspt += dtMem[i];
+				}
+				this.mspt /= dtMem.length;
+			}
+			this.mspt = Math.round(this.mspt);
+			this.tps = +(1000 / this.mspt).toFixed(2);
+
+			this.tpsHistory.unshift(this.tps); // Add this dt to dtMem (at start of array)
+			this.tpsHistory = this.tpsHistory.slice(0, this.memorySize); // cut off any extra entries from the end of the array
+		}
 
 		this.tick = function() {};
 
@@ -59,6 +79,8 @@ var ice = (function (ice) {
 			if(loop === undefined) return !noLoop;
 			noLoop = !loop;
 		}
+
+		loop = setInterval(tick, 1000 / this.tps);
 	}
 
 	return ice;

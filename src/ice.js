@@ -1,4 +1,4 @@
-var ice = (function (ice) {
+var ice = (function(ice) {
 
 	ice.version = "v2.1.10"
 	ice.modules = [];

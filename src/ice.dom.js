@@ -1,4 +1,4 @@
-var ice = (function (ice) {
+var ice = (function(ice) {
 
 	ice.modules = ice.modules || [];
 	ice.modules.push("dom");
