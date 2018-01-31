@@ -15,9 +15,7 @@
 
 		<form id="importTool">
 			<fieldset onclick="updateModules();">
-
 				<legend>Modules to include: </legend>
-
 				<label>
 					<input type="radio" name="importAll" value="all" onclick="setSpecify(false);" id="importAll" checked />
 					All modules<br />
@@ -27,53 +25,11 @@
 					Specify:
 				</label>
 
-				<ul style="list-style: none; margin: 0px;">
+				<ul id="moduleList" style="list-style: none; margin: 0px;">
 					<li>
 						<label>
 							<input type="checkbox" id="allCB" onclick="toggleEverything();" disabled />
 							Select all
-						</label>
-					</li>
-					<li>
-						<label>
-							<input type="checkbox" id="mathCB" disabled />
-							Math
-						</label>
-					</li>
-					<li>
-						<label>
-							<input type="checkbox" id="physicsCB" disabled />
-							Physics
-						</label>
-					</li>
-					<li>
-						<label>
-							<input type="checkbox" id="colorsCB" disabled />
-							Colors
-						</label>
-					</li>
-					<li>
-						<label>
-							<input type="checkbox" id="debugCB" disabled />
-							Debug
-						</label>
-					</li>
-					<li>
-						<label>
-							<input type="checkbox" id="graphicsCB" disabled />
-							Graphics
-						</label>
-					</li>
-					<li>
-						<label>
-							<input type="checkbox" id="domCB" disabled />
-							Dom
-						</label>
-					</li>
-					<li>
-						<label>
-							<input type="checkbox" id="timeCB" disabled />
-							Time
 						</label>
 					</li>
 				</ul>
@@ -93,29 +49,45 @@
 		</label><br />
 
 		<script>
-			var modules = {
-				math: document.getElementById("mathCB"),
-				physics: document.getElementById("physicsCB"),
-				colors: document.getElementById("colorsCB"),
-				debug: document.getElementById("debugCB"),
-				graphics: document.getElementById("graphicsCB"),
-				dom: document.getElementById("domCB"),
-				time: document.getElementById("timeCB")
+			let modules = {
+				math: "math",
+				physics: "physics",
+				colors: "colors",
+				debug: "debug",
+				graphics: "graphics",
+				dom: "dom",
+				time: "time"
 			}
-			var allCB = document.getElementById("allCB");
-			var importAll = document.getElementById("importAll");
-			var embedInput = document.getElementById("embedInput");
-			var bookmarklet = document.getElementById("bookmarklet");
-			var jsInput = document.getElementById("jsInput");
+
+			let moduleList = document.getElementById("moduleList");
+			for(let module in modules) {
+				let li = document.createElement("li");
+				let label = document.createElement("label");
+				let input = document.createElement("input");
+				let labelText = document.createTextNode(modules[module]);
+				input.type = "checkbox";
+				input.disabled = true;
+				label.appendChild(input);
+				label.appendChild(labelText);
+				li.appendChild(label);
+				modules[module] = input;
+				moduleList.appendChild(modules[module].parentElement.parentElement);
+			}
+
+			let allCB = document.getElementById("allCB");
+			let importAll = document.getElementById("importAll");
+			let embedInput = document.getElementById("embedInput");
+			let bookmarklet = document.getElementById("bookmarklet");
+			let jsInput = document.getElementById("jsInput");
 
 			function toggleEverything() {
-				for(var module in modules) {
+				for(let module in modules) {
 					modules[module].checked = allCB.checked;
 				}
 			}
 			function updateModules() {
-				var allChecked = true;
-				for(var module in modules) {
+				let allChecked = true;
+				for(let module in modules) {
 					if(!modules[module].checked) {
 						allChecked = false;
 						break;
@@ -126,17 +98,17 @@
 			}
 			function setSpecify(enabled) {
 				allCB.disabled = !enabled;
-				for(var module in modules) {
+				for(let module in modules) {
 					modules[module].disabled = !enabled;
 				}
 			}
 			function updateOutput() {
-				var toInclude = [];
+				let toInclude = [];
 				if(importAll.checked) {
 					toInclude.push("src/ice.js");
 				}
 				else {
-					for(var module in modules) {
+					for(let module in modules) {
 						if(modules[module].checked) {
 							toInclude.push("src/ice." + module + ".js");
 						}
@@ -147,8 +119,8 @@
 				updateJsInclude(toInclude);
 			}
 			function updateEmbed(toInclude) {
-				var text = "";
-				for(var module of toInclude) {
+				let text = "";
+				for(let module of toInclude) {
 					text += "<script src=\"https://caasinehc.github.io/ice/" + module + "\"><\/script>\n";
 				}
 				embedInput.innerText = text;
@@ -157,31 +129,29 @@
 				embedInput.select();
 			}
 			function updateBookmarklet(toInclude) {
-				var text = (
-					"javascript: " +
-					"(function() {" +
-						"var modules = [\"" + toInclude.join("\", \"") + "\"];" +
-						"var appendLocation = document.head || document.body || document.documentElement || document;" +
-						"for(var module of modules) {" +
-							"var script = document.createElement(\"script\");" +
-							"script.src = \"https://caasinehc.github.io/ice/\" + module;" +
-							"appendLocation.appendChild(script);" +
-						"}" +
-					"})();"
-				);
+				let text = `javascript:(d=>{if(d.head===null){if(d.documentElement===null)d.appendChild(d.createElement("html"));d.documentElement.appendChild(d.createElement("head"))}let v=d.createElement("div");for(let m of["${toInclude.map(str=>str.replace(/src\/ice\.(.*)\.js/, "$1")).join(`","`)}"]){let s=d.createElement("script");s.src=\`https://caasinehc.github.io/ice/src/ice.\${m}.js\`;v.appendChild(s)}let c=d.currentScript;c?c.parentElement.replaceChild(v,c):d.head.appendChild(v)})(document);`;
 				bookmarklet.href = text;
 			}
 			function updateJsInclude(toInclude) {
-				var text = (
-					"(function() {\n" +
-					"	var modules = [\"" + toInclude.join("\", \"") + "\"];\n" +
-					"	var appendLocation = document.head || document.body || document.documentElement || document;\n" +
-					"	for(var module of modules) {\n" +
-					"		var script = document.createElement(\"script\");\n" +
-					"		script.src = \"https://caasinehc.github.io/ice/\" + module;\n" +
-					"		appendLocation.appendChild(script);\n" +
-					"	}\n" +
-					"})();"
+				let text = (
+`(function() {
+	if(document.head === null) {
+		if(document.documentElement === null) {
+			document.appendChild(document.createElement("html"));
+		}
+		document.documentElement.appendChild(document.createElement("head"));
+	}
+	let modules = ["${toInclude.join(`", "`)}"];
+	let div = document.createElement("div");
+	for(let module of modules) {
+		let script = document.createElement("script");
+		script.src = "https://caasinehc.github.io/ice/" + module;
+		div.appendChild(script);
+	}
+	let currentScript = document.currentScript;
+	if(currentScript) currentScript.parentElement.replaceChild(div, currentScript);
+	else document.head.appendChild(div);
+})();`
 				);
 				jsInput.innerText = text;
 			}

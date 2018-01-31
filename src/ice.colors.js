@@ -1,7 +1,4 @@
-if(typeof ice === "undefined") {
-	ice = {};
-	ice.modules = [];
-}
+if(typeof ice === "undefined") ice = {modules: []};
 (function() {
 	ice.modules.push("colors");
 	ice.colors = {};

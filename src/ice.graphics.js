@@ -1,7 +1,4 @@
-if(typeof ice === "undefined") {
-	ice = {};
-	ice.modules = [];
-}
+if(typeof ice === "undefined") ice = {modules: []};
 (function() {
 	if(!ice.modules.includes("graphics")) ice.modules.push("graphics");
 	ice.graphics = {};
