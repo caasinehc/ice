@@ -1,9 +1,11 @@
-var ice = (function(ice) {
-
-	ice.modules = ice.modules || [];
-	ice.modules.push("time");
+if(typeof ice === "undefined") {
+	ice = {};
+	ice.modules = [];
+}
+(function() {
+	if(!ice.modules.includes("time")) ice.modules.push("time");
 	ice.time = {};
-	ice.time.version = "v1.0.1"; // This version of the ice.time module
+	ice.time.version = "v1.0.2"; // This version of the ice.time module
 	console.log("%cice.time " + ice.time.version + " imported successfully.", "color: #008000");
 
 	/*
@@ -68,20 +70,18 @@ var ice = (function(ice) {
 
 		this.tick = function() {};
 
-		this.setTickRate = function(tickRate = 60) {
+		this.setTickRate = (tickRate = 60) => {
 			if(tickRate !== this.tickRate) {
 				this.tickRate = tickRate;
 				clearInterval(loop);
 				loop = setInterval(tick, 1000 / tickRate);
 			}
 		}
-		this.loop = function(loop) {
+		this.loop = (loop) => {
 			if(loop === undefined) return !noLoop;
 			noLoop = !loop;
 		}
 
 		loop = setInterval(tick, 1000 / this.tps);
 	}
-
-	return ice;
-}(ice || {}));
+})();

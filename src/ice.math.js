@@ -1,7 +1,9 @@
-var ice = (function(ice) {
-
-	ice.modules = ice.modules || [];
-	ice.modules.push("math");
+if(typeof ice === "undefined") {
+	ice = {};
+	ice.modules = [];
+}
+(function() {
+	if(!ice.modules.includes("math")) ice.modules.push("math");
 	ice.math = {};
 	ice.math.version = "v2.0.9"; // This version of the ice.math module
 	console.log("%cice.math " + ice.math.version + " imported successfully.", "color: #008000");
@@ -12,9 +14,9 @@ var ice = (function(ice) {
 
 	// Private variables/functions
 
-	var RAD_TO_DEG = 180 / Math.PI;
-	var DEG_TO_RAD = Math.PI / 180;
-	var fibMem = {};
+	let RAD_TO_DEG = 180 / Math.PI;
+	let DEG_TO_RAD = Math.PI / 180;
+	let fibMem = {};
 
 	// Properties
 
@@ -28,11 +30,11 @@ var ice = (function(ice) {
 			if(min === undefined) {
 				return Math.random();
 			}
-			var maxInt = Math.floor(min);
+			let maxInt = Math.floor(min);
 			return Math.floor(Math.random() * (maxInt + 1));
 		}
-		var minInt = Math.ceil(min);
-		var maxInt = Math.floor(max);
+		let minInt = Math.ceil(min);
+		let maxInt = Math.floor(max);
 		return Math.floor(Math.random() * (maxInt - minInt + 1) + minInt);
 	}
 	ice.math.randomFloat = function(min, max) { // returns a random float from min (inclusive) to max (exclusive)
@@ -73,22 +75,22 @@ var ice = (function(ice) {
 	}
 	ice.math.distSq = function(x1, y1, x2, y2) {
 		if(x2 === undefined) {
-			var dx = x1.x - y1.x;
-			var dy = x1.y - y1.y;
+			let dx = x1.x - y1.x;
+			let dy = x1.y - y1.y;
 			return dx * dx + dy * dy;
 		}
-		var dx = x1 - x2;
-		var dy = y1 - y2;
+		let dx = x1 - x2;
+		let dy = y1 - y2;
 		return dx * dx + dy * dy;
 	}
 	ice.math.dist = function(x1, y1, x2, y2) {
 		if(x2 === undefined) {
-			var dx = x1.x - y1.x;
-			var dy = x1.y - y1.y;
+			let dx = x1.x - y1.x;
+			let dy = x1.y - y1.y;
 			return Math.sqrt(dx * dx + dy * dy);
 		}
-		var dx = x1 - x2;
-		var dy = y1 - y2;
+		let dx = x1 - x2;
+		let dy = y1 - y2;
 		return Math.sqrt(dx * dx + dy * dy);
 	}
 	ice.math.map = function(n, oldMin, oldMax, newMin, newMax, clamp) {
@@ -102,13 +104,13 @@ var ice = (function(ice) {
 		 * Just let it go. Woo-sah, wooooo-saaaahh
 		 */
 		if(newMin === newMax) return newMin;
-		var mapped = (n - oldMin) * (newMax - newMin) / (oldMax - oldMin) + newMin;
+		let mapped = (n - oldMin) * (newMax - newMin) / (oldMax - oldMin) + newMin;
 		if(clamp) mapped = ice.math.clamp(mapped, newMin, newMax);
 		return mapped;
 	}
 	ice.math.isPrime = function(n) { // returns whether or not a number is prime (0, 1, and Infinity are not prime)
 		if(isFinite(n)) {
-			for(var i = 2, sqrt = Math.sqrt(n); i <= sqrt; i++) {
+			for(let i = 2, sqrt = Math.sqrt(n); i <= sqrt; i++) {
 				if(n % i === 0) {
 					return false;
 				}
@@ -138,7 +140,7 @@ var ice = (function(ice) {
 	}
 	ice.math.clamp = function(n, min, max) {
 		if(min > max) {
-			var temp = min;
+			let temp = min;
 			min = max;
 			max = temp;
 		}
@@ -146,6 +148,4 @@ var ice = (function(ice) {
 		if(n > max) return max;
 		return n;
 	}
-
-	return ice;
-}(ice || {}));
+})();

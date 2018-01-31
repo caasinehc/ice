@@ -1,6 +1,8 @@
-var ice = (function(ice) {
-
-	ice.modules = ice.modules || [];
+if(typeof ice === "undefined") {
+	ice = {};
+	ice.modules = [];
+}
+(function() {
 	ice.modules.push("colors");
 	ice.colors = {};
 	ice.colors.version = "v2.1.3"; // This version of the ice.colors module
@@ -151,6 +153,4 @@ var ice = (function(ice) {
 		set = set || ice.colors.huesExt;
 		return set[Math.floor(Math.random() * set.length)];
 	}
-
-	return ice;
-}(ice || {}));
+})();

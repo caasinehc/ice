@@ -1,11 +1,9 @@
-var ice = (function(ice) {
-
-	ice.version = "v2.1.10"
+if(typeof ice === "undefined") {
+	ice = {};
 	ice.modules = [];
-	console.log("%c-------- Importing ice.js " + ice.version + " --------", "font-weight: bold; font-size: 24px");
-
-	return ice;
-}(ice || {}));
+}
+ice.version = "v2.1.11"
+console.log("%c-------- Importing ice.js " + ice.version + " --------", "font-weight: bold; font-size: 24px");
 
 // Ensure the document has a head (for importing)
 
