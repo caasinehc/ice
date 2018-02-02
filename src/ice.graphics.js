@@ -1,9 +1,8 @@
-var ice = (function(ice) {
-
-	ice.modules = ice.modules || [];
-	ice.modules.push("graphics");
+if(typeof ice === "undefined") ice = {modules: []};
+(function() {
+	if(!ice.modules.includes("graphics")) ice.modules.push("graphics");
 	ice.graphics = {};
-	ice.graphics.version = "v2.2.10"; // This version of the ice.graphics module
+	ice.graphics.version = "v2.2.12"; // This version of the ice.graphics module
 	console.log("%cice.graphics " + ice.graphics.version + " imported successfully.", "color: #008000");
 
 	/*
@@ -14,26 +13,26 @@ var ice = (function(ice) {
 	 *	TODO:
 	 *		curve
 	 *		scale, transform, rotate, and all that unnecessarily complicated bullsh*t
-	 *		charts: bar, line, scatter
+	 *		charts: bar
 	 *		renew (un-taints canvas by scrapping it and creating a new one)
 	 */
 
 	// Private variables/functions
 
-	var TAU = Math.PI * 2;
-	var WHITE = "#FFFFFF";
-	var BLACK = "#000000";
-	var SILVER = "#C0C0C0";
-	var TRANSPARENT = "rgba(0, 0, 0, 0)";
-	var DEG120 = degToRad(120);
-	var DEG240 = degToRad(240);
-	var SIN120 = Math.sin(DEG120);
-	var COS120 = Math.cos(DEG120);
-	var SIN240 = Math.sin(DEG240);
-	var COS240 = Math.cos(DEG240);
-	var DEG45 = degToRad(45);
-	var SIN45 = Math.sin(DEG45);
-	var COS45 = Math.cos(DEG45);
+	let TAU = Math.PI * 2;
+	let WHITE = "#FFFFFF";
+	let BLACK = "#000000";
+	let SILVER = "#C0C0C0";
+	let TRANSPARENT = "rgba(0, 0, 0, 0)";
+	let DEG120 = degToRad(120);
+	let DEG240 = degToRad(240);
+	let SIN120 = Math.sin(DEG120);
+	let COS120 = Math.cos(DEG120);
+	let SIN240 = Math.sin(DEG240);
+	let COS240 = Math.cos(DEG240);
+	let DEG45 = degToRad(45);
+	let SIN45 = Math.sin(DEG45);
+	let COS45 = Math.cos(DEG45);
 
 	function degToRad(n) {
 		return n * (Math.PI / 180);
@@ -44,7 +43,7 @@ var ice = (function(ice) {
 			return document.querySelector("canvas").getContext("2d");
 		}
 		if(typeof input === "string") {
-			var possibleCanvas = document.querySelector(input);
+			let possibleCanvas = document.querySelector(input);
 			if(possibleCanvas instanceof HTMLCanvasElement) {
 				return possibleCanvas.getContext("2d");
 			}
@@ -69,12 +68,12 @@ var ice = (function(ice) {
 		this.midWidth = this.width / 2;
 		this.midHeight = this.height / 2;
 
-		var canvas = this.canvas;
-		var ctx = this.ctx;
-		var imgMem = {};
-		var tainted = false;
+		let canvas = this.canvas;
+		let ctx = this.ctx;
+		let imgMem = {};
+		let tainted = false;
 
-		var settings = {};
+		let settings = {};
 		settings.bgColor = WHITE;
 		settings.fill = SILVER;
 		settings.stroke = BLACK;
@@ -90,17 +89,17 @@ var ice = (function(ice) {
 		settings.angleMode = "radians";
 		settings.imagePrefix = "https://cors-anywhere.herokuapp.com/";
 
-		var bufferCanvas = document.createElement("canvas");
+		let bufferCanvas = document.createElement("canvas");
 		bufferCanvas.width = this.width;
 		bufferCanvas.height = this.height;
-		var bufferCtx = bufferCanvas.getContext("2d");
+		let bufferCtx = bufferCanvas.getContext("2d");
 
 		function interpretColor(arg1, arg2, arg3, arg4, defaultColor) {
 			if(arg1 === undefined) {
 				return defaultColor === undefined ? WHITE : defaultColor;
 			}
 			modeIsRGB = settings.colorMode === "rgb";
-			var arg1IsNumber = typeof arg1 === "number";
+			let arg1IsNumber = typeof arg1 === "number";
 			if(arg2 === undefined) {
 				if(arg1IsNumber) {
 					if(modeIsRGB) {
@@ -123,8 +122,8 @@ var ice = (function(ice) {
 				if(modeIsRGB) {
 					return "rgb(" + arg1 + ", " + arg2 + ", " + arg3 + ")";
 				}
-				var typeofArg2 = typeof arg2;
-				var typeofArg3 = typeof arg3;
+				let typeofArg2 = typeof arg2;
+				let typeofArg3 = typeof arg3;
 				if(typeofArg2 === "number" || (typeofArg2 === "string" && !arg2.endsWith("%"))) arg2 += "%";
 				if(typeofArg3 === "number" || (typeofArg3 === "string" && !arg3.endsWith("%"))) arg3 += "%";
 				return "hsl(" + arg1 + ", " + arg2 + ", " + arg3 + ")";
@@ -132,8 +131,8 @@ var ice = (function(ice) {
 			if(modeIsRGB) {
 				return "rgba(" + arg1 + ", " + arg2 + ", " + arg3 + ", " + arg4 + ")";
 			}
-			var typeofArg2 = typeof arg2;
-			var typeofArg3 = typeof arg3;
+			let typeofArg2 = typeof arg2;
+			let typeofArg3 = typeof arg3;
 			if(typeofArg2 === "number" || (typeofArg2 === "string" && !arg2.endsWith("%"))) arg2 += "%";
 			if(typeofArg3 === "number" || (typeofArg3 === "string" && !arg3.endsWith("%"))) arg3 += "%";
 			return "hsla(" + arg1 + ", " + arg2 + ", " + arg3 + ", " + arg4 + ")";
@@ -145,8 +144,8 @@ var ice = (function(ice) {
 			}
 			else if(g === undefined) {
 				if(typeof r === "string") {
-					var rgbaArray = r.replace(/[^\d,.]/g, "").split(",");
-					for(var i = 0; i < rgbaArray.length; i++) {
+					let rgbaArray = r.replace(/[^\d,.]/g, "").split(",");
+					for(let i = 0; i < rgbaArray.length; i++) {
 						rgbaArray[i] = parseFloat(rgbaArray[i]);
 					}
 					return rgbToHsl(rgbaArray[0], rgbaArray[1], rgbaArray[2], rgbaArray[3]);
@@ -170,13 +169,13 @@ var ice = (function(ice) {
 			g /= 255;
 			b /= 255;
 
-			var max = Math.max(r, g, b);
-			var min = Math.min(r, g, b);
-			var l = (max + min) * 50;
+			let max = Math.max(r, g, b);
+			let min = Math.min(r, g, b);
+			let l = (max + min) * 50;
 
 			if(max == min) return [0, 0, l, a];
 
-			var diff = max - min;
+			let diff = max - min;
 			s = 100 * diff / (l > 50 ? 2 - max - min : max + min);
 			if(max === r) h = 60 * (g - b) / diff + (g < b ? 360 : 0);
 			else if(max === g) h = 60 * (b - r) / diff + 120;
@@ -191,8 +190,8 @@ var ice = (function(ice) {
 			}
 			else if(s === undefined) {
 				if(typeof h === "string") {
-					var hslaArray = h.replace(/[^\d,.]/g, "").split(",");
-					for(var i = 0; i < hslaArray.length; i++) {
+					let hslaArray = h.replace(/[^\d,.]/g, "").split(",");
+					for(let i = 0; i < hslaArray.length; i++) {
 						hslaArray[i] = parseFloat(hslaArray[i]);
 					}
 					return hslToRgb(hslaArray[0], hslaArray[1], hslaArray[2], hslaArray[3]);
@@ -230,8 +229,8 @@ var ice = (function(ice) {
 				return p;
 			}
 
-			var q = l < 0.5 ? l * (1 + s) : l + s - l * s;
-			var p = 2 * l - q;
+			let q = l < 0.5 ? l * (1 + s) : l + s - l * s;
+			let p = 2 * l - q;
 
 			return [
 				Math.round(hue2rgb(p, q, h + 1 / 3) * 255),
@@ -247,7 +246,7 @@ var ice = (function(ice) {
 				return r + r + g + g + b + b + a + a;
 			});
 
-			var result = /^#?([a-f\d]{2})([a-f\d]{2})([a-f\d]{2})([a-f\d]{2})?$/i.exec(hex);
+			let result = /^#?([a-f\d]{2})([a-f\d]{2})([a-f\d]{2})([a-f\d]{2})?$/i.exec(hex);
 			if(result === null) return [0, 0, 0, 0];
 			result[4] = result[4] === undefined ? "FF" : result[4]
 			return [
@@ -262,8 +261,8 @@ var ice = (function(ice) {
 			if(r === undefined) return "#00000000";
 			else if(g === undefined) {
 				if(typeof r === "string") {
-					var rgbaArray = r.replace(/[^\d,.]/g, "").split(",");
-					for(var i = 0; i < rgbaArray.length; i++) {
+					let rgbaArray = r.replace(/[^\d,.]/g, "").split(",");
+					for(let i = 0; i < rgbaArray.length; i++) {
 						rgbaArray[i] = parseFloat(rgbaArray[i]);
 					}
 					return rgbToHex(rgbaArray[0], rgbaArray[1], rgbaArray[2], rgbaArray[3]);
@@ -283,7 +282,7 @@ var ice = (function(ice) {
 			g = g.length === 1 ? "0" + g : g;
 			b = b.toString(16);
 			b = b.length === 1 ? "0" + b : b;
-			var rgb = "#" + r + g + b;
+			let rgb = "#" + r + g + b;
 			if(a !== undefined) {
 				a = parseInt(a * 255).toString(16);
 				a = a.length === 1 ? "0" + a : a;
@@ -335,15 +334,14 @@ var ice = (function(ice) {
 				ctx.stroke();
 			}
 		}
-		this.background = function(arg1, arg2, arg3, arg4) {
+		this.background = (arg1, arg2, arg3, arg4) => {
 			this.ctx.fillStyle = interpretColor(arg1, arg2, arg3, arg4, settings.bgColor);
 			this.ctx.fillRect(0, 0, this.width, this.height);
 		}
-		this.setBackground = function(arg1, arg2, arg3, arg4) {
+		this.setBackground = (arg1, arg2, arg3, arg4) => {
 			return settings.bgColor = interpretColor(arg1, arg2, arg3, arg4, settings.bgColor);
 		}
-		this.resize = function(w, h) {
-			h = h === undefined ? w : h;
+		this.resize = (w, h = w) => {
 			this.width = this.canvas.width = w;
 			this.height = this.canvas.height = h;
 			this.midWidth = this.width / 2;
@@ -351,25 +349,25 @@ var ice = (function(ice) {
 			bufferCanvas.width = this.width;
 			bufferCanvas.height = this.height;
 		}
-		this.fill = function(arg1, arg2, arg3, arg4) {
+		this.fill = (arg1, arg2, arg3, arg4) => {
 			return settings.fill = interpretColor(arg1, arg2, arg3, arg4, settings.fill);
 		}
-		this.stroke = function(arg1, arg2, arg3, arg4) {
+		this.stroke = (arg1, arg2, arg3, arg4) => {
 			return settings.stroke = interpretColor(arg1, arg2, arg3, arg4, settings.stroke);
 		}
-		this.lineWidth = function(width) {
+		this.lineWidth = width => {
 			return settings.lineWidth = width === undefined ? settings.lineWidth : width;
 		}
-		this.strokePattern = function(pattern) {
+		this.strokePattern = pattern => {
 			return settings.strokePattern = pattern === undefined ? settings.strokePattern : pattern;
 		}
-		this.noFill = function() {
+		this.noFill = () => {
 			settings.fill = false;
 		}
-		this.noStroke = function() {
+		this.noStroke = () => {
 			settings.stroke = false;
 		}
-		this.font = function(arg1, arg2) {
+		this.font = (arg1, arg2) => {
 			if(typeof arg1 === "string") {
 				settings.fontFamily = arg1;
 				if(typeof arg2 === "number") {
@@ -387,7 +385,7 @@ var ice = (function(ice) {
 
 		function getFont(asString) {
 			if(asString) {
-				var font = "";
+				let font = "";
 				if(settings.italic) font += "italic ";
 				if(settings.bold) font += "bold ";
 				font += settings.fontSize + "px ";
@@ -396,7 +394,7 @@ var ice = (function(ice) {
 			}
 			return [settings.fontSize, settings.fontFamily, settings.italic, settings.bold];
 		}
-		this.textAlign = function(arg1, arg2) {
+		this.textAlign = (arg1, arg2) => {
 			if(arg1 === "left" || arg1 === "right" || arg1 === "center" || arg1 === "start" || arg1 === "end") {
 				settings.textAlign = arg1;
 				if(arg2 === "top" || arg2 === "hanging" || arg2 === "middle" || arg2 === "alphabetic" || arg2 === "ideographic" || arg2 === "bottom") {
@@ -411,19 +409,15 @@ var ice = (function(ice) {
 			}
 			return [settings.textBaseline, settings.textAlign];
 		}
-		this.bold = function(bold) {
-			if(bold === undefined) {
-				return settings.bold;
-			}
+		this.bold = bold => {
+			if(bold === undefined) return settings.bold;
 			settings.bold = bold;
 		}
-		this.italic = function(italic) {
-			if(italic === undefined) {
-				return settings.italic;
-			}
+		this.italic = italic => {
+			if(italic === undefined) return settings.italic;
 			settings.italic = italic;
 		}
-		this.colorMode = function(mode) {
+		this.colorMode = mode => {
 			if(typeof mode === "string") {
 				mode = mode.toLowerCase();
 			}
@@ -432,7 +426,7 @@ var ice = (function(ice) {
 			}
 			return settings.colorMode;
 		}
-		this.angleMode = function(mode) {
+		this.angleMode = mode => {
 			if(typeof mode === "string") {
 				mode = mode.toLowerCase();
 			}
@@ -441,34 +435,29 @@ var ice = (function(ice) {
 			}
 			return settings.angleMode;
 		}
-		this.imagePrefix = function(prefix) {
+		this.imagePrefix = prefix => {
 			if(prefix === undefined) return settings.imagePrefix;
 			return settings.imagePrefix = prefix;
 		}
-		this.rect = function(x, y, w, h) {
-			h = h === undefined ? w : h;
+		this.rect = (x, y, w, h = w) => {
 			if(prepFill()) this.ctx.fillRect(x, y, w, h);
 			if(prepStroke()) this.ctx.strokeRect(x, y, w, h);
 		}
-		this.ellipse = function(x, y, w, h, ang) {
-			ang = ang === undefined ? 0 : ang;
+		this.ellipse = (x, y, w, h = w, ang = 0) => {
 			if(settings.angleMode === "degrees") ang = degToRad(ang);
-			h = h === undefined ? w : h;
 			this.ctx.beginPath();
 			this.ctx.ellipse(x, y, w, h, ang, 0, TAU)
 			renderPath();
 		}
-		this.circle = function(x, y, rad) {
-			rad = rad === undefined ? 8 : rad;
+		this.circle = (x, y, rad = 8) => {
 			this.ctx.beginPath();
 			this.ctx.arc(x, y, rad, 0, TAU);
 			renderPath();
 		}
-		this.point = function(pos, size) {
-			size = size === undefined ? 1 : size;
+		this.point = (pos, size = 1) => {
 			this.circle(pos.x, pos.y, size);
 		}
-		this.line = function(x1, y1, x2, y2) {
+		this.line = (x1, y1, x2, y2) => {
 			this.ctx.beginPath();
 			if(x2 === undefined) {
 				this.ctx.moveTo(x1.x, x1.y);
@@ -480,16 +469,16 @@ var ice = (function(ice) {
 			}
 			renderPath();
 		}
-		this.triangle = function(cx, cy, v1x, v1y) {
+		this.triangle = (cx, cy, v1x, v1y) => {
 			if(v1y === undefined) {
 				v1y = v1x;
 				v1x = 0;
 			}
 
-			var v2x = v1x * COS120 - v1y * SIN120;
-			var v2y = v1x * SIN120 + v1y * COS120;
-			var v3x = v1x * COS240 - v1y * SIN240;
-			var v3y = v1x * SIN240 + v1y * COS240;
+			let v2x = v1x * COS120 - v1y * SIN120;
+			let v2y = v1x * SIN120 + v1y * COS120;
+			let v3x = v1x * COS240 - v1y * SIN240;
+			let v3y = v1x * SIN240 + v1y * COS240;
 
 			this.ctx.beginPath();
 			this.ctx.moveTo(cx + v1x, cy + v1y);
@@ -498,13 +487,12 @@ var ice = (function(ice) {
 			this.ctx.closePath();
 			renderPath();
 		}
-		this.regPolygon = function(x, y, sides, rad, rotation) {
+		this.regPolygon = (x, y, sides, rad, rotation = 0) => {
 			sides = Math.floor(sides);
 			if(sides <= 1) {
 				this.circle(x, y, rad);
 				return;
 			}
-			rotation = rotation === undefined ? 0 : rotation;
 			if(settings.angleMode === "degrees") rotation = degToRad(rotation);
 			rotation -= TAU / 4;
 			this.ctx.beginPath();
@@ -518,10 +506,9 @@ var ice = (function(ice) {
 			this.ctx.closePath();
 			renderPath();
 		}
-		this.polygon = function(points) {
-			if(!points instanceof Array || points.length <= 0) {
-				return;
-			}
+		this.polygon = points => {
+			if(!points instanceof Array) points = arguments;
+			if(points.length <= 0) return;
 			if(points.length === 1) {
 				this.point(points[0]);
 				return;
@@ -534,27 +521,19 @@ var ice = (function(ice) {
 			this.ctx.closePath();
 			renderPath();
 		}
-		this.text = function(text, x, y, maxWidth) {
+		this.text = (text, x, y, maxWidth) => {
 			ctx.font = getFont(true);
 			ctx.textAlign = settings.textAlign;
 			ctx.textBaseline = settings.textBaseline;
 			if(prepFill()) ctx.fillText(text, x, y, maxWidth);
 			if(prepStroke()) ctx.strokeText(text, x, y, maxWidth);
 		}
-		this.points = function(points, size) {
-			size = size === undefined ? 1 : size;
-			for(var point of points) {
-				this.circle(point.x, point.y, size);
-			}
+		this.points = (points, size = 1) => {
+			for(let point of points) this.point(point, size);
 		}
-		this.lines = function(points) {
-			if(!points instanceof Array) {
-				this.lines(arguments);
-				return;
-			}
-			if(points.length <= 0) {
-				return;
-			}
+		this.lines = points => {
+			if(!points instanceof Array) points = arguments;
+			if(points.length <= 0) return;
 			if(points.length === 1) {
 				this.point(points[0]);
 				return;
@@ -572,16 +551,16 @@ var ice = (function(ice) {
 			this.img = new Image();
 			this.ready = false;
 
-			var callbacks = [];
+			let callbacks = [];
 
 			function executeCallbacks() {
-				for(var callback of callbacks) {
+				for(let callback of callbacks) {
 					callback();
 				}
 				callbacks = [];
 			}
 
-			this.img.onload = (e) => {
+			this.img.onload = e => {
 				this.ready = true;
 				executeCallbacks();
 			}
@@ -593,7 +572,7 @@ var ice = (function(ice) {
 			}
 			this.img.src = this.src;
 
-			this.addCallback = function(callback) {
+			this.addCallback = callback => {
 				if(typeof callback !== "function") return;
 				if(this.ready) {
 					callback();
@@ -606,11 +585,11 @@ var ice = (function(ice) {
 				}
 			}
 
-			this.reload = function() {
+			this.reload = () => {
 				this.img = new Image();
 				this.ready = false;
 
-				this.img.onload = function() {
+				this.img.onload = () => {
 					this.ready = true;
 					executeCallbacks();
 				}
@@ -620,10 +599,8 @@ var ice = (function(ice) {
 				this.img.src = this.src;
 			}
 		}
-		this.taint = function() {
-			tainted = true;
-		}
-		this.image = function(img, x, y, w, h, sx, sy, sw, sh) {
+		this.taint = () => {tainted = true;}
+		this.image = (img, x = 0, y = 0, w = this.width, h = this.height, sx, sy, sw, sh) => {
 			if(typeof img === "string") {
 				if(imgMem[img] === undefined) {
 					imgMem[img] = new cachedImage(img);
@@ -636,47 +613,39 @@ var ice = (function(ice) {
 				}
 				img = imgMem[img].img;
 			}
-			x = x === undefined ? 0 : x;
-			y = y === undefined ? 0 : y;
-			w = w === undefined ? this.width : w;
-			h = h === undefined ? this.height : h;
-			if(sx === undefined) {
-				this.ctx.drawImage(img, x, y, w, h);
-			}
-			else {
-				this.ctx.drawImage(img, sx, sy, sw, sh, x, y, w, h);
-			}
+			if(sx === undefined) this.ctx.drawImage(img, x, y, w, h);
+			else this.ctx.drawImage(img, sx, sy, sw, sh, x, y, w, h);
 		}
 
 		function pieChart(x, y, rad, dataIn, rotation, donut, meter) {
-			var data = {
+			let data = {
 				rings: [],
 				ringTotal: 0
 			};
-			var ringsIn = dataIn.rings === undefined ? [{
+			let ringsIn = dataIn.rings === undefined ? [{
 				slices: dataIn.slices
 			}] : dataIn.rings;
-			for(var ring of ringsIn) {
-				var slices = [];
-				var total = 0;
-				var lineWidth = 0;
+			for(let ring of ringsIn) {
+				let slices = [];
+				let total = 0;
+				let lineWidth = 0;
 				if(ring.lineWidth !== undefined) lineWidth = ring.lineWidth;
 				else if(ring.width !== undefined) lineWidth = ring.width;
-				var size = 1;
+				let size = 1;
 				if(ring.size !== undefined) size = ring.size;
 				else if(ring.value !== undefined) size = ring.value;
 				else if(ring.data !== undefined) size = ring.data;
 				if(size < 0) size = 0;
-				var slicesIn = ring.slices === undefined ? [] : ring.slices;
-				for(var slice of slicesIn) {
-					var sliceSize = 1;
+				let slicesIn = ring.slices === undefined ? [] : ring.slices;
+				for(let slice of slicesIn) {
+					let sliceSize = 1;
 					if(slice.size !== undefined) sliceSize = slice.size;
 					else if(slice.value !== undefined) sliceSize = slice.value;
 					else if(slice.data !== undefined) sliceSize = slice.data;
 					if(sliceSize < 0) sliceSize = 0;
-					var color = slice.color === undefined ? typeof slice === "string" ? slice : TRANSPARENT : slice.color;
-					var border = slice.border === undefined ? BLACK : slice.border;
-					var sliceLineWidth = 0;
+					let color = slice.color === undefined ? typeof slice === "string" ? slice : TRANSPARENT : slice.color;
+					let border = slice.border === undefined ? BLACK : slice.border;
+					let sliceLineWidth = 0;
 					if(slice.lineWidth !== undefined) sliceLineWidth = slice.lineWidth;
 					else if(slice.width !== undefined) sliceLineWidth = slice.width;
 					slices.push({
@@ -698,13 +667,13 @@ var ice = (function(ice) {
 			}
 			if(donut) data.ringTotal *= 2;
 
-			var offsetRad = rad;
+			let offsetRad = rad;
 			bufferCtx.clearRect(0, 0, bufferCanvas.width, bufferCanvas.height);
-			for(var ring of data.rings) {
-				var thisRad = rad * (ring.size / data.ringTotal);
-				var offsetAngle = rotation;
-				for(var slice of ring.slices) {
-					var thisAngle = (TAU * slice.size / ring.sliceTotal);
+			for(let ring of data.rings) {
+				let thisRad = rad * (ring.size / data.ringTotal);
+				let offsetAngle = rotation;
+				for(let slice of ring.slices) {
+					let thisAngle = (TAU * slice.size / ring.sliceTotal);
 					bufferCtx.beginPath();
 					bufferCtx.moveTo(x, y);
 					bufferCtx.arc(x, y, offsetRad, offsetAngle, thisAngle + offsetAngle);
@@ -738,25 +707,22 @@ var ice = (function(ice) {
 			ctx.drawImage(bufferCanvas, 0, 0);
 		}
 		this.charts = {};
-		this.charts.pie = function(x, y, rad, dataIn, rotation) {
-			rotation = rotation === undefined ? 0 : rotation;
+		this.charts.pie = (x, y, rad, dataIn, rotation = 0) => {
 			if(settings.angleMode === "degrees") rotation = degToRad(rotation);
 			rotation -= TAU / 4;
 			pieChart(x, y, rad, dataIn, rotation);
 		}
-		this.charts.donut = function(x, y, rad, dataIn, rotation) {
-			rotation = rotation === undefined ? 0 : rotation;
+		this.charts.donut = (x, y, rad, dataIn, rotation = 0) => {
 			if(settings.angleMode === "degrees") rotation = degToRad(rotation);
 			rotation -= TAU / 4;
 			pieChart(x, y, rad, dataIn, rotation, true);
 		}
-		this.charts.meter = function(x, y, rad, dataIn, rotation, text) {
-			rotation = rotation === undefined ? 0 : rotation;
+		this.charts.meter = (x, y, rad, dataIn, rotation = 0, text) => {
 			if(settings.angleMode === "degrees") rotation = degToRad(rotation);
 			rotation -= TAU / 2;
 			pieChart(x, y, rad, dataIn, rotation, true, true);
 			if(text !== undefined) {
-				var font = "";
+				let font = "";
 				if(settings.italic) font += "italic ";
 				if(settings.bold) font += "bold ";
 				font += rad / 2 + "px ";
@@ -764,13 +730,13 @@ var ice = (function(ice) {
 				ctx.font = font;
 				ctx.textAlign = "center";
 				ctx.textBaseline = "alphabetic";
-				var maxWidth = rad * COS45;
+				let maxWidth = rad * COS45;
 				if(prepFill()) ctx.fillText(text, x, y, maxWidth);
 				if(prepStroke()) ctx.strokeText(text, x, y, maxWidth);
 			}
 		}
 		function lineChart(x, y, w, h, dataIn, line) {
-			var data = {};
+			let data = {};
 			data.groups = dataIn.groups === undefined ? [{points: dataIn.points}] : dataIn.groups;
 			data.borderColor = dataIn.borderColor === undefined ? BLACK : dataIn.borderColor;
 			data.borderWidth = dataIn.borderWidth === undefined ? 2 : dataIn.borderWidth;
@@ -831,10 +797,10 @@ var ice = (function(ice) {
 			}
 			ctx.drawImage(bufferCanvas, x, y - h, w, h, x, y - h, w, h);
 		}
-		this.charts.scatter = function(x, y, w, h, dataIn) {
+		this.charts.scatter = (x, y, w, h, dataIn) => {
 			lineChart(x, y, w, h, dataIn, false);
 		}
-		this.charts.line = function(x, y, w, h, dataIn) {
+		this.charts.line = (x, y, w, h, dataIn) => {
 			lineChart(x, y, w, h, dataIn, true);
 		}
 		this.charts.presets = {};
@@ -938,34 +904,27 @@ var ice = (function(ice) {
 				}
 			]
 		};
-		this.clear = function() {
-			ctx.clearRect(0, 0, this.width, this.height);
-		}
-		this.getPixel = function(x, y) {
-			var data = ctx.getImageData(x, y, 1, 1).data;
-			if(settings.colorMode === "rgb") {
-				return data;
-			}
-			else {
-				return rgbToHsl(data);
-			}
+		this.clear = () => {ctx.clearRect(0, 0, this.width, this.height);}
+		this.getPixel = (x, y) => {
+			let data = ctx.getImageData(x, y, 1, 1).data;
+			return settings.colorMode === "rgb" ? data : rgbToHsl(data);
 		}
 
-		this.setPixels = function(func, x, y, w, h) {
+		this.setPixels = (func, x, y, w, h) => {
 			if(x === undefined) {
 				x = 0;
 				y = 0;
 				w = this.width;
 				h = this.height;
 			}
-			var imageData = ctx.getImageData(x, y, w, h);
-			var data = imageData.data;
-			var newData = new ImageData(w, h);
+			let imageData = ctx.getImageData(x, y, w, h);
+			let data = imageData.data;
+			let newData = new ImageData(w, h);
 			wholeData = ctx.getImageData(0, 0, this.width, this.height).data;
 
-			for(var i = 0; i < data.length; i += 4) {
+			for(let i = 0; i < data.length; i += 4) {
 				thisData = settings.colorMode === "rgb" ? [data[i], data[i + 1], data[i + 2], data[i + 3] / 255] : rgbToHsl(data[i], data[i + 1], data[i + 2], data[i + 3] / 255);
-				var results = func((i / 4) % w, Math.floor((i / 4) / w), thisData[0], thisData[1], thisData[2], thisData[3], wholeData, i);
+				let results = func((i / 4) % w, Math.floor((i / 4) / w), thisData[0], thisData[1], thisData[2], thisData[3], wholeData, i);
 				if(settings.colorMode === "hsl") results = hslToRgb(results);
 				newData.data[i] = results[0];
 				newData.data[i + 1] = results[1];
@@ -982,75 +941,67 @@ var ice = (function(ice) {
 				ctx.drawImage(bufferCanvas, 0, 0, w, h, x, y, w, h);
 			}
 		}
-		this.download = function(name) {
+		this.download = name => {
 			/*
 			 *	Quick warning: This will NOT work on a "tainted" canvas (ie: one that used an image without CORS approval)
 			 *	This is a security issue. It's annoying, but necessary.
 			 *	(un)Fortunately, there is no work-around if the canvas has already been tainted.
 			 *	For more info, visit: https://developer.mozilla.org/en-US/docs/Web/HTML/CORS_enabled_image
 			 */
-			var link = document.createElement("a");
+			let link = document.createElement("a");
 			link.href = canvas.toDataURL();
 			link.download = name || "download";
 			link.click();
 			// window.open(canvas.toDataURL());
 		}
-		this.invert = function(percent) {
+		this.invert = percent => {
 			percent = percent === undefined ? "100%" : percent + "%";
 			applyCssFilter("invert", percent);
 		}
-		this.grayscale = function(percent) {
+		this.grayscale = percent => {
 			percent = percent === undefined ? "100%" : percent + "%";
 			applyCssFilter("grayscale", percent);
 		}
-		this.sepia = function(percent) {
+		this.sepia = percent => {
 			percent = percent === undefined ? "100%" : percent + "%";
 			applyCssFilter("sepia", percent);
 		}
-		this.brightness = function(percent) {
+		this.brightness = percent => {
 			percent = percent === undefined ? "100%" : percent + "%";
 			applyCssFilter("brightness", percent);
 		}
-		this.contrast = function(percent) {
+		this.contrast = percent => {
 			percent = percent === undefined ? "100%" : percent + "%";
 			applyCssFilter("contrast", percent);
 		}
-		this.blur = function(px) {
+		this.blur = px => {
 			px = px === undefined ? "1px" : px + "px";
 			applyCssFilter("blur", px);
 		}
-		this.saturate = function(percent) {
+		this.saturate = percent => {
 			percent = percent === undefined ? "100%" : percent + "%";
 			applyCssFilter("saturate", percent);
 		}
-		this.opacity = function(percent) {
+		this.opacity = percent => {
 			percent = percent === undefined ? "100%" : percent + "%";
 			applyCssFilter("opacity", percent);
 		}
-		this.colorshift = function(degrees) {
+		this.colorshift = degrees => {
 			degrees = degrees === undefined ? "180deg" : degrees + "deg";
 			applyCssFilter("hue-rotate", degrees);
 		}
-		this.recolor = function(arg1, arg2, arg3, arg4) {
+		this.recolor = (arg1, arg2, arg3, arg4) => {
 			ctx.save();
 			ctx.globalCompositeOperation = "color";
 			ctx.fillStyle = interpretColor(arg1, arg2, arg3, arg4, this.color);
 			ctx.fillRect(0, 0, this.width, this.height);
 			ctx.restore();
 		}
-		this.save = function() {
-			return ctx.getImageData(0, 0, this.width, this.height);
-		}
-		this.restore = function(imageData) {
-			ctx.putImageData(imageData, 0, 0);
-		}
+		this.save = () => ctx.getImageData(0, 0, this.width, this.height);
+		this.restore = imageData => {ctx.putImageData(imageData, 0, 0);}
 
 		// Duplicates
 
 		this.greyscale = ice.graphics.Scene.prototype.grayscale;
 	}
-
-	// Methods
-
-	return ice;
-}(ice || {}));
+})();

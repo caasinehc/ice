@@ -1,9 +1,8 @@
-var ice = (function(ice) {
-
-	ice.modules = ice.modules || [];
-	ice.modules.push("dom");
+if(typeof ice === "undefined") ice = {modules: []};
+(function() {
+	if(!ice.modules.includes("dom")) ice.modules.push("dom");
 	ice.dom = {};
-	ice.dom.version = "v1.0.6"; // This version of the ice.dom module
+	ice.dom.version = "v1.0.8"; // This version of the ice.dom module
 	console.log("%cice.dom " + ice.dom.version + " imported successfully.", "color: #008000");
 	init();
 
@@ -13,7 +12,7 @@ var ice = (function(ice) {
 
 	// Private variables/functions
 
-	var typeLookup = {
+	let typeLookup = {
 		"script": "js",
 		"js": "js",
 		"javascript": "js",
@@ -151,7 +150,7 @@ var ice = (function(ice) {
 			"NumpadSubtract": false
 		};
 	}
-	var keyEncoder = {
+	let keyEncoder = {
 		"1": "Digit1",
 		"2": "Digit2",
 		"3": "Digit3",
@@ -305,7 +304,7 @@ var ice = (function(ice) {
 
 	ice.dom.import = function(src, type) {
 		if(typeLookup[type] === "css") {
-			var stylesheet = document.createElement("link");
+			let stylesheet = document.createElement("link");
 			stylesheet.rel = "stylesheet";
 			stylesheet.href = src;
 			let prom = new Promise(function(resolve, reject) {
@@ -316,7 +315,7 @@ var ice = (function(ice) {
 			return prom;
 		}
 		else {
-			var script = document.createElement("script");
+			let script = document.createElement("script");
 			script.src = src;
 			let prom = new Promise(function(resolve, reject) {
 				script.onload = resolve;
@@ -408,41 +407,41 @@ var ice = (function(ice) {
 		}
 
 		this.mouseDown = function(e, button) {};
-		this.elem.addEventListener("mousedown", (e) => {
+		this.elem.addEventListener("mousedown", e => {
 			let button = getButton(e.which);
 			downButtons[button] = true;
 			this.mouseDown(e, button);
 		});
 		this.mouseUp = function(e, button) {};
 		this.click = function(e, button) {};
-		this.elem.addEventListener("mouseup", (e) => {
+		this.elem.addEventListener("mouseup", e => {
 			let button = getButton(e.which);
 			let downBefore = downButtons[button];
 			downButtons[button] = false;
 			this.mouseUp(e, button);
 			if(downBefore) this.click(e, button);
 		});
-		this.mouseMove = function(e) {};
-		this.elem.addEventListener("mousemove", (e) => {
+		this.mouseMove = function(e, x, y) {};
+		this.elem.addEventListener("mousemove", e => {
 			this.prevMouseX = this.mouseX;
 			this.prevMouseY = this.mouseY;
 			this.mouseX = e.offsetX;
 			this.mouseY = e.offsetY;
-			this.mouseMove(e);
+			this.mouseMove(e, this.mouseX, this.mouseY);
 		});
-		this.wheel = function() {};
-		this.elem.addEventListener("wheel", (e) => {
+		this.wheel = function(e, dy) {};
+		this.elem.addEventListener("wheel", e => {
 			this.wheel(e, e.deltaY);
 		}, {
 			passive: true
 		});
-		this.keyDown = function() {};
-		this.elem.addEventListener("keydown", (e) => {
+		this.keyDown = function(e, key) {};
+		this.elem.addEventListener("keydown", e => {
 			setKey(e.code, true);
 			this.keyDown(e, e.key);
 		});
-		this.keyUp = function() {};
-		this.elem.addEventListener("keyup", (e) => {
+		this.keyUp = function(e, key) {};
+		this.elem.addEventListener("keyup", e => {
 			setKey(e.code, false);
 			this.keyUp(e, e.key);
 		});
@@ -459,6 +458,4 @@ var ice = (function(ice) {
 			document.documentElement.appendChild(document.createElement("head"));
 		}
 	}
-
-	return ice;
-}(ice || {}));
+})();

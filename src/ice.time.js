@@ -1,9 +1,8 @@
-var ice = (function(ice) {
-
-	ice.modules = ice.modules || [];
-	ice.modules.push("time");
+if(typeof ice === "undefined") ice = {modules: []};
+(function() {
+	if(!ice.modules.includes("time")) ice.modules.push("time");
 	ice.time = {};
-	ice.time.version = "v1.0.1"; // This version of the ice.time module
+	ice.time.version = "v1.0.3"; // This version of the ice.time module
 	console.log("%cice.time " + ice.time.version + " imported successfully.", "color: #008000");
 
 	/*
@@ -17,10 +16,6 @@ var ice = (function(ice) {
 			return new ice.time.Clock(tickRate);
 		}
 
-		this.tickRate = tickRate;
-		this.memorySize = tickRate;
-		this.smoothTps = true;
-
 		this.tps = tickRate;
 		this.mspt = 1000 / this.tps;
 		this.dt = performance.now();
@@ -28,6 +23,8 @@ var ice = (function(ice) {
 		this.tpsHistory = [];
 
 		let noLoop = false;
+		let memorySize = tickRate;
+		let smoothTps = true;
 		let loop;
 		let lastTick = performance.now();
 		let dtMem = [];
@@ -45,9 +42,9 @@ var ice = (function(ice) {
 			lastTick = now;
 
 			dtMem.unshift(this.dt); // Add this dt to dtMem (at start of array)
-			dtMem = dtMem.slice(0, this.memorySize); // cut off any extra entries from the end of the array
+			dtMem = dtMem.slice(0, memorySize); // cut off any extra entries from the end of the array
 			this.mspt = 0;
-			if(this.smoothTps) {
+			if(smoothTps) {
 				for(let i = dtMem.length - 1; i >= 0; i--) {
 					this.mspt += dtMem[i];
 					this.mspt /= 2;
@@ -63,25 +60,34 @@ var ice = (function(ice) {
 			this.tps = +(1000 / this.mspt).toFixed(2);
 
 			this.tpsHistory.unshift(this.tps); // Add this dt to dtMem (at start of array)
-			this.tpsHistory = this.tpsHistory.slice(0, this.memorySize); // cut off any extra entries from the end of the array
+			this.tpsHistory = this.tpsHistory.slice(0, memorySize); // cut off any extra entries from the end of the array
 		}
 
 		this.tick = function() {};
 
-		this.setTickRate = function(tickRate = 60) {
-			if(tickRate !== this.tickRate) {
-				this.tickRate = tickRate;
-				clearInterval(loop);
-				loop = setInterval(tick, 1000 / tickRate);
-			}
+		this.tickRate = newTickRate => {
+			if(newTickRate === undefined) return tickRate;
+			tickRate = newTickRate;
+			clearInterval(loop);
+			loop = setInterval(tick, 1000 / tickRate);
 		}
-		this.loop = function(loop) {
+		this.loop = loop => {
 			if(loop === undefined) return !noLoop;
 			noLoop = !loop;
 		}
+		this.memorySize = size => {
+			if(size === undefined) return memorySize;
+			memorySize = size;
+		}
+		this.smoothTps = smooth => {
+			if(smooth === undefined) return smoothTps;
+			smoothTps = smooth;
+		}
+		this.kill = () => {
+			clearInterval(loop);
+			for(let key in this) delete this[key];
+		}
 
-		loop = setInterval(tick, 1000 / this.tps);
+		loop = setInterval(tick, 1000 / tickRate);
 	}
-
-	return ice;
-}(ice || {}));
+})();

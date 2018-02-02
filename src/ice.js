@@ -1,11 +1,6 @@
-var ice = (function(ice) {
-
-	ice.version = "v2.1.10"
-	ice.modules = [];
-	console.log("%c-------- Importing ice.js " + ice.version + " --------", "font-weight: bold; font-size: 24px");
-
-	return ice;
-}(ice || {}));
+if(typeof ice === "undefined") ice = {modules: []};
+ice.version = "v2.1.11"
+console.log("%c-------- Importing ice.js " + ice.version + " --------", "font-weight: bold; font-size: 24px");
 
 // Ensure the document has a head (for importing)
 
@@ -27,7 +22,6 @@ if(document.head === null) {
 	}
 	function importFiles(files) {
 		let div = document.createElement("div");
-		div.id = "iceLibrary";
 		for(let file of files) {
 			let script = document.createElement("script");
 			script.src = "https://caasinehc.github.io/ice/" + file;
