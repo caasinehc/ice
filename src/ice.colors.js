@@ -2,7 +2,7 @@ if(typeof ice === "undefined") ice = {modules: []};
 (function() {
 	ice.modules.push("colors");
 	ice.colors = {};
-	ice.colors.version = "v2.1.4"; // This version of the ice.colors module
+	ice.colors.version = "v2.1.5"; // This version of the ice.colors module
 	console.log("%cice.colors " + ice.colors.version + " imported successfully.", "color: #008000");
 
 	/*
@@ -257,6 +257,7 @@ if(typeof ice === "undefined") ice = {modules: []};
 	}
 
 	ice.colors.hexToRgb = function (hex) {
+		hex = hex.toLowerCase();
 		hex = hex.replace(/^#?([a-f\d])([a-f\d])([a-f\d])([a-f\d])?$/i, (m, r, g, b, a) => {
 			a = a === undefined ? "F" : a;
 			return r + r + g + g + b + b + a + a;
