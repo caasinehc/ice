@@ -2,7 +2,7 @@ if(typeof ice === "undefined") ice = {modules: []};
 (function() {
 	if(!ice.modules.includes("math")) ice.modules.push("math");
 	ice.math = {};
-	ice.math.version = "v2.0.9"; // This version of the ice.math module
+	ice.math.version = "v2.0.10"; // This version of the ice.math module
 	console.log("%cice.math " + ice.math.version + " imported successfully.", "color: #008000");
 
 	/*
@@ -67,6 +67,9 @@ if(typeof ice === "undefined") ice = {modules: []};
 	ice.math.coinFlip = function() { // returns true 50% of the time
 		return Math.random() < 0.50;
 	}
+	ice.math.dieRoll = function(sides = 6) { // returns true 50% of the time
+		return Math.floor(Math.random() * sides) + 1;
+	}
 	ice.math.pythag = function(dX, dY) { // returns the length of the hypotenuse from the two other side lengths
 		return Math.sqrt(dX * dX + dY * dY);
 	}
@@ -105,16 +108,14 @@ if(typeof ice === "undefined") ice = {modules: []};
 		if(clamp) mapped = ice.math.clamp(mapped, newMin, newMax);
 		return mapped;
 	}
-	ice.math.isPrime = function(n) { // returns whether or not a number is prime (0, 1, and Infinity are not prime)
-		if(isFinite(n)) {
-			for(let i = 2, sqrt = Math.sqrt(n); i <= sqrt; i++) {
-				if(n % i === 0) {
-					return false;
-				}
-			}
-			return n && n !== 1;
+	ice.math.isPrime = function(n) { // returns whether or not a number is prime (negatives, 0, 1, non-integers, and Infinity are not prime)
+		if(n <= 1 || n % 1 > 0 || !isFinite(n)) return false;
+		if(n % 2 === 0) return n === 2;
+		if(n % 3 === 0) return n === 3;
+		for(let i = 5, sqrt = Math.sqrt(n); i <= sqrt; i += 6) {
+			if(n % i === 0 || n % (i + 2) === 0) return false;
 		}
-		return false;
+		return true;
 	}
 	ice.math.radToDeg = function(rad) {
 		return rad * RAD_TO_DEG;
@@ -123,19 +124,13 @@ if(typeof ice === "undefined") ice = {modules: []};
 		return deg * DEG_TO_RAD;
 	}
 	ice.math.fibonacci = function(n) {
-		if(n > 1475) { // any n above 1475 will return Infinity anyway, this is just faster
-			return Infinity;
-		}
-		n = Math.floor(n);
-		if(fibMem[n] === undefined) {
-			if(n <= 1) {
-				return 1;
-			}
-			fibMem[n] = ice.math.fibonacci(n - 1) + ice.math.fibonacci(n - 2);
-		}
+		n = n >= 1476 ? 1476 : Math.floor(n);
+		if(n <= 1) return 1;
+		if(fibMem[n] === undefined) return fibMem[n] = ice.math.fibonacci(n - 1) + ice.math.fibonacci(n - 2);
 		return fibMem[n];
 	}
 	ice.math.clamp = function(n, min, max) {
+		if(max === undefined) return n > min ? min : n;
 		if(min > max) {
 			let temp = min;
 			min = max;

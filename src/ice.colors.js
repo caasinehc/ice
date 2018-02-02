@@ -2,7 +2,7 @@ if(typeof ice === "undefined") ice = {modules: []};
 (function() {
 	ice.modules.push("colors");
 	ice.colors = {};
-	ice.colors.version = "v2.1.3"; // This version of the ice.colors module
+	ice.colors.version = "v2.1.4"; // This version of the ice.colors module
 	console.log("%cice.colors " + ice.colors.version + " imported successfully.", "color: #008000");
 
 	/*
@@ -146,8 +146,172 @@ if(typeof ice === "undefined") ice = {modules: []};
 	ice.colors.other = ice.colors.misc;
 	ice.colors.huesExt = [].concat(ice.colors.hues, ice.colors.tints, ice.colors.shades);
 	ice.colors.all = [].concat(ice.colors.huesExt, ice.colors.grayscale, ice.colors.misc);
+
+	// Methods
+
 	ice.colors.random = function(set) {
 		set = set || ice.colors.huesExt;
 		return set[Math.floor(Math.random() * set.length)];
+	}
+
+	ice.colors.rgbToHsl = function(r, g, b, a) {
+		if(r === undefined) {
+			return [0, 0, 0, 0];
+		}
+		else if(g === undefined) {
+			if(typeof r === "string") {
+				let rgbaArray = r.replace(/[^\d,.]/g, "").split(",");
+				for(let i = 0; i < rgbaArray.length; i++) {
+					rgbaArray[i] = parseFloat(rgbaArray[i]);
+				}
+				return ice.colors.rgbToHsl(rgbaArray[0], rgbaArray[1], rgbaArray[2], rgbaArray[3]);
+			}
+			if(r instanceof Array || r instanceof Uint8ClampedArray) {
+				return ice.colors.rgbToHsl(r[0], r[1], r[2], r[3]);
+			}
+			g = r;
+			b = r;
+			a = 1;
+		}
+		else if(b === undefined) {
+			g = r;
+			b = r;
+			a = g;
+		}
+		else if(a === undefined) {
+			a = 1;
+		}
+		r /= 255;
+		g /= 255;
+		b /= 255;
+
+		let max = Math.max(r, g, b);
+		let min = Math.min(r, g, b);
+		let l = (max + min) * 50;
+
+		if(max == min) return [0, 0, l, a];
+
+		let diff = max - min;
+		s = 100 * diff / (l > 50 ? 2 - max - min : max + min);
+		if(max === r) h = 60 * (g - b) / diff + (g < b ? 360 : 0);
+		else if(max === g) h = 60 * (b - r) / diff + 120;
+		else if(max === b) h = 60 * (r - g) / diff + 240;
+
+		return [h, s, l, a];
+	}
+
+	ice.colors.hslToRgb = function(h, s, l, a) {
+		if(h === undefined) {
+			return [0, 0, 0, 0];
+		}
+		else if(s === undefined) {
+			if(typeof h === "string") {
+				let hslaArray = h.replace(/[^\d,.]/g, "").split(",");
+				for(let i = 0; i < hslaArray.length; i++) {
+					hslaArray[i] = parseFloat(hslaArray[i]);
+				}
+				return ice.colors.hslToRgb(hslaArray[0], hslaArray[1], hslaArray[2], hslaArray[3]);
+			}
+			if(h instanceof Array || h instanceof Uint8ClampedArray) {
+				return ice.colors.hslToRgb(h[0], h[1], h[2], h[3]);
+			}
+			s = 100;
+			l = 50;
+			a = 1;
+		}
+		else if(l === undefined) {
+			a = s;
+			s = 100;
+			l = 50;
+		}
+		else if(a === undefined) {
+			a = 1;
+		}
+
+		if(s === 0) {
+			l *= 255 / 100;
+			return [l, l, l, a];
+		}
+
+		h /= 360;
+		s /= 100;
+		l /= 100;
+
+		function hue2rgb(p, q, t) {
+			t = (t + 1) % 1;
+			if(t < 1 / 6) return p + (q - p) * 6 * t;
+			if(t < 1 / 2) return q;
+			if(t < 2 / 3) return p + (q - p) * (2 / 3 - t) * 6;
+			return p;
+		}
+
+		let q = l < 0.5 ? l * (1 + s) : l + s - l * s;
+		let p = 2 * l - q;
+
+		return [
+			Math.round(hue2rgb(p, q, h + 1 / 3) * 255),
+			Math.round(hue2rgb(p, q, h) * 255),
+			Math.round(hue2rgb(p, q, h - 1 / 3) * 255),
+			a
+		];
+	}
+
+	ice.colors.hexToRgb = function (hex) {
+		hex = hex.replace(/^#?([a-f\d])([a-f\d])([a-f\d])([a-f\d])?$/i, (m, r, g, b, a) => {
+			a = a === undefined ? "F" : a;
+			return r + r + g + g + b + b + a + a;
+		});
+
+		let result = /^#?([a-f\d]{2})([a-f\d]{2})([a-f\d]{2})([a-f\d]{2})?$/i.exec(hex);
+		if(result === null) return [0, 0, 0, 0];
+		result[4] = result[4] === undefined ? "FF" : result[4]
+		return [
+			parseInt(result[1], 16),
+			parseInt(result[2], 16),
+			parseInt(result[3], 16),
+			parseInt(result[4], 16) / 255
+		];
+	}
+
+	ice.colors.rgbToHex = function(r, g, b, a) {
+		if(r === undefined) return "#00000000";
+		else if(g === undefined) {
+			if(typeof r === "string") {
+				let rgbaArray = r.replace(/[^\d,.]/g, "").split(",");
+				for(let i = 0; i < rgbaArray.length; i++) {
+					rgbaArray[i] = parseFloat(rgbaArray[i]);
+				}
+				return ice.colors.rgbToHex(rgbaArray[0], rgbaArray[1], rgbaArray[2], rgbaArray[3]);
+			}
+			if(r instanceof Array || r instanceof Uint8ClampedArray) {
+				return ice.colors.rgbToHex(r[0], r[1], r[2], r[3]);
+			}
+		}
+		else if(b === undefined) {
+			a = g;
+			g = r;
+			b = r;
+		}
+		r = r.toString(16);
+		r = r.length === 1 ? "0" + r : r;
+		g = g.toString(16);
+		g = g.length === 1 ? "0" + g : g;
+		b = b.toString(16);
+		b = b.length === 1 ? "0" + b : b;
+		let rgb = "#" + r + g + b;
+		if(a !== undefined && a < 1) {
+			a = parseInt(a * 255).toString(16);
+			a = a.length === 1 ? "0" + a : a;
+			rgb += a;
+		}
+		return rgb;
+	}
+
+	ice.colors.hslToHex = function(h, s, l, a) {
+		return ice.colors.rgbToHex(ice.colors.hslToRgb(h, s, l, a));
+	}
+
+	ice.colors.hexToHsl = function(hex) {
+		return ice.colors.rgbToHsl(ice.colors.hexToRgb(hex));
 	}
 })();

@@ -2,7 +2,7 @@ if(typeof ice === "undefined") ice = {modules: []};
 (function() {
 	if(!ice.modules.includes("debug")) ice.modules.push("debug");
 	ice.debug = {};
-	ice.debug.version = "v2.1.17"; // This version of the ice.debug module
+	ice.debug.version = "v2.1.18"; // This version of the ice.debug module
 	console.log("%cice.debug " + ice.debug.version + " imported successfully.", "color: #008000");
 
 	/*
@@ -54,7 +54,8 @@ if(typeof ice === "undefined") ice = {modules: []};
 		color: "#808080"
 	};
 	ice.debug.styles.RAINBOW = {
-		shadow: (" \
+		shadow: (
+			" \
 			1px 1px 0px #FF0000, \
 			2px 2px 0px #FF8000, \
 			3px 3px 0px #FFFF00, \
@@ -67,11 +68,13 @@ if(typeof ice === "undefined") ice = {modules: []};
 			10px 10px 0px #8000FF, \
 			11px 11px 0px #FF00FF, \
 			12px 12px 0px #FF0080 \
-		"),
+		"
+		),
 		color: "transparent"
 	}
 	ice.debug.styles.DOUBLE_RAINBOW = {
-		shadow: (" \
+		shadow: (
+			" \
 			1px 1px 0px #FF0000, \
 			2px 2px 0px #FF8000, \
 			3px 3px 0px #FFFF00, \
@@ -96,11 +99,13 @@ if(typeof ice === "undefined") ice = {modules: []};
 			22px 22px 0px #8000FF, \
 			23px 23px 0px #FF00FF, \
 			24px 24px 0px #FF0080 \
-		"),
+		"
+		),
 		color: "transparent"
 	}
 	ice.debug.styles.FADE = {
-		shadow: (" \
+		shadow: (
+			" \
 			0px 0px 0px #000, \
 			1px 1px 0px #111, \
 			2px 2px 0px #222, \
@@ -117,12 +122,13 @@ if(typeof ice === "undefined") ice = {modules: []};
 			13px 13px 0px #DDD, \
 			14px 14px 0px #EEE, \
 			15px 15px 0px #FFF \
-		")
+		"
+		)
 	}
 
 	// Methods
 
-	ice.debug.testFunction = function(func, sampleSize, args) {
+	ice.debug.testFunction = function(func, sampleSize, args, abortTime = 60000) {
 		// Stores results
 		let results = {};
 		// Stores info on results
@@ -130,6 +136,7 @@ if(typeof ice === "undefined") ice = {modules: []};
 		let max;
 		let resultsText = {};
 		let totalResults = 0;
+		let totalUniqueResults = 0;
 		let percent = Math.floor(sampleSize / 100);
 		let clearString = Array(100).join("\n");
 		let runtime = 0;
@@ -138,48 +145,54 @@ if(typeof ice === "undefined") ice = {modules: []};
 		// Runs the function [sampleSize] times, incrementing results[(the result)]
 		for(let i = 0; i < sampleSize; i++) {
 			let result = func.apply(null, args);
-			if(typeof results[result] === "undefined") {
-				results[result] = 1;
-			}
-			else {
-				results[result]++;
-			}
+			if(typeof results[result] === "undefined") results[result] = 1;
+			else results[result]++;
+			totalResults++;
 			if(i % percent === 0) {
+				let perc = i / percent;
 				console.log(clearString);
-				console.log("%cTest progress: %c" + Math.floor(i / percent) + "%", "font-size: 36px; color: #808080", "font-size: 36px; font-weight: bold");
+				if(performance.now() - before > abortTime) break;
+				console.log(clearString);
+				console.log(`%cTest progress: %c${perc}%`, "font-size: 36px; color: #808080", "font-size: 36px; font-weight: bold");
+				console.log("%c", `background: linear-gradient(to right, black ${perc}%, rgba(0, 0, 0, 0.5) ${perc}%); padding: 0px 50%; border: 2px solid black;`);
 			}
 		}
 		let after = performance.now();
 		console.clear();
 		// loops through results, noting important values and adding percentage information
 		for(let key in results) {
-			if(typeof min === "undefined") {min = key; max = key}
-			if(results[key] < results[min]) {min = key;}
-			if(results[key] > results[max]) {max = key;}
-			totalResults++;
+			if(typeof min === "undefined") {
+				min = key;
+				max = key
+			}
+			if(results[key] < results[min]) {
+				min = key;
+			}
+			if(results[key] > results[max]) {
+				max = key;
+			}
+			totalUniqueResults++;
 			resultsText[key] = results[key] + " (" + ((results[key] / sampleSize) * 100).toFixed(2) + "%)";
 		}
 		let totalSeconds = (after - before) / 1000;
 		let totalTime = "";
-		if(totalSeconds >= 60) {
-			totalTime += Math.floor(totalSeconds / 60) + " Minutes, ";
-		}
+		if(totalSeconds >= 60) totalTime += Math.floor(totalSeconds / 60) + " Minutes, ";
 		totalTime += totalSeconds.toFixed(4) % 60 + " Seconds";
 		// The information to be returned
 		let returnObject = {
 			"Function tested": func.toString(),
-			"Sample size": sampleSize,
-			"Total unique results": totalResults,
+			"Target sample size": sampleSize,
+			"Actual sample size": totalResults,
+			"Total unique results": totalUniqueResults,
 			"Total time": totalTime,
 			// Interesting facts from wikipedia:
 			// 1.016703362164 nanoseconds – 1 light foot.
 			// 0.330 nanoseconds – The time it takes a common 3.0 GHz CPU to add two integers
 			// approx 1 million nanoseconds - The average duration of a camera flash.
-			"Average time": (1000000 * (after - before) / sampleSize).toFixed(4) + " nanoseconds",
-			"Total unique results": totalResults,
-			"Expected frequency (assuming even distribution)": sampleSize / totalResults + "(" + (100 / totalResults).toFixed(2) + "%)",
-			"Most common": max + ", occuring a whopping " + results[max] + " times (" + ((results[max] / sampleSize) * 100).toFixed(2) + "%)",
-			"Least common": min + ", occuring only " + results[min] + " times (" + ((results[min] / sampleSize) * 100).toFixed(2) + "%)"
+			"Average time": (1000000 * (after - before) / totalResults).toFixed(4) + " nanoseconds",
+			"Expected frequency (assuming even distribution)": totalResults / totalUniqueResults + "(" + (100 / totalUniqueResults).toFixed(2) + "%)",
+			"Most common": max + ", occuring a whopping " + results[max] + " times (" + ((results[max] / totalResults) * 100).toFixed(2) + "%)",
+			"Least common": min + ", occuring only " + results[min] + " times (" + ((results[min] / totalResults) * 100).toFixed(2) + "%)"
 		}
 		console.table(returnObject);
 		console.groupCollapsed("Results");
@@ -189,9 +202,8 @@ if(typeof ice === "undefined") ice = {modules: []};
 		return returnObject;
 	}
 
-	// Very similar to testFunction, but much more accurate timing (also way slower)
-	ice.debug.testPerf = function(func, sampleSize, args, abortTime) {
-		abortTime = abortTime === undefined ? 60000 : abortTime;
+	// Very similar to testFunction, but much more accurate timing (also way slower, usually about 1/10th as fast)
+	ice.debug.benchmark = function(func, sampleSize, args, abortTime = 60000) {
 		// Stores info on results
 		let totalResults = 0;
 		let percent = Math.floor(sampleSize / 100);
@@ -212,23 +224,21 @@ if(typeof ice === "undefined") ice = {modules: []};
 				break;
 			}
 			if(i % percent === 0) {
+				let perc = i / percent;
 				console.log(clearString);
-				console.log("%cTest progress: %c" + Math.floor(i / percent) + "%", "font-size: 36px; color: #808080", "font-size: 36px; font-weight: bold");
+				console.log(`%cTest progress: %c${perc}%`, "font-size: 36px; color: #808080", "font-size: 36px; font-weight: bold");
+				console.log("%c", `background: linear-gradient(to right, black ${perc}%, rgba(0, 0, 0, 0.5) ${perc}%); padding: 0px 50%;`);
 			}
 		}
 		let after = performance.now();
 		console.clear();
 		let totalSeconds = (after - before) / 1000;
 		let totalTime = "";
-		if(totalSeconds >= 60) {
-			totalTime += Math.floor(totalSeconds / 60) + Math.floor(totalSeconds / 60) > 1 ? " Minutes, " : " Minute, ";
-		}
+		if(totalSeconds >= 60) totalTime += Math.floor(totalSeconds / 60) + (Math.floor(totalSeconds / 60) > 1 ? " Minutes, " : " Minute, ");
 		totalTime += totalSeconds.toFixed(4) % 60 + " Seconds";
 		let runtimeSeconds = runtime / 1000;
 		let runtimeText = "";
-		if(runtimeSeconds >= 60) {
-			runtimeText += Math.floor(runtimeSeconds / 60) + Math.floor(runtimeSeconds / 60) > 1 ? " Minutes, " : " Minute, ";
-		}
+		if(runtimeSeconds >= 60) runtimeText += Math.floor(runtimeSeconds / 60) + (Math.floor(runtimeSeconds / 60) > 1 ? " Minutes, " : " Minute, ");
 		runtimeText += runtimeSeconds.toFixed(4) % 60 + " Seconds";
 		// The information to be returned
 		let returnObject = {
@@ -244,60 +254,93 @@ if(typeof ice === "undefined") ice = {modules: []};
 	}
 
 	ice.debug.log = function(text, style, style2) {
-		if(typeof style === "string") {
-			console.log("%c" + text, style);
-		}
+		if(typeof style === "string") console.log("%c" + text, style);
 		else if(typeof style === "object") {
-			if(typeof style2 === "object") {
-				style = Object.assign(Object.assign({}, style), style2);
-			}
+			if(typeof style2 === "object") style = Object.assign(Object.assign({}, style), style2);
 			let css = "";
-			if(style.color !== undefined) {css += "color: " + style.color + ";";}
-			if(style.bold) {css += "font-weight: bold;";}
-			if(style.underline || style.overline || style.strike) {css += "text-decoration:";}
-			if(style.underline) {css += " underline";}
-			if(style.overline) {css += " overline";}
-			if(style.strike) {css += " strike";}
-			if(style.underline || style.overline || style.strike) {css += ";";}
-			if(style.italic) {css += "font-style: italic;";}
-			if(style.line_height !== undefined) {css += "line-height: " + style.line_height + ";";}
-			if(style.background !== undefined) {css += "background: " + style.background + ";";}
-			if(style.font !== undefined) {css += "font-family: " + style.font + ";";}
-			if(style.size !== undefined) {css += "font-size: " + style.size + ";";}
+			if(style.color !== undefined) css += "color: " + style.color + ";";
+			if(style.bold) css += "font-weight: bold;";
+			if(style.underline || style.overline || style.strike) css += "text-decoration:";
+			if(style.underline) css += " underline";
+			if(style.overline) css += " overline";
+			if(style.strike) css += " strike";
+			if(style.underline || style.overline || style.strike) css += ";";
+			if(style.italic) css += "font-style: italic;";
+			if(style.line_height !== undefined) css += "line-height: " + style.line_height + ";";
+			if(style.background !== undefined) css += "background: " + style.background + ";";
+			if(style.font !== undefined) css += "font-family: " + style.font + ";";
+			if(style.size !== undefined) css += "font-size: " + style.size + ";";
 			if(style.border_style === undefined && (
-				style.border_width !== undefined ||
-				style.border_color !== undefined ||
-				style.border_radius !== undefined
-			)) {css += "border-style: solid;";}
-			else if(style.border_style !== undefined) {css += "border-style: " + style.border_style + ";";}
-			if(style.border_width !== undefined) {css += "border-width: " + style.border_width + ";";}
-			if(style.border_color !== undefined) {css += "border-color: " + style.border_color + ";";}
-			if(style.border_radius !== undefined) {css += "border-radius: " + style.border_radius + ";";}
-			if(style.margin !== undefined) {css += "margin: " + style.margin + ";";}
-			if(style.padding !== undefined) {css += "padding: " + style.padding + ";";}
-			if(style.shadow !== undefined) {css += "text-shadow: " + style.shadow + ";";}
-			if(style.prefix !== undefined) {text = style.prefix + text;}
-			if(style.suffix !== undefined) {text = text + style.suffix;}
+					style.border_width !== undefined ||
+					style.border_color !== undefined ||
+					style.border_radius !== undefined
+				)) {
+				css += "border-style: solid;";
+			}
+			else if(style.border_style !== undefined) css += "border-style: " + style.border_style + ";";
+			if(style.border_width !== undefined) css += "border-width: " + style.border_width + ";";
+			if(style.border_color !== undefined) css += "border-color: " + style.border_color + ";";
+			if(style.border_radius !== undefined) css += "border-radius: " + style.border_radius + ";";
+			if(style.margin !== undefined) css += "margin: " + style.margin + ";";
+			if(style.padding !== undefined) css += "padding: " + style.padding + ";";
+			if(style.shadow !== undefined) css += "text-shadow: " + style.shadow + ";";
+			if(style.prefix !== undefined) text = style.prefix + text;
+			if(style.suffix !== undefined) text = text + style.suffix;
 
-			if(style.type === "error") {
-				console.error("%c" + text, css);
-			}
-			else if(style.type === "warning" || style.type === "warn") {
-				console.warn("%c" + text, css);
-			}
-			else if(style.type === "info") {
-				console.info("%c" + text, css);
-			}
-			else if(style.type === "debug") {
-				console.debug("%c" + text, css);
-			}
-			else if(style.type === "hidden") {
-				console.log("%c", css);
-			}
-			else {
-				console.log("%c" + text, css);
-			}
+			if(style.type === "error") console.error("%c" + text, css);
+			else if(style.type === "warning" || style.type === "warn") console.warn("%c" + text, css);
+			else if(style.type === "info") console.info("%c" + text, css);
+			else if(style.type === "debug") console.debug("%c" + text, css);
+			else if(style.type === "hidden") console.log("%c", css);
+			else console.log("%c" + text, css);
 		}
+	}
+
+	// function logCanvas(ctx) {
+	// 	console.log("\n");
+	// 	let canvas = ctx.canvas;
+	// 	var lineHeight = 19;
+	// 	var width = canvas.width;
+	// 	var height = canvas.height;
+	// 	var data = ctx.getImageData(0, 0, width, height).data;
+	// 	function getPixel(x, y) {
+	// 		let i = (x + y * width) * 4;
+	// 		return ice.colors.rgbToHex(data[i], data[i + 1], data[i + 2], data[i + 3]);
+	//     }
+	// 	for(let i = 0; i < height / lineHeight; i++) {
+	// 		var args = [Array(width + 1).join("%c")];
+	// 		for(let j = 0; j < width; j++) {
+	// 			var grad = "linear-gradient(to bottom";
+	// 			for(let k = 0; k < lineHeight; k++) {
+	// 				let color = getPixel(j, (i * lineHeight) + k);
+	// 				grad += `, ${color} ${k}px, ${color} ${k + 1}px`;
+	// 			}
+	// 			grad += ")"
+	// 			args.push(
+	// `background: ${grad};
+	// padding: ${lineHeight}px 1px 0px 0px;
+	// font-size: 0px;`
+	// 			);
+	// 		}
+	// 		args[0] += `%c${i}`;
+	// 		args.push("font-size: 0px");
+	// 		console.log.apply(null, args);
+	// 	}
+	// }
+	ice.debug.logImage = function(src) {
+		if(src instanceof HTMLCanvasElement) src = src.toDataURL();
+		else if(src instanceof CanvasRenderingContext2D) src = src.canvas.toDataURL();
+
+		let img = new Image();
+		img.onload = function() {
+			let padW = Math.floor(this.width / 2);
+			let padH = Math.floor(this.height / 2);
+			console.log(
+				"%c",
+				`font-size: 0px;padding: ${padH}px ${padW}px;line-height: ${this.height}px;background: url(${src});`
+			);
+		}
+		img.src = src;
 	}
 
 	ice.debug.summonDebugDoug = function() {
@@ -333,22 +376,22 @@ if(typeof ice === "undefined") ice = {modules: []};
 		);
 		debugDougWindow.document.write(
 			"<style>" +
-				"pre {" +
-					"position: absolute;" +
-					"top: 0;" +
-					"left: 0;" +
-					"word-wrap: normal;" +
-					"white-space: pre-wrap;" +
-					"width: 400;" +
-					"height: 350;" +
-				"}" +
+			"pre {" +
+			"position: absolute;" +
+			"top: 0;" +
+			"left: 0;" +
+			"word-wrap: normal;" +
+			"white-space: pre-wrap;" +
+			"width: 400;" +
+			"height: 350;" +
+			"}" +
 			"</style>"
 		);
 		debugDougWindow.document.write(
 			"<script>" +
-				"window.onclick = function() {" +
-					"window.resizeTo(421, 446);" +
-				"}" +
+			"window.onclick = function() {" +
+			"window.resizeTo(421, 446);" +
+			"}" +
 			"</script>"
 		);
 	}

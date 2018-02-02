@@ -2,7 +2,7 @@ if(typeof ice === "undefined") ice = {modules: []};
 (function() {
 	if(!ice.modules.includes("graphics")) ice.modules.push("graphics");
 	ice.graphics = {};
-	ice.graphics.version = "v2.2.11"; // This version of the ice.graphics module
+	ice.graphics.version = "v2.2.12"; // This version of the ice.graphics module
 	console.log("%cice.graphics " + ice.graphics.version + " imported successfully.", "color: #008000");
 
 	/*
@@ -341,8 +341,7 @@ if(typeof ice === "undefined") ice = {modules: []};
 		this.setBackground = (arg1, arg2, arg3, arg4) => {
 			return settings.bgColor = interpretColor(arg1, arg2, arg3, arg4, settings.bgColor);
 		}
-		this.resize = (w, h) => {
-			h = h === undefined ? w : h;
+		this.resize = (w, h = w) => {
 			this.width = this.canvas.width = w;
 			this.height = this.canvas.height = h;
 			this.midWidth = this.width / 2;
@@ -356,10 +355,10 @@ if(typeof ice === "undefined") ice = {modules: []};
 		this.stroke = (arg1, arg2, arg3, arg4) => {
 			return settings.stroke = interpretColor(arg1, arg2, arg3, arg4, settings.stroke);
 		}
-		this.lineWidth = (width) => {
+		this.lineWidth = width => {
 			return settings.lineWidth = width === undefined ? settings.lineWidth : width;
 		}
-		this.strokePattern = (pattern) => {
+		this.strokePattern = pattern => {
 			return settings.strokePattern = pattern === undefined ? settings.strokePattern : pattern;
 		}
 		this.noFill = () => {
@@ -410,19 +409,15 @@ if(typeof ice === "undefined") ice = {modules: []};
 			}
 			return [settings.textBaseline, settings.textAlign];
 		}
-		this.bold = (bold) => {
-			if(bold === undefined) {
-				return settings.bold;
-			}
+		this.bold = bold => {
+			if(bold === undefined) return settings.bold;
 			settings.bold = bold;
 		}
-		this.italic = (italic) => {
-			if(italic === undefined) {
-				return settings.italic;
-			}
+		this.italic = italic => {
+			if(italic === undefined) return settings.italic;
 			settings.italic = italic;
 		}
-		this.colorMode = (mode) => {
+		this.colorMode = mode => {
 			if(typeof mode === "string") {
 				mode = mode.toLowerCase();
 			}
@@ -431,7 +426,7 @@ if(typeof ice === "undefined") ice = {modules: []};
 			}
 			return settings.colorMode;
 		}
-		this.angleMode = (mode) => {
+		this.angleMode = mode => {
 			if(typeof mode === "string") {
 				mode = mode.toLowerCase();
 			}
@@ -440,31 +435,26 @@ if(typeof ice === "undefined") ice = {modules: []};
 			}
 			return settings.angleMode;
 		}
-		this.imagePrefix = (prefix) => {
+		this.imagePrefix = prefix => {
 			if(prefix === undefined) return settings.imagePrefix;
 			return settings.imagePrefix = prefix;
 		}
-		this.rect = (x, y, w, h) => {
-			h = h === undefined ? w : h;
+		this.rect = (x, y, w, h = w) => {
 			if(prepFill()) this.ctx.fillRect(x, y, w, h);
 			if(prepStroke()) this.ctx.strokeRect(x, y, w, h);
 		}
-		this.ellipse = (x, y, w, h, ang) => {
-			ang = ang === undefined ? 0 : ang;
+		this.ellipse = (x, y, w, h = w, ang = 0) => {
 			if(settings.angleMode === "degrees") ang = degToRad(ang);
-			h = h === undefined ? w : h;
 			this.ctx.beginPath();
 			this.ctx.ellipse(x, y, w, h, ang, 0, TAU)
 			renderPath();
 		}
-		this.circle = (x, y, rad) => {
-			rad = rad === undefined ? 8 : rad;
+		this.circle = (x, y, rad = 8) => {
 			this.ctx.beginPath();
 			this.ctx.arc(x, y, rad, 0, TAU);
 			renderPath();
 		}
-		this.point = (pos, size) => {
-			size = size === undefined ? 1 : size;
+		this.point = (pos, size = 1) => {
 			this.circle(pos.x, pos.y, size);
 		}
 		this.line = (x1, y1, x2, y2) => {
@@ -497,13 +487,12 @@ if(typeof ice === "undefined") ice = {modules: []};
 			this.ctx.closePath();
 			renderPath();
 		}
-		this.regPolygon = (x, y, sides, rad, rotation) => {
+		this.regPolygon = (x, y, sides, rad, rotation = 0) => {
 			sides = Math.floor(sides);
 			if(sides <= 1) {
 				this.circle(x, y, rad);
 				return;
 			}
-			rotation = rotation === undefined ? 0 : rotation;
 			if(settings.angleMode === "degrees") rotation = degToRad(rotation);
 			rotation -= TAU / 4;
 			this.ctx.beginPath();
@@ -517,10 +506,9 @@ if(typeof ice === "undefined") ice = {modules: []};
 			this.ctx.closePath();
 			renderPath();
 		}
-		this.polygon = (points) => {
-			if(!points instanceof Array || points.length <= 0) {
-				return;
-			}
+		this.polygon = points => {
+			if(!points instanceof Array) points = arguments;
+			if(points.length <= 0) return;
 			if(points.length === 1) {
 				this.point(points[0]);
 				return;
@@ -540,20 +528,12 @@ if(typeof ice === "undefined") ice = {modules: []};
 			if(prepFill()) ctx.fillText(text, x, y, maxWidth);
 			if(prepStroke()) ctx.strokeText(text, x, y, maxWidth);
 		}
-		this.points = (points, size) => {
-			size = size === undefined ? 1 : size;
-			for(let point of points) {
-				this.circle(point.x, point.y, size);
-			}
+		this.points = (points, size = 1) => {
+			for(let point of points) this.point(point, size);
 		}
-		this.lines = (points) => {
-			if(!points instanceof Array) {
-				this.lines(arguments);
-				return;
-			}
-			if(points.length <= 0) {
-				return;
-			}
+		this.lines = points => {
+			if(!points instanceof Array) points = arguments;
+			if(points.length <= 0) return;
 			if(points.length === 1) {
 				this.point(points[0]);
 				return;
@@ -580,7 +560,7 @@ if(typeof ice === "undefined") ice = {modules: []};
 				callbacks = [];
 			}
 
-			this.img.onload = (e) => {
+			this.img.onload = e => {
 				this.ready = true;
 				executeCallbacks();
 			}
@@ -592,7 +572,7 @@ if(typeof ice === "undefined") ice = {modules: []};
 			}
 			this.img.src = this.src;
 
-			this.addCallback = (callback) => {
+			this.addCallback = callback => {
 				if(typeof callback !== "function") return;
 				if(this.ready) {
 					callback();
@@ -619,10 +599,8 @@ if(typeof ice === "undefined") ice = {modules: []};
 				this.img.src = this.src;
 			}
 		}
-		this.taint = () => {
-			tainted = true;
-		}
-		this.image = (img, x, y, w, h, sx, sy, sw, sh) => {
+		this.taint = () => {tainted = true;}
+		this.image = (img, x = 0, y = 0, w = this.width, h = this.height, sx, sy, sw, sh) => {
 			if(typeof img === "string") {
 				if(imgMem[img] === undefined) {
 					imgMem[img] = new cachedImage(img);
@@ -635,16 +613,8 @@ if(typeof ice === "undefined") ice = {modules: []};
 				}
 				img = imgMem[img].img;
 			}
-			x = x === undefined ? 0 : x;
-			y = y === undefined ? 0 : y;
-			w = w === undefined ? this.width : w;
-			h = h === undefined ? this.height : h;
-			if(sx === undefined) {
-				this.ctx.drawImage(img, x, y, w, h);
-			}
-			else {
-				this.ctx.drawImage(img, sx, sy, sw, sh, x, y, w, h);
-			}
+			if(sx === undefined) this.ctx.drawImage(img, x, y, w, h);
+			else this.ctx.drawImage(img, sx, sy, sw, sh, x, y, w, h);
 		}
 
 		function pieChart(x, y, rad, dataIn, rotation, donut, meter) {
@@ -737,20 +707,17 @@ if(typeof ice === "undefined") ice = {modules: []};
 			ctx.drawImage(bufferCanvas, 0, 0);
 		}
 		this.charts = {};
-		this.charts.pie = (x, y, rad, dataIn, rotation) => {
-			rotation = rotation === undefined ? 0 : rotation;
+		this.charts.pie = (x, y, rad, dataIn, rotation = 0) => {
 			if(settings.angleMode === "degrees") rotation = degToRad(rotation);
 			rotation -= TAU / 4;
 			pieChart(x, y, rad, dataIn, rotation);
 		}
-		this.charts.donut = (x, y, rad, dataIn, rotation) => {
-			rotation = rotation === undefined ? 0 : rotation;
+		this.charts.donut = (x, y, rad, dataIn, rotation = 0) => {
 			if(settings.angleMode === "degrees") rotation = degToRad(rotation);
 			rotation -= TAU / 4;
 			pieChart(x, y, rad, dataIn, rotation, true);
 		}
-		this.charts.meter = (x, y, rad, dataIn, rotation, text) => {
-			rotation = rotation === undefined ? 0 : rotation;
+		this.charts.meter = (x, y, rad, dataIn, rotation = 0, text) => {
 			if(settings.angleMode === "degrees") rotation = degToRad(rotation);
 			rotation -= TAU / 2;
 			pieChart(x, y, rad, dataIn, rotation, true, true);
@@ -937,17 +904,10 @@ if(typeof ice === "undefined") ice = {modules: []};
 				}
 			]
 		};
-		this.clear = () => {
-			ctx.clearRect(0, 0, this.width, this.height);
-		}
+		this.clear = () => {ctx.clearRect(0, 0, this.width, this.height);}
 		this.getPixel = (x, y) => {
 			let data = ctx.getImageData(x, y, 1, 1).data;
-			if(settings.colorMode === "rgb") {
-				return data;
-			}
-			else {
-				return rgbToHsl(data);
-			}
+			return settings.colorMode === "rgb" ? data : rgbToHsl(data);
 		}
 
 		this.setPixels = (func, x, y, w, h) => {
@@ -981,7 +941,7 @@ if(typeof ice === "undefined") ice = {modules: []};
 				ctx.drawImage(bufferCanvas, 0, 0, w, h, x, y, w, h);
 			}
 		}
-		this.download = (name) => {
+		this.download = name => {
 			/*
 			 *	Quick warning: This will NOT work on a "tainted" canvas (ie: one that used an image without CORS approval)
 			 *	This is a security issue. It's annoying, but necessary.
@@ -994,39 +954,39 @@ if(typeof ice === "undefined") ice = {modules: []};
 			link.click();
 			// window.open(canvas.toDataURL());
 		}
-		this.invert = (percent) => {
+		this.invert = percent => {
 			percent = percent === undefined ? "100%" : percent + "%";
 			applyCssFilter("invert", percent);
 		}
-		this.grayscale = (percent) => {
+		this.grayscale = percent => {
 			percent = percent === undefined ? "100%" : percent + "%";
 			applyCssFilter("grayscale", percent);
 		}
-		this.sepia = (percent) => {
+		this.sepia = percent => {
 			percent = percent === undefined ? "100%" : percent + "%";
 			applyCssFilter("sepia", percent);
 		}
-		this.brightness = (percent) => {
+		this.brightness = percent => {
 			percent = percent === undefined ? "100%" : percent + "%";
 			applyCssFilter("brightness", percent);
 		}
-		this.contrast = (percent) => {
+		this.contrast = percent => {
 			percent = percent === undefined ? "100%" : percent + "%";
 			applyCssFilter("contrast", percent);
 		}
-		this.blur = (px) => {
+		this.blur = px => {
 			px = px === undefined ? "1px" : px + "px";
 			applyCssFilter("blur", px);
 		}
-		this.saturate = (percent) => {
+		this.saturate = percent => {
 			percent = percent === undefined ? "100%" : percent + "%";
 			applyCssFilter("saturate", percent);
 		}
-		this.opacity = (percent) => {
+		this.opacity = percent => {
 			percent = percent === undefined ? "100%" : percent + "%";
 			applyCssFilter("opacity", percent);
 		}
-		this.colorshift = (degrees) => {
+		this.colorshift = degrees => {
 			degrees = degrees === undefined ? "180deg" : degrees + "deg";
 			applyCssFilter("hue-rotate", degrees);
 		}
@@ -1037,12 +997,8 @@ if(typeof ice === "undefined") ice = {modules: []};
 			ctx.fillRect(0, 0, this.width, this.height);
 			ctx.restore();
 		}
-		this.save = () => {
-			return ctx.getImageData(0, 0, this.width, this.height);
-		}
-		this.restore = (imageData) => {
-			ctx.putImageData(imageData, 0, 0);
-		}
+		this.save = () => ctx.getImageData(0, 0, this.width, this.height);
+		this.restore = imageData => {ctx.putImageData(imageData, 0, 0);}
 
 		// Duplicates
 
