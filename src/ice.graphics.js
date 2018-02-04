@@ -2,7 +2,7 @@ if(typeof ice === "undefined") ice = {modules: []};
 (function() {
 	if(!ice.modules.includes("graphics")) ice.modules.push("graphics");
 	ice.graphics = {};
-	ice.graphics.version = "v2.2.12"; // This version of the ice.graphics module
+	ice.graphics.version = "v2.2.13"; // This version of the ice.graphics module
 	console.log("%cice.graphics " + ice.graphics.version + " imported successfully.", "color: #008000");
 
 	/*
@@ -87,7 +87,7 @@ if(typeof ice === "undefined") ice = {modules: []};
 		settings.italic = false;
 		settings.colorMode = "rgb";
 		settings.angleMode = "radians";
-		settings.imagePrefix = "https://cors-anywhere.herokuapp.com/";
+		settings.imagePrefix = ""; // "https://cors-anywhere.herokuapp.com/" is a good one
 
 		let bufferCanvas = document.createElement("canvas");
 		bufferCanvas.width = this.width;
