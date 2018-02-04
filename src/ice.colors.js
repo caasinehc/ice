@@ -2,7 +2,7 @@ if(typeof ice === "undefined") ice = {modules: []};
 (function() {
 	ice.modules.push("colors");
 	ice.colors = {};
-	ice.colors.version = "v2.1.5"; // This version of the ice.colors module
+	ice.colors.version = "v2.1.6"; // This version of the ice.colors module
 	console.log("%cice.colors " + ice.colors.version + " imported successfully.", "color: #008000");
 
 	/*
@@ -12,7 +12,6 @@ if(typeof ice === "undefined") ice = {modules: []};
 	/*
 	 *	TODO:
 	 *		interpret
-	 *		hex, rgb, and hsl translate
 	 *		colerp
 	 *		modify red, green, blue, alpha, hue, saturation, lightness, tint, tone, shade
 	 *		invert, contrasting, blend
@@ -174,9 +173,9 @@ if(typeof ice === "undefined") ice = {modules: []};
 			a = 1;
 		}
 		else if(b === undefined) {
+			a = g;
 			g = r;
 			b = r;
-			a = g;
 		}
 		else if(a === undefined) {
 			a = 1;

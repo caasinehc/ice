@@ -2,7 +2,7 @@ if(typeof ice === "undefined") ice = {modules: []};
 (function() {
 	if(!ice.modules.includes("math")) ice.modules.push("math");
 	ice.math = {};
-	ice.math.version = "v2.0.10"; // This version of the ice.math module
+	ice.math.version = "v2.0.11"; // This version of the ice.math module
 	console.log("%cice.math " + ice.math.version + " imported successfully.", "color: #008000");
 
 	/*
@@ -25,7 +25,7 @@ if(typeof ice === "undefined") ice = {modules: []};
 	ice.math.randomInt = function(min, max) { // returns a random int from min (inclusive) to max (inclusive)
 		if(max === undefined) {
 			if(min === undefined) {
-				return Math.random();
+				return Math.floor(Math.random() * 2);
 			}
 			let maxInt = Math.floor(min);
 			return Math.floor(Math.random() * (maxInt + 1));
@@ -37,17 +37,19 @@ if(typeof ice === "undefined") ice = {modules: []};
 	ice.math.randomFloat = function(min, max) { // returns a random float from min (inclusive) to max (exclusive)
 		if(max === undefined) {
 			if(min === undefined) {
-				return Math.random() < 0.50;
+				return Math.random();
 			}
 			return Math.random() * min;
 		}
 		return Math.random() * (max - min) + min;
 	}
-	ice.math.randomFrom = function(arr) { // returns a random element from an array
-		return arr[Math.floor(Math.random() * arr.length)];
+	ice.math.randomFrom = function(input) { // returns a random element from an array
+		if(typeof input === "string") input = input.split("");
+		return input[Math.floor(Math.random() * input.length)];
 	}
 	ice.math.random = function(arg1, arg2) {
-		if(arg1 instanceof Array) {
+		if(typeof arg1 === "string") arg1 = arg1.split("");
+		if(arg1 instanceof Array || arg1 instanceof Uint8ClampedArray) {
 			return arg1[Math.floor(Math.random() * arg1.length)];
 		}
 		if(arg2 === undefined) {
