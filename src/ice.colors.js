@@ -1,8 +1,10 @@
-if(typeof ice === "undefined") ice = {modules: []};
+if(typeof ice === "undefined") ice = {
+	modules: []
+};
 (function() {
 	ice.modules.push("colors");
 	ice.colors = {};
-	ice.colors.version = "v2.1.6"; // This version of the ice.colors module
+	ice.colors.version = "v2.1.7"; // This version of the ice.colors module
 	console.log("%cice.colors " + ice.colors.version + " imported successfully.", "color: #008000");
 
 	/*
@@ -17,73 +19,108 @@ if(typeof ice === "undefined") ice = {modules: []};
 	 *		invert, contrasting, blend
 	 */
 
+	// Private variables/functions
+
+	function interpretColor(arg1, arg2, arg3, arg4) {
+		if(arg1 === undefined) return [[0, 0, 0, 0], [0, 0, 0, 0], "#00000000"];
+		if(arg2 === undefined) {
+			if(typeof arg1 === "number") return [arg1, arg1, arg1, 1];
+			if(
+				arg1 instanceof Array ||
+				arg1 instanceof Uint8ClampedArray
+			) return interpretColor(arg1[0], arg1[1], arg1[2], arg1[3]);
+			if(arg1.includes("rgb")) {
+				let rgba = arg1.replace(/[^\d,.]/g, "").split(",").map(Number);
+				if(rgba.length < 4) rgba.push(1);
+				return [rgba, ice.colors.rgbToHsl(rgba), ice.colors.rgbToHex(rgba)];
+			}
+			if(arg1.includes("hsl")) {
+				let hsla = arg1.replace(/[^\d,.]/g, "").split(",").map(Number);
+				if(hsla.length < 4) hsla.push(1);
+				let rgba = ice.colors.hslToRgb(hsla);
+				return [rgba, hsla, ice.colors.rgbToHex(rgba)];
+			}
+			let rgba = ice.colors.hexToRgb(arg1);
+			return [rgba, ice.colors.rgbToHsl(rgba), arg1]
+		}
+		let rgba = (
+			arg3 === undefined ? [arg1, arg1, arg1, arg2] :
+			arg4 === undefined ? [arg1, arg2, arg3, 1] :
+			[arg1, arg2, arg3, arg4]
+		);
+		return [rgba, ice.colors.rgbToHsl(rgba), ice.colors.rgbToHex(rgba)];
+	}
+	ice.colors.Color = function(arg1, arg2, arg3, arg4) {
+		[this.rgba, this.hsla, this.hex] = interpretColor(arg1, arg2, arg3, arg4);
+	}
+
 	// Properties
 
 	// Hues
-	ice.colors.RED = 											"#FF0000";
-	ice.colors.ORANGE = 										"#FF8000";
-	ice.colors.YELLOW = 										"#FFFF00";
-	ice.colors.CHARTREUSE = 									"#80FF00";
-	ice.colors.LIME = 											"#00FF00";
-	ice.colors.MINT = 											"#00FF80";
-	ice.colors.CYAN = 											"#00FFFF";
-	ice.colors.CERULEAN = 										"#0080FF";
-	ice.colors.BLUE = 											"#0000FF";
-	ice.colors.PURPLE = 										"#8000FF";
-	ice.colors.MAGENTA = 										"#FF00FF";
-	ice.colors.PINK = 											"#FF0080";
+	ice.colors.RED = "#FF0000";
+	ice.colors.ORANGE = "#FF8000";
+	ice.colors.YELLOW = "#FFFF00";
+	ice.colors.CHARTREUSE = "#80FF00";
+	ice.colors.LIME = "#00FF00";
+	ice.colors.MINT = "#00FF80";
+	ice.colors.CYAN = "#00FFFF";
+	ice.colors.CERULEAN = "#0080FF";
+	ice.colors.BLUE = "#0000FF";
+	ice.colors.PURPLE = "#8000FF";
+	ice.colors.MAGENTA = "#FF00FF";
+	ice.colors.PINK = "#FF0080";
 	// Tints
-	ice.colors.LIGHT_RED = 			ice.colors.SALMON = 		"#FF8080";
-	ice.colors.LIGHT_ORANGE = 		ice.colors.PEACH = 			"#FFC080";
-	ice.colors.LIGHT_YELLOW = 		ice.colors.CANARY = 		"#FFFF80";
-	ice.colors.LIGHT_CHARTREUSE = 	ice.colors.KEYLIME = 		"#C0FF80";
-	ice.colors.LIGHT_LIME = 		ice.colors.SHAMROCK = 		"#80FF80";
-	ice.colors.LIGHT_MINT = 		ice.colors.SEAFOAM = 		"#80FFC0";
-	ice.colors.LIGHT_CYAN = 		ice.colors.SKY = 			"#80FFFF";
-	ice.colors.LIGHT_CERULEAN = 	ice.colors.CORNFLOWER = 	"#80C0FF";
-	ice.colors.LIGHT_BLUE = 		ice.colors.PERIWINKLE = 	"#8080FF";
-	ice.colors.LIGHT_PURPLE = 		ice.colors.LAVENDER = 		"#C080FF";
-	ice.colors.LIGHT_MAGENTA = 		ice.colors.ORCHID = 		"#FF80FF";
-	ice.colors.LIGHT_PINK = 		ice.colors.CARNATION = 		"#FF80C0";
+	ice.colors.LIGHT_RED = ice.colors.SALMON = "#FF8080";
+	ice.colors.LIGHT_ORANGE = ice.colors.PEACH = "#FFC080";
+	ice.colors.LIGHT_YELLOW = ice.colors.CANARY = "#FFFF80";
+	ice.colors.LIGHT_CHARTREUSE = ice.colors.KEYLIME = "#C0FF80";
+	ice.colors.LIGHT_LIME = ice.colors.SHAMROCK = "#80FF80";
+	ice.colors.LIGHT_MINT = ice.colors.SEAFOAM = "#80FFC0";
+	ice.colors.LIGHT_CYAN = ice.colors.SKY = "#80FFFF";
+	ice.colors.LIGHT_CERULEAN = ice.colors.CORNFLOWER = "#80C0FF";
+	ice.colors.LIGHT_BLUE = ice.colors.PERIWINKLE = "#8080FF";
+	ice.colors.LIGHT_PURPLE = ice.colors.LAVENDER = "#C080FF";
+	ice.colors.LIGHT_MAGENTA = ice.colors.ORCHID = "#FF80FF";
+	ice.colors.LIGHT_PINK = ice.colors.CARNATION = "#FF80C0";
 	// Shades
-	ice.colors.DARK_RED = 			ice.colors.MAROON = 		"#800000";
-	ice.colors.DARK_ORANGE = 		ice.colors.RUST = 			"#804000";
-	ice.colors.DARK_YELLOW = 		ice.colors.OLIVE = 			"#808000";
-	ice.colors.DARK_CHARTREUSE = 	ice.colors.BASIL = 			"#408000";
-	ice.colors.DARK_LIME = 			ice.colors.GREEN = 			"#008000";
-	ice.colors.DARK_MINT = 			ice.colors.PINE = 			"#008040";
-	ice.colors.DARK_CYAN = 			ice.colors.TEAL = 			"#008080";
-	ice.colors.DARK_CERULEAN = 		ice.colors.COBALT = 		"#004080";
-	ice.colors.DARK_BLUE = 			ice.colors.NAVY = 			"#000080";
-	ice.colors.DARK_PURPLE = 		ice.colors.EGGPLANT = 		"#400080";
-	ice.colors.DARK_MAGENTA = 		ice.colors.PLUM = 			"#800080";
-	ice.colors.DARK_PINK = 			ice.colors.BEETROOT = 		"#800040";
+	ice.colors.DARK_RED = ice.colors.MAROON = "#800000";
+	ice.colors.DARK_ORANGE = ice.colors.RUST = "#804000";
+	ice.colors.DARK_YELLOW = ice.colors.OLIVE = "#808000";
+	ice.colors.DARK_CHARTREUSE = ice.colors.BASIL = "#408000";
+	ice.colors.DARK_LIME = ice.colors.GREEN = "#008000";
+	ice.colors.DARK_MINT = ice.colors.PINE = "#008040";
+	ice.colors.DARK_CYAN = ice.colors.TEAL = "#008080";
+	ice.colors.DARK_CERULEAN = ice.colors.COBALT = "#004080";
+	ice.colors.DARK_BLUE = ice.colors.NAVY = "#000080";
+	ice.colors.DARK_PURPLE = ice.colors.EGGPLANT = "#400080";
+	ice.colors.DARK_MAGENTA = ice.colors.PLUM = "#800080";
+	ice.colors.DARK_PINK = ice.colors.BEETROOT = "#800040";
 	// Grayscale
-	ice.colors.WHITE = 											"#FFFFFF";
-	ice.colors.LIGHT_GRAY = 		ice.colors.SILVER =			"#C0C0C0";
-	ice.colors.GRAY = 											"#808080";
-	ice.colors.DARK_GRAY = 			ice.colors.CHARCOAL = 		"#404040";
-	ice.colors.BLACK = 											"#000000";
+	ice.colors.WHITE = "#FFFFFF";
+	ice.colors.LIGHT_GRAY = ice.colors.SILVER = "#C0C0C0";
+	ice.colors.GRAY = "#808080";
+	ice.colors.DARK_GRAY = ice.colors.CHARCOAL = "#404040";
+	ice.colors.BLACK = "#000000";
 	// Misc colors
-	ice.colors.BROWN = 											"#402000";
-	ice.colors.GOLD = 											"#D0B030";
-	ice.colors.SEPIA =											"#704214";
-	ice.colors.CLEAR =											"rgba(0, 0, 0, 0)";
+	ice.colors.BROWN = "#402000";
+	ice.colors.GOLD = "#D0B030";
+	ice.colors.SEPIA = "#704214";
+	ice.colors.CLEAR = "rgba(0, 0, 0, 0)";
 	// Duplicates
-	ice.colors.AQUA = 				ice.colors.CYAN;
-	ice.colors.VIOLET = 			ice.colors.PURPLE;
-	ice.colors.FUCHSIA = 			ice.colors.MAGENTA;
-	ice.colors.GREY = 				ice.colors.GRAY;
-	ice.colors.LIGHT_AQUA = 		ice.colors.LIGHT_CYAN;
-	ice.colors.LIGHT_VIOLET = 		ice.colors.LIGHT_PURPLE;
-	ice.colors.LIGHT_FUCHSIA = 		ice.colors.LIGHT_MAGENTA;
-	ice.colors.LIGHT_GREY = 		ice.colors.LIGHT_GRAY;
-	ice.colors.DARK_AQUA = 			ice.colors.DARK_CYAN;
-	ice.colors.DARK_VIOLET = 		ice.colors.DARK_PURPLE;
-	ice.colors.DARK_FUCHSIA = 		ice.colors.DARK_MAGENTA;
-	ice.colors.DARK_GREY = 			ice.colors.DARK_GRAY;
-	ice.colors.TRANS = 				ice.colors.CLEAR;
-	ice.colors.TRANSPARENT = 		ice.colors.CLEAR;
+	ice.colors.AQUA = ice.colors.CYAN;
+	ice.colors.VIOLET = ice.colors.PURPLE;
+	ice.colors.FUCHSIA = ice.colors.MAGENTA;
+	ice.colors.GREY = ice.colors.GRAY;
+	ice.colors.LIGHT_AQUA = ice.colors.LIGHT_CYAN;
+	ice.colors.LIGHT_VIOLET = ice.colors.LIGHT_PURPLE;
+	ice.colors.LIGHT_FUCHSIA = ice.colors.LIGHT_MAGENTA;
+	ice.colors.LIGHT_GREY = ice.colors.LIGHT_GRAY;
+	ice.colors.DARK_AQUA = ice.colors.DARK_CYAN;
+	ice.colors.DARK_VIOLET = ice.colors.DARK_PURPLE;
+	ice.colors.DARK_FUCHSIA = ice.colors.DARK_MAGENTA;
+	ice.colors.DARK_GREY = ice.colors.DARK_GRAY;
+	ice.colors.TRANS = ice.colors.CLEAR;
+	ice.colors.TRANSPARENT = ice.colors.CLEAR;
 
 	ice.colors.hues = [
 		ice.colors.RED,
@@ -159,10 +196,7 @@ if(typeof ice === "undefined") ice = {modules: []};
 		}
 		else if(g === undefined) {
 			if(typeof r === "string") {
-				let rgbaArray = r.replace(/[^\d,.]/g, "").split(",");
-				for(let i = 0; i < rgbaArray.length; i++) {
-					rgbaArray[i] = parseFloat(rgbaArray[i]);
-				}
+				let rgbaArray = r.replace(/[^\d,.]/g, "").split(",").map(Number);
 				return ice.colors.rgbToHsl(rgbaArray[0], rgbaArray[1], rgbaArray[2], rgbaArray[3]);
 			}
 			if(r instanceof Array || r instanceof Uint8ClampedArray) {
@@ -205,10 +239,7 @@ if(typeof ice === "undefined") ice = {modules: []};
 		}
 		else if(s === undefined) {
 			if(typeof h === "string") {
-				let hslaArray = h.replace(/[^\d,.]/g, "").split(",");
-				for(let i = 0; i < hslaArray.length; i++) {
-					hslaArray[i] = parseFloat(hslaArray[i]);
-				}
+				let hslaArray = h.replace(/[^\d,.]/g, "").split(",").map(Number);
 				return ice.colors.hslToRgb(hslaArray[0], hslaArray[1], hslaArray[2], hslaArray[3]);
 			}
 			if(h instanceof Array || h instanceof Uint8ClampedArray) {
@@ -255,14 +286,9 @@ if(typeof ice === "undefined") ice = {modules: []};
 		];
 	}
 
-	ice.colors.hexToRgb = function (hex) {
-		hex = hex.toLowerCase();
-		hex = hex.replace(/^#?([a-f\d])([a-f\d])([a-f\d])([a-f\d])?$/i, (m, r, g, b, a) => {
-			a = a === undefined ? "F" : a;
-			return r + r + g + g + b + b + a + a;
-		});
-
-		let result = /^#?([a-f\d]{2})([a-f\d]{2})([a-f\d]{2})([a-f\d]{2})?$/i.exec(hex);
+	ice.colors.hexToRgb = function(hex) {
+		hex = hex.toUpperCase().replace(/^#?([A-F\d])([A-F\d])([A-F\d])([A-F\d])?$/i, (m, r, g, b, a = "F") => r + r + g + g + b + b + a + a);
+		let result = /^#?([A-F\d]{2})([A-F\d]{2})([A-F\d]{2})([A-F\d]{2})?$/i.exec(hex);
 		if(result === null) return [0, 0, 0, 0];
 		result[4] = result[4] === undefined ? "FF" : result[4]
 		return [
@@ -277,15 +303,10 @@ if(typeof ice === "undefined") ice = {modules: []};
 		if(r === undefined) return "#00000000";
 		else if(g === undefined) {
 			if(typeof r === "string") {
-				let rgbaArray = r.replace(/[^\d,.]/g, "").split(",");
-				for(let i = 0; i < rgbaArray.length; i++) {
-					rgbaArray[i] = parseFloat(rgbaArray[i]);
-				}
+				let rgbaArray = r.replace(/[^\d,.]/g, "").split(",").map(Number);
 				return ice.colors.rgbToHex(rgbaArray[0], rgbaArray[1], rgbaArray[2], rgbaArray[3]);
 			}
-			if(r instanceof Array || r instanceof Uint8ClampedArray) {
-				return ice.colors.rgbToHex(r[0], r[1], r[2], r[3]);
-			}
+			if(r instanceof Array || r instanceof Uint8ClampedArray) return ice.colors.rgbToHex(r[0], r[1], r[2], r[3]);
 		}
 		else if(b === undefined) {
 			a = g;
@@ -304,7 +325,7 @@ if(typeof ice === "undefined") ice = {modules: []};
 			a = a.length === 1 ? "0" + a : a;
 			rgb += a;
 		}
-		return rgb;
+		return rgb.toUpperCase();
 	}
 
 	ice.colors.hslToHex = function(h, s, l, a) {

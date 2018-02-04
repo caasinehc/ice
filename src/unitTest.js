@@ -110,12 +110,14 @@
 		.toBeAn(Array);
 	expect(`ice.colors.rgbToHsl(255, 127.5, 0, 0.25).join(", ")`, ice.colors.rgbToHsl(255, 127.5, 0, 0.25).join(", "))
 		.toBe("30, 100, 50, 0.25");
+	expect(`ice.colors.rgbToHsl("rgba(255, 127.5, 0, 0.25)").join(", ")`, ice.colors.rgbToHsl("rgba(255, 127.5, 0, 0.25)").join(", "))
+		.toBe("30, 100, 50, 0.25");
 	expect(`ice.colors.rgbToHsl([255, 0.3]).join(", ")`, ice.colors.rgbToHsl([255, 0.3]).join(", "))
 		.toBe("0, 0, 100, 0.3");
 	expect(`ice.colors.hexToRgb(ice.colors.RED).join(", ")`, ice.colors.hexToRgb(ice.colors.RED).join(", "))
 		.toBe("255, 0, 0, 1");
 	expect("ice.colors.rgbToHex([255, 0, 0, 1])", ice.colors.rgbToHex([255, 0, 0, 1]))
-		.toBe(ice.colors.RED.toLowerCase());
+		.toBe(ice.colors.RED);
 
 	expect("ice.debug", ice.debug)
 		.toExist();
