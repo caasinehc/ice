@@ -2,7 +2,7 @@ if(typeof ice === "undefined") ice = {modules: []};
 (function() {
 	if(!ice.modules.includes("dom")) ice.modules.push("dom");
 	ice.dom = {};
-	ice.dom.version = "v1.0.8"; // This version of the ice.dom module
+	ice.dom.version = "v1.0.9"; // This version of the ice.dom module
 	console.log("%cice.dom " + ice.dom.version + " imported successfully.", "color: #008000");
 	init();
 
@@ -350,6 +350,155 @@ if(typeof ice === "undefined") ice = {modules: []};
 		else {
 			elem.addEventListener("contextmenu", stop);
 		}
+	}
+	ice.dom.append = function(elem, location = document.body, where = "child") {
+		if(where === "child") location.appendChild(elem);
+		else if (where === "before") location.parentNode.insertBefore(elem, location);
+		else if(where === "after") location.parentNode.insertBefore(elem, location.nextSibling);
+	}
+
+	ice.dom.createH1 = function(text) {
+		let elem = document.createElement("h1");
+		elem.appendChild(document.createTextNode(text));
+		return elem;
+	}
+	ice.dom.createH2 = function(text) {
+		let elem = document.createElement("h2");
+		elem.appendChild(document.createTextNode(text));
+		return elem;
+	}
+	ice.dom.createH3 = function(text) {
+		let elem = document.createElement("h3");
+		elem.appendChild(document.createTextNode(text));
+		return elem;
+	}
+	ice.dom.createH4 = function(text) {
+		let elem = document.createElement("h4");
+		elem.appendChild(document.createTextNode(text));
+		return elem;
+	}
+	ice.dom.createH5 = function(text) {
+		let elem = document.createElement("h5");
+		elem.appendChild(document.createTextNode(text));
+		return elem;
+	}
+	ice.dom.createH6 = function(text) {
+		let elem = document.createElement("h6");
+		elem.appendChild(document.createTextNode(text));
+		return elem;
+	}
+	ice.dom.createDiv = function() {
+		return document.createElement("div");
+	}
+	ice.dom.createP = function(text) {
+		let elem = document.createElement("p");
+		elem.appendChild(document.createTextNode(text));
+		return elem;
+	}
+	ice.dom.createA = function(text, href) {
+		let elem = document.createElement("a");
+		elem.appendChild(document.createTextNode(text));
+		elem.href = href;
+		return elem;
+	}
+	ice.dom.createBr = function() {
+		return document.createElement("br");
+	}
+	ice.dom.createSpan = function() {
+		return document.createElement("span");
+	}
+	ice.dom.createImg = function(src) {
+		let elem = document.createElement("img");
+		elem.src = src;
+		return elem;
+	}
+	ice.dom.createCanvas = function(width, height) {
+		let elem = document.createElement("canvas");
+		elem.width = width;
+		elem.height = height;
+		return elem;
+	}
+	// TODO ice.dom.createTable
+	ice.dom.createButton = function(text = "Button", onclick) {
+		let elem  = document.createElement("button");
+		elem.onclick = onclick;
+		return elem;
+	}
+	ice.dom.createTextInput = function(placeholder) {
+		let elem = document.createElement("input");
+		elem.type = "text";
+		elem.placeholder = placeholder;
+		return elem;
+	}
+	ice.dom.createCheckbox = function(checked, disabled) {
+		let elem = document.createElement("input");
+		elem.type = "checkbox";
+		elem.checked = checked;
+		elem.disabled = disabled;
+		return elem;
+	}
+	ice.dom.createColorInput = function(def) {
+		let elem = document.createElement("input");
+		elem.type = "color";
+		elem.value = def;
+		return elem;
+	}
+	ice.dom.createDateInput = function(def) {
+		let elem = document.createElement("input");
+		elem.type = "date";
+		elem.value = def;
+		return elem;
+	}
+	ice.dom.createEmailInput = function(placeholder, multiple) {
+		let elem = document.createElement("input");
+		elem.type = "email";
+		elem.placeholder = def;
+		elem.multiple = multiple;
+		return elem;
+	}
+	ice.dom.createFileInput = function(accept, multiple) {
+		let elem = document.createElement("input");
+		elem.type = "file";
+		elem.accept = accept;
+		elem.multiple = multiple;
+		return elem;
+	}
+	ice.dom.createNumberInput = function(def, min, max, step, placeholder) {
+		let elem = document.createElement("input");
+		elem.type = "number";
+		elem.value = def;
+		elem.min = min;
+		elem.max = max;
+		elem.step = step;
+		elem.placeholder = placeholder;
+		return elem;
+	}
+	ice.dom.createPasswordInput = function() {
+		let elem = document.createElement("input");
+		elem.type = "password";
+		return elem;
+	}
+	ice.dom.createRadioInput = function(name, value, checked) {
+		let elem = document.createElement("input");
+		elem.type = "radio";
+		elem.name = name;
+		elem.value = value;
+		elem.checked = checked;
+		return elem;
+	}
+	ice.dom.createSlider = function(min, max, step, def) {
+		let elem = document.createElement("input");
+		elem.type = "range";
+		elem.min = min;
+		elem.max = max;
+		elem.step = step;
+		elem.value = def;
+		return elem;
+	}
+	ice.dom.createPasswordInput = function() {
+		let elem = document.createElement("input");
+		elem.type = "password";
+		return elem;
 	}
 
 	// Constructors
