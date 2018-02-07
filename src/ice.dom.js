@@ -2,7 +2,7 @@ if(typeof ice === "undefined") ice = {modules: []};
 (function() {
 	if(!ice.modules.includes("dom")) ice.modules.push("dom");
 	ice.dom = {};
-	ice.dom.version = "v1.0.10"; // This version of the ice.dom module
+	ice.dom.version = "v1.0.11"; // This version of the ice.dom module
 	console.log("%cice.dom " + ice.dom.version + " imported successfully.", "color: #008000");
 	init();
 
@@ -404,11 +404,12 @@ if(typeof ice === "undefined") ice = {modules: []};
 		elem.appendChild(document.createTextNode(text));
 		return elem;
 	}
-	ice.dom.createA = function(text = "link", href = "javascript: void(0);") {
+	ice.dom.createA = function(text = "link", href = "javascript: void(0);", newTab) {
 		let elem = document.createElement("a");
 		elem.appendChild(document.createTextNode(text));
 		if(typeof href === "function") href = `javascript: (${href.toString()})();`;
 		elem.href = href;
+		if(newTab !== undefined) elem.target = "_blank";
 		return elem;
 	}
 	ice.dom.createBr = function() {
