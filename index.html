@@ -105,36 +105,63 @@
 			}
 			function updateOutput() {
 				let toInclude = [];
-				if(importAll.checked) {
-					toInclude.push("src/ice.js");
-				}
-				else {
+				if(!importAll.checked) {
 					for(let module in modules) {
 						if(modules[module].checked) {
-							toInclude.push("src/ice." + module + ".js");
+							toInclude.push(module);
 						}
 					}
+					updateEmbed(toInclude, false);
+					updateBookmarklet(toInclude, false);
+					updateJsInclude(toInclude, false);
 				}
-				updateEmbed(toInclude);
-				updateBookmarklet(toInclude);
-				updateJsInclude(toInclude);
+				else {
+					updateEmbed(toInclude, true);
+					updateBookmarklet(toInclude, true);
+					updateJsInclude(toInclude, true);
+				}
 			}
-			function updateEmbed(toInclude) {
+			function updateEmbed(toInclude, all) {
 				let text = "";
-				for(let module of toInclude) {
-					text += "<script src=\"https://caasinehc.github.io/ice/" + module + "\"><\/script>\n";
+				if(all) {
+					text += "<script src=\"https://caasinehc.github.io/ice/src/ice.js\"><\/script>\n"
+				}
+				else {
+					for(let module of toInclude) {
+						text += "<script src=\"https://caasinehc.github.io/ice/src/ice." + module + ".js\"><\/script>\n";
+					}
 				}
 				embedInput.innerText = text;
 			}
 			embedInput.onclick = function() {
 				embedInput.select();
 			}
-			function updateBookmarklet(toInclude) {
-				let text = `javascript:(d=>{if(d.head===null){if(d.documentElement===null)d.appendChild(d.createElement("html"));d.documentElement.appendChild(d.createElement("head"))}let v=d.createElement("div");for(let m of["${toInclude.map(str=>str.replace(/src\/ice\.(.*)\.js/, "$1")).join(`","`)}"]){let s=d.createElement("script");s.src=\`https://caasinehc.github.io/ice/src/ice.\${m}.js\`;v.appendChild(s)}let c=d.currentScript;c?c.parentElement.replaceChild(v,c):d.head.appendChild(v)})(document);`;
+			function updateBookmarklet(toInclude, all) {
+				let text = all ? (
+					`javascript:(d=>{if(d.head===null){if(d.documentElement===null)d.appendChild(d.createElement("html"));d.documentElement.appendChild(d.createElement("head"))}let v=d.createElement("div");let s=d.createElement("script");s.src="https://caasinehc.github.io/ice/src/ice.js";v.appendChild(s);let c=d.currentScript;c?c.parentElement.replaceChild(v,c):d.head.appendChild(v)})(document);`
+				) : toInclude.length === 0 ? "javascript: void(0);" : (
+					`javascript:(d=>{if(d.head===null){if(d.documentElement===null)d.appendChild(d.createElement("html"));d.documentElement.appendChild(d.createElement("head"))}let v=d.createElement("div");for(let m of["${toInclude.map(str=>str.replace(/src\/ice\.(.*)\.js/, "$1")).join(`","`)}"]){let s=d.createElement("script");s.src=\`https://caasinehc.github.io/ice/src/ice.\${m}.js\`;v.appendChild(s)}let c=d.currentScript;c?c.parentElement.replaceChild(v,c):d.head.appendChild(v)})(document);`
+				);
 				bookmarklet.href = text;
 			}
-			function updateJsInclude(toInclude) {
-				let text = (
+			function updateJsInclude(toInclude, all) {
+				let text = all ? (
+`(function() {
+	if(document.head === null) {
+		if(document.documentElement === null) {
+			document.appendChild(document.createElement("html"));
+		}
+		document.documentElement.appendChild(document.createElement("head"));
+	}
+	let div = document.createElement("div");
+	let script = document.createElement("script");
+	script.src = "https://caasinehc.github.io/ice/src/ice.js";
+	div.appendChild(script);
+	let currentScript = document.currentScript;
+	if(currentScript) currentScript.parentElement.replaceChild(div, currentScript);
+	else document.head.appendChild(div);
+})();`
+				) : toInclude.length === 0 ? "" : (
 `(function() {
 	if(document.head === null) {
 		if(document.documentElement === null) {
@@ -146,7 +173,7 @@
 	let div = document.createElement("div");
 	for(let module of modules) {
 		let script = document.createElement("script");
-		script.src = "https://caasinehc.github.io/ice/" + module;
+		script.src = \`https://caasinehc.github.io/ice/src/ice.\${module}.js\`;
 		div.appendChild(script);
 	}
 	let currentScript = document.currentScript;
@@ -157,7 +184,7 @@
 				jsInput.innerText = text;
 			}
 			jsInput.onclick = function() {
-				jsInput.select();
+				this.select();
 			}
 
 			window.onload = function() {
