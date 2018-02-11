@@ -1,5 +1,5 @@
 if(typeof ice === "undefined") ice = {modules: []};
-ice.version = "v2.1.11"
+ice.version = "v2.1.12"
 console.log("%c-------- Importing ice.js " + ice.version + " --------", "font-weight: bold; font-size: 24px");
 
 // Ensure the document has a head (for importing)
@@ -44,7 +44,8 @@ if(document.head === null) {
 		"src/ice.debug.js",
 		"src/ice.physics.js",
 		"src/ice.dom.js",
-		"src/ice.time.js"
+		"src/ice.time.js",
+		"src/ice.audio.js"
 	];
 	importFiles(files);
 })();

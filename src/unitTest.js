@@ -273,5 +273,8 @@
 	expect("ice.time", ice.time)
 		.toExist();
 
+	expect("ice.audio", ice.audio)
+		.toExist();
+
 	console.log(`%cUnit test ran! failures: ${failures}`, `color: ${failures > 0 ? "red" : "green"}; font-weight: bold; background-color: ${failures > 0 ? "rgba(255, 0, 0, 0.2)" : "rgba(0, 255, 0, 0.2)"}; display: block;`);
 })();
