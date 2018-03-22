@@ -234,6 +234,8 @@
 		.toBe(true);
 	expect("ice.math.isPrime(9)", ice.math.isPrime(9))
 		.toBe(false);
+	expect(`ice.math.factors(36).join(", ")`, ice.math.factors(36).join(", "))
+		.toBe("1, 2, 3, 4, 6, 9, 12, 18, 36");
 	expect("ice.math.radToDeg(Math.PI)", ice.math.radToDeg(Math.PI))
 		.toBe(180);
 	expect("ice.math.radToDeg(Math.PI * 4)", ice.math.radToDeg(Math.PI * 4))
@@ -266,6 +268,12 @@
 		.toBe(10);
 	expect("ice.math.clamp(1, -2, -1)", ice.math.clamp(1, -2, -1))
 		.toBe(-1);
+	expect("ice.math.binary(132)", ice.math.binary(132))
+		.toBe("10000100");
+	expect("ice.math.binary(53452, true).length", ice.math.binary(53452, true).length)
+		.toBe(32);
+	expect("ice.math.binary(53452, true)", ice.math.binary(53452, true))
+		.toBe("00000000000000001101000011001100");
 
 	expect("ice.physics", ice.physics)
 		.toExist();
