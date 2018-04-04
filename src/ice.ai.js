@@ -2,7 +2,7 @@ if(typeof ice === "undefined") ice = {modules: []};
 (function() {
 	if(!ice.modules.includes("ai")) ice.modules.push("ai");
 	ice.ai = {};
-	ice.audio.version = "v1.0.0"; // This version of the ice.ai module
+	ice.ai.version = "v1.0.1"; // This version of the ice.ai module
 	console.log("%cice.ai " + ice.ai.version + " imported successfully.", "color: #008000");
 
 	/*
