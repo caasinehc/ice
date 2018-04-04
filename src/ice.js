@@ -45,7 +45,8 @@ if(document.head === null) {
 		"src/ice.physics.js",
 		"src/ice.dom.js",
 		"src/ice.time.js",
-		"src/ice.audio.js"
+		"src/ice.audio.js",
+		"src/ice.ai.js"
 	];
 	importFiles(files);
 })();

@@ -284,5 +284,14 @@
 	expect("ice.audio", ice.audio)
 		.toExist();
 
+	expect("ice.ai", ice.ai)
+		.toExist();
+	expect("new ice.ai.GeneticAlgorithm(2, 25, 0.1).creatures[0].DNA.genes.length", new ice.ai.GeneticAlgorithm(2, 25, 0.1).creatures[0].DNA.genes.length)
+		.toBe(2);
+	expect("new ice.ai.GeneticAlgorithm(2, 25, 0.1).creatures.length", new ice.ai.GeneticAlgorithm(2, 25, 0.1).creatures.length)
+		.toBe(25);
+	expect("new ice.ai.GeneticAlgorithm(2, 25, 0.1).mutationRate", new ice.ai.GeneticAlgorithm(2, 25, 0.1).mutationRate)
+		.toBe(0.1);
+
 	console.log(`%cUnit test ran! failures: ${failures}`, `color: ${failures > 0 ? "red" : "green"}; font-weight: bold; background-color: ${failures > 0 ? "rgba(255, 0, 0, 0.2)" : "rgba(0, 255, 0, 0.2)"}; display: block;`);
 })();
