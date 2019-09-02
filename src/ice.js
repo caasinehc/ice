@@ -1,8 +1,8 @@
 /*
  * ice.js
- * a2.0.0
+ * v2.0.0
  * By Isaac Chen
- * Last Updated: 8/31/2019
+ * Last Updated: 9/2/2019
  */
 /*
  * TODO:
