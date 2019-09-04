@@ -84,6 +84,11 @@ function iceInit() {
 	// The main framework stuff
 	canvas = append(createCanvas(800, 600));
 	canvas.style.border = "4px solid black";
+	canvas.style.userSelect = "none";
+	canvas.style.outline = "none";
+	canvas.addEventListener("contextmenu", function(e) {
+		e.preventDefault();
+	});
 	scene = new Scene(canvas);
 	inputListener = new InputListener(canvas);
 	clock = new Clock();
