@@ -2226,7 +2226,7 @@ let ice = (function() {
 	
 	/*
 	 * [Module name]  graphics
-	 * [Version]      v1.0.0
+	 * [Version]      v1.0.1
 	 * [Dependencies] physics (2), colors (1), math (1)
 	 * [Level]        3
 	 * [Description]  This module handles everything related to graphics.
@@ -2690,10 +2690,10 @@ let ice = (function() {
 				let v3Ang = rot - alpha;
 				
 				// Calculate the vertices
-				let x2 = basics.cos(v2Ang) * edgeLength;
-				let y2 = basics.sin(v2Ang) * edgeLength;
-				let x3 = basics.cos(v3Ang) * edgeLength;
-				let y3 = basics.sin(v3Ang) * edgeLength;
+				let x2 = x1 + basics.cos(v2Ang) * edgeLength;
+				let y2 = y1 + basics.sin(v2Ang) * edgeLength;
+				let x3 = x1 + basics.cos(v3Ang) * edgeLength;
+				let y3 = y1 + basics.sin(v3Ang) * edgeLength;
 				
 				// Draw the triangle
 				ctx.beginPath();
