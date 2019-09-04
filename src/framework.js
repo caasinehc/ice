@@ -1,6 +1,6 @@
 /*
  * framework.js
- * v2.0.0
+ * v2.0.1
  * By Isaac Chen
  * Last Updated: 9/2/2019
  */
@@ -8,6 +8,8 @@
 let canvas, scene, inputListener, clock;
 let mouseX, mouseY, prevMouseX, prevMouseY, mousePos, prevMousePos;
 var tick, render;
+if(typeof tick   !== "function") tick   = function() {};
+if(typeof render !== "function") render = function() {};
 
 function iceInit() {
 	// Uses this magical shit: https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Operators/Destructuring_assignment
