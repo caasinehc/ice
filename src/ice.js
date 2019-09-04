@@ -1,6 +1,6 @@
 /*
  * ice.js
- * v2.0.1
+ * v2.0.2
  * By Isaac Chen
  * Last Updated: 9/2/2019
  */
@@ -14,7 +14,7 @@
 
 let ice = (function() {
 	
-	let version = "v2.0.0";
+	let version = "v2.0.2";
 	let ice = {};
 	let basics = (function() {
 		// This really doesn't have to be wrapped in an IIFE, but it allows it to
@@ -1682,7 +1682,7 @@ let ice = (function() {
 		// Clamps the vector's magnitude
 		physics.Vector.prototype.clampMag = function(min, max = 0) {
 			let magSq = this.magSq();
-			let magClampedSq = basics.clamp(magSq, min * min, max * max);
+			let magSqClamped = basics.clamp(magSq, min * min, max * max);
 			// I should be able to avoid this sqrt operation, but it doesn't seem necessary
 			if(magSq !== magSqClamped) this.setMag(basics.sqrt(magSqClamped));
 			return this;
