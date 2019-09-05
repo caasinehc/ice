@@ -14,7 +14,7 @@
 
 let ice = (function() {
 	
-	let version = "v2.0.2";
+	let version = "v2.0.3";
 	let ice = {};
 	let basics = (function() {
 		// This really doesn't have to be wrapped in an IIFE, but it allows it to
