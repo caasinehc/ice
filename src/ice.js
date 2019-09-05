@@ -1,8 +1,8 @@
 /*
  * ice.js
- * v2.0.2
+ * v2.0.3
  * By Isaac Chen
- * Last Updated: 9/2/2019
+ * Last Updated: 9/5/2019
  */
 /*
  * TODO:
@@ -502,7 +502,7 @@ let ice = (function() {
 	
 	/*
 	 * [Module name]  math
-	 * [Version]      v1.0.0
+	 * [Version]      v1.0.1
 	 * [Dependencies] none.
 	 * [Level]        1
 	 * [Description]  Everything math. It's got the basics, like PI, sin(), and
@@ -609,6 +609,7 @@ let ice = (function() {
 		math.PI    = basics.PI;
 		math.TAU   = basics.TAU;
 		math.E     = basics.E;
+		math.PHI   = (1 + basics.sqrt(5)) / 2;
 		math.SQRT2 = basics.SQRT2;
 		
 		// Methods

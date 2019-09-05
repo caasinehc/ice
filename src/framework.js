@@ -37,7 +37,7 @@ function iceInit() {
 		
 		// Math
 		({
-			PerlinNoiseMono, PerlinNoise, PI, TAU, E, SQRT2, deg, rad,
+			PerlinNoiseMono, PerlinNoise, PI, TAU, E, PHI, SQRT2, deg, rad,
 			randomInt, randomFloat, randomFrom, random, randomGaussian, chance,
 			coinFlip, pythag, pythagSq, dist, distSq, map, isPrime, factors,
 			gcd, lcm, fibonacci, clamp, binary, sigmoid, abs, sign, min, max,
