@@ -1,6 +1,6 @@
 /*
  * ice.js
- * v2.0.3
+ * v2.0.4
  * By Isaac Chen
  * Last Updated: 9/5/2019
  */
@@ -14,7 +14,7 @@
 
 let ice = (function() {
 	
-	let version = "v2.0.3";
+	let version = "v2.0.4";
 	let ice = {};
 	let basics = (function() {
 		// This really doesn't have to be wrapped in an IIFE, but it allows it to
@@ -502,7 +502,7 @@ let ice = (function() {
 	
 	/*
 	 * [Module name]  math
-	 * [Version]      v1.0.1
+	 * [Version]      v1.0.2
 	 * [Dependencies] none.
 	 * [Level]        1
 	 * [Description]  Everything math. It's got the basics, like PI, sin(), and
@@ -864,9 +864,10 @@ let ice = (function() {
 		math.cos = basics.cos;
 		math.tan = basics.tan;
 		// Inverse circle trig functions
-		math.asin = basics.asin;
-		math.acos = basics.acos;
-		math.atan = basics.atan;
+		math.asin  = basics.asin;
+		math.acos  = basics.acos;
+		math.atan  = basics.atan;
+		math.atan2 = Math.atan2;
 		// Hyperbolic trig functions
 		math.sinh = Math.sinh;
 		math.cosh = Math.cosh;
@@ -1400,7 +1401,7 @@ let ice = (function() {
 	
 	/*
 	 * [Module name]  physics
-	 * [Version]      v1.0.0
+	 * [Version]      v1.0.1
 	 * [Dependencies] math (1).
 	 * [Level]        2
 	 * [Description]  This modules handles physics. It's primary focus is vectors,
