@@ -516,7 +516,7 @@ let ice = (function() {
 		
 		// Methods
 		// Secure Hash Algorithm 256
-		crypto.sha256(ascii, binary = false) {
+		crypto.sha256 = function(ascii, binary = false) {
 			function rightRotate(value, amount) {
 				return (value >>> amount) | (value << (32 - amount));
 			}
