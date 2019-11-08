@@ -999,7 +999,7 @@ let ice = (function() {
 	
 	/*
 	 * [Module name]  time
-	 * [Version]	  v1.0.0
+	 * [Version]	  v1.0.1
 	 * [Dependencies] none.
 	 * [Level]        1
 	 * [Description]  This module handles timing, with everything from timed
@@ -1036,47 +1036,52 @@ let ice = (function() {
 			}
 			
 			// Properties
-			this.status = "not started";
+			this.status = this.statuses.NOT_STARTED;
 			
 			// Methods
 			// Starts clock (technically the same as resume)
 			this.start = function() {
 				ticking = true;
-				this.status = "ticking";
+				this.status = this.statuses.TICKING;
 			}
 			// Pauses clock
 			this.pause = function() {
 				ticking = false;
-				this.status = "paused";
+				this.status = this.statuses.PAUSED;
 			}
 			// Resumes clock
 			this.resume = function() {
 				ticking = true;
-				this.status = "ticking";
+				this.status = this.statuses.TICKING;
 			}
 			// Sets the tick rate of the clock
-			this.setTickRate = function(newTickRate) {
+			this.tickRate = function(newTickRate) {
+				if(newTickRate === undefined) {
+					return tickRate;
+				}
 				tickRate = newTickRate;
 				clearInterval(interval);
 				interval = setInterval(tick, 1000 / tickRate);
 			}
-			// Gets the tick rate of the clock
-			this.getTickRate = function() {
-				return tickRate;
-			}
 			// The function that gets called every tick. Redefined by the programmer
-			this.tick = function() {
+			this.tick = function(dt) {
 				// This is what the programmer gets to define
 			}
 			// Terminates the clock properly.
 			this.kill = function() {
 				clearInterval(interval);
 				for(let key in this) delete this[key];
-				this.status = "killed";
+				this.status = this.statuses.KILLED;
 			}
 			
 			// Finalization
 			interval = setInterval(tick, 1000 / tickRate);
+		}
+		time.Clock.prototype.statuses = {
+			NOT_STARTED: "not started",
+			TICKING: "ticking",
+			PAUSED: "paused",
+			KILLED: "killed"
 		}
 		
 		// Methods
