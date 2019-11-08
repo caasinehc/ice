@@ -1,20 +1,22 @@
-let pos;
+let copyCat = mouse.pos.clone();
 
 function init() {
-	pos = middle.clone();
-	init = undefined;
+	
 }
 if(typeof ice !== "undefined" && ice.meta.framework.initialized) init();
 
-function tick() {
-	pos.lerp(mouse.pos, 0.1);
+function render() {
+	background();
+	
+	fill(BLACK);
+	point(mouse.pos, 10);
+	
+	fill(RED);
+	point(copyCat, 5);
 }
 
-function render() {
-	background(SALMON);
+function tick(dt) {
+	console.log(dt);
 	
-	fill(SILVER);
-	stroke(BLACK);
-	strokeWidth(4);
-	point(pos, 32);
+	copyCat.set(mouse.pos);
 }

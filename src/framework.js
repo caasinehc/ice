@@ -125,8 +125,8 @@ function iceInit() {
 	ice.meta.framework.initialized = true;
 	
 	// Clock initialization
-	clock.tick = function() {
-		tick();
+	clock.tick = function(dt) {
+		tick(dt);
 	}
 	clock.start();
 	

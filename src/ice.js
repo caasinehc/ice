@@ -1032,6 +1032,7 @@ let ice = (function() {
 			let tick = () => {
 				let now = performance.now();
 				let dt = now - then;
+				then = now;
 				if(ticking) this.tick(dt);
 			}
 			
@@ -1040,17 +1041,17 @@ let ice = (function() {
 			
 			// Methods
 			// Starts clock (technically the same as resume)
-			this.start = function() {
+			this.start = () => {
 				ticking = true;
 				this.status = this.statuses.TICKING;
 			}
 			// Pauses clock
-			this.pause = function() {
+			this.pause = () => {
 				ticking = false;
 				this.status = this.statuses.PAUSED;
 			}
 			// Resumes clock
-			this.resume = function() {
+			this.resume = () => {
 				ticking = true;
 				this.status = this.statuses.TICKING;
 			}
@@ -1068,7 +1069,7 @@ let ice = (function() {
 				// This is what the programmer gets to define
 			}
 			// Terminates the clock properly.
-			this.kill = function() {
+			this.kill = () => {
 				clearInterval(interval);
 				for(let key in this) delete this[key];
 				this.status = this.statuses.KILLED;
