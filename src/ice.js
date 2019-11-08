@@ -1030,10 +1030,12 @@ let ice = (function() {
 			// user-defined this.tick function. Has to be arrow notation because
 			// of scope issues.
 			let tick = () => {
-				let now = performance.now();
-				let dt = now - then;
-				then = now;
-				if(ticking) this.tick(dt);
+				if(ticking) {
+					let now = performance.now();
+					let dt = now - then;
+					then = now;
+					this.tick(dt);
+				}
 			}
 			
 			// Properties

@@ -1,7 +1,9 @@
 let copyCat = mouse.pos.clone();
 
 function init() {
+	// canvas.style.cursor = "none";
 	
+	// tickRate(60);
 }
 if(typeof ice !== "undefined" && ice.meta.framework.initialized) init();
 
