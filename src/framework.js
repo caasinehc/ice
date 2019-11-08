@@ -135,8 +135,8 @@ function iceInit() {
 	
 	// Render loop
 	function actualRender() {
-		if(clock.status === clock.statuses.TICKING) render();
 		requestAnimationFrame(actualRender);
+		if(clock.status === clock.statuses.TICKING) render();
 	}
 	requestAnimationFrame(actualRender);
 }
