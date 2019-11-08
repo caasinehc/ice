@@ -124,6 +124,9 @@ function iceInit() {
 	// Final initialization
 	ice.meta.framework.initialized = true;
 	
+	// Call the init function (user defined)
+	if(typeof init !== "undefined") init();
+	
 	// Clock initialization
 	clock.tick = function(dt) {
 		tick(dt);
@@ -136,9 +139,6 @@ function iceInit() {
 		requestAnimationFrame(actualRender);
 	}
 	requestAnimationFrame(actualRender);
-	
-	// Call the init function (user defined)
-	if(typeof init !== "undefined") init();
 }
 // If ice is already loaded (will be the case *most* of the time)
 if(typeof ice !== "undefined") iceInit();
