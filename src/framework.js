@@ -124,11 +124,18 @@ function iceInit() {
 	// Final initialization
 	ice.meta.framework.initialized = true;
 	
+	// Clock initialization
 	clock.tick = function() {
 		tick();
-		render();
 	}
 	clock.start();
+	
+	// Render loop
+	function actualRender() {
+		if(clock.status === clock.statuses.TICKING) render();
+		requestAnimationFrame(actualRender);
+	}
+	requestAnimationFrame(actualRender);
 	
 	// Call the init function (user defined)
 	if(typeof init !== "undefined") init();
