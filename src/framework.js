@@ -16,7 +16,8 @@ function iceInit() {
 	
 	// Globalize the modules
 	(function() {
-		({debug, dom, crypto, math, time, colors, physics, graphics} = ice);
+		// ice.crypto can't be globalized, as "crypto" is already a thing in the browser
+		({debug, dom, math, time, colors, physics, graphics} = ice);
 		
 		// Debug
 		({
@@ -36,9 +37,10 @@ function iceInit() {
 		} = dom);
 		
 		// Crypto
+		// ice.crypto can't be globalized, as "crypto" is already a thing in the browser
 		({
 			sha256
-		} = crypto);
+		} = ice.crypto);
 		
 		// Math
 		({
