@@ -1,8 +1,8 @@
 /*
  * framework.js
- * v2.0.1
+ * v2.0.2
  * By Isaac Chen
- * Last Updated: 9/2/2019
+ * Last Updated: 11/8/2019
  */
 
 let canvas, scene, inputListener, clock;
@@ -16,7 +16,7 @@ function iceInit() {
 	
 	// Globalize the modules
 	(function() {
-		({debug, dom, math, time, colors, physics, graphics} = ice);
+		({debug, dom, crypto, math, time, colors, physics, graphics} = ice);
 		
 		// Debug
 		({
@@ -34,6 +34,11 @@ function iceInit() {
 			createH3, createH4, createH5, createH6, createImg, createP,
 			createProgress, createSpan
 		} = dom);
+		
+		// Crypto
+		({
+			sha256
+		} = crypto);
 		
 		// Math
 		({

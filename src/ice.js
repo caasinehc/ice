@@ -1,20 +1,19 @@
 /*
  * ice.js
- * v2.0.4
+ * v2.0.5
  * By Isaac Chen
- * Last Updated: 9/5/2019
+ * Last Updated: 11/8/2019
  */
 /*
  * TODO:
  *    • Sweep through and make sure whitespace/formatting is nice and consistent (prob spaces instead of tabs 
  *      and lines over 80 chars from chromebook editing)
  *    • Vibrations
- *    • Crypto
  */
 
 let ice = (function() {
 	
-	let version = "v2.0.4";
+	let version = "v2.0.5";
 	let ice = {};
 	let basics = (function() {
 		// This really doesn't have to be wrapped in an IIFE, but it allows it to
@@ -176,6 +175,7 @@ let ice = (function() {
 			"email": "isaacjchen1@gmail.com",
 			"github": "https://github.com/caasinehc"
 		};
+		// For the ice framework
 		meta.framework = {
 			initialized: false
 		};
@@ -498,6 +498,122 @@ let ice = (function() {
 		
 		logImport("debug");
 		return debug;
+	})();
+	
+	/*
+	 * [Module name]  crypto
+	 * [Version]      v1.0.0
+	 * [Dependencies] none.
+	 * [Level]        1
+	 * [Description]  Cryptographic stuff. While I did try my best, this is
+	 *     ***ABSOLUTELY NOT*** a cryptographically secure library. ***DO NOT***
+	 *     use this for ANYTHING serious like password storage.
+	 * [TODO]
+	 *     • None
+	 */
+	ice.crypto = (function() {
+		let crypto = {};
+		
+		// Methods
+		// Secure Hash Algorithm 256
+		crypto.sha256(ascii, binary = false) {
+			function rightRotate(value, amount) {
+				return (value >>> amount) | (value << (32 - amount));
+			}
+			
+			let maxWord = 2 ** 32;
+			let result = "";
+
+			let words = [];
+			let asciiBitLength = ascii.length * 8;
+			
+			let hash = [];
+			let k = [];
+			let primeCounter = 0;
+
+			let isComposite = {};
+			for(let candidate = 2; primeCounter < 64; candidate++) {
+				if(!isComposite[candidate]) {
+					for(let i = 0; i < 313; i += candidate) {
+						isComposite[i] = candidate;
+					}
+					hash[primeCounter] = (basics.sqrt(candidate) * maxWord) | 0;
+					k   [primeCounter] = (basics.cbrt(candidate) * maxWord) | 0;
+					primeCounter++;
+				}
+			}
+
+			ascii += "\x80";
+			while(ascii.length % 64 - 56) ascii += "\x00";
+			for(let i = 0; i < ascii.length; i++) {
+				let j = ascii.charCodeAt(i);
+				if(j >> 8) return;
+				words[i >> 2] |= j << ((3 - i) % 4) * 8;
+			}
+			words[words.length] = ((asciiBitLength / maxWord) | 0);
+			words[words.length] = (asciiBitLength);
+
+			for(let j = 0; j < words.length;) {
+				let w = words.slice(j, j += 16);
+				let oldHash = hash;
+
+				hash = hash.slice(0, 8);
+				
+				for(let i = 0; i < 64; i++) {
+					let i2 = i + j;
+
+					let w15 = w[i - 15];
+					let w2  = w[i - 2];
+
+					let a = hash[0];
+					let e = hash[4];
+					let temp1 = (
+						hash[7] +
+						(rightRotate(e, 6) ^ rightRotate(e, 11) ^ rightRotate(e, 25)) +
+						((e & hash[5]) ^ ((~e) & hash[6])) +
+						k[i] + (
+							w[i] = (i < 16) ? w[i] : (
+								w[i - 16] +
+								(rightRotate(w15, 7) ^ rightRotate(w15, 18) ^ (w15 >>> 3)) +
+								w[i - 7] +
+								(rightRotate(w2, 17) ^ rightRotate(w2, 19) ^ (w2 >>> 10))
+							) | 0
+						)
+					);
+
+					let temp2 = (
+						(rightRotate(a, 2) ^ rightRotate(a, 13) ^ rightRotate(a, 22)) +
+						((a & hash[1]) ^ (a & hash[2]) ^ (hash[1] & hash[2]))
+					);
+					
+					hash = [(temp1 + temp2) | 0].concat(hash);
+					hash[4] = (hash[4] + temp1) | 0;
+				}
+				
+				for(let i = 0; i < 8; i++) {
+					hash[i] = (hash[i] + oldHash[i]) | 0;
+				}
+			}
+			
+			for(let i = 0; i < 8; i++) {
+				for(let j = 3; j + 1; j--) {
+					let b = (hash[i] >> (j * 8)) & 255;
+					result += ((b < 16) ? 0 : "") + b.toString(16);
+				}
+			}
+
+			if(binary) {
+				result = result.split("").map(char => {
+					bin = parseInt(char, 16).toString(2);
+					paddedBin = "0".repeat(4 - bin.length) + bin;
+					return paddedBin;
+				}).join("");
+			}
+			return result;
+		}
+		
+		logImport("crypto");
+		return crypto;
 	})();
 	
 	/*
@@ -2898,4 +3014,4 @@ let ice = (function() {
 })();
 
 // Callback for after ice has loaded
-if(typeof iceInit !== "undefined") iceInit();
+if(typeof iceInit !== "undefined" && typeof iceInit === "function") iceInit();
