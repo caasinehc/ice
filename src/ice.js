@@ -2352,7 +2352,7 @@ let ice = (function() {
 	
 	/*
 	 * [Module name]  graphics
-	 * [Version]      v1.0.1
+	 * [Version]      v1.0.2
 	 * [Dependencies] physics (2), colors (1), math (1)
 	 * [Level]        3
 	 * [Description]  This module handles everything related to graphics.
@@ -2404,7 +2404,7 @@ let ice = (function() {
 			}
 			
 			// Private variables
-			let ctx = canvas.getContext("2d");this.ctx
+			let ctx = canvas.getContext("2d");
 			let settings = {
 				bgColor:     WHITE,
 				fill:        BLACK,
@@ -2722,6 +2722,7 @@ let ice = (function() {
 				if(settings.angleMode === "degrees") rot = basics.deg(rot);
 				ctx.beginPath();
 				ctx.ellipse(x, y, w / 2, h / 2, rot, 0, basics.TAU);
+				renderPath();
 			}
 			
 			// Draws a circle with given x, y, and radius
