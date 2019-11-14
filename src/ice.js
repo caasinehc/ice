@@ -999,7 +999,7 @@ let ice = (function() {
 	
 	/*
 	 * [Module name]  time
-	 * [Version]	  v1.0.1
+	 * [Version]	  v1.0.2
 	 * [Dependencies] none.
 	 * [Level]        1
 	 * [Description]  This module handles timing, with everything from timed
@@ -1007,7 +1007,6 @@ let ice = (function() {
 	 *     function that you should ***NEVER EVER USE UNDER ANY CIRCUMSTANCE***
 	 * [TODO]
 	 *     • Time translation
-	 *     • Delta t
 	 now
 	 */
 	ice.time = (function() {
@@ -1025,7 +1024,28 @@ let ice = (function() {
 			let ticking = false;
 			let then = performance.now();
 			
+			const MAX_DELTA = 5;
+			const TPS_HIST_SIZE = 6;
+			let tpsHist = [];
+			let currTps = 0;
+			let tps = 0;
+			
 			// Private functions
+			// Handles tracking the tps
+			function tpsTracker(dt) {
+				let thisTps = 1000 / dt;
+				let delta = basics.clamp(thisTps - currTps, -MAX_DELTA, MAX_DELTA);
+				currTps += delta;
+				tpsHist.unshift(currTps);
+				if(tpsHist.length > TPS_HIST_SIZE) tpsHist.pop();
+				
+				tps = 0;
+				for(let i = 0; i < tpsHist.length; i++) {
+					tps += tpsHist[i];
+				}
+				tps /= tpsHist.length;
+			}
+			
 			// The actual tick function, which tracks information and calls the
 			// user-defined this.tick function. Has to be arrow notation because
 			// of scope issues.
@@ -1034,6 +1054,7 @@ let ice = (function() {
 					let now = performance.now();
 					let dt = now - then;
 					then = now;
+					tpsTracker(dt);
 					this.tick(dt);
 				}
 			}
@@ -1066,6 +1087,14 @@ let ice = (function() {
 				clearInterval(interval);
 				interval = setInterval(tick, 1000 / tickRate);
 			}
+			// Gets the tps (smoothed)
+			this.getTps = function() {
+				return tps;
+			}
+			// Gets the raw tps (unsmoothed);
+			this.getRawTps = function() {
+				return tpsHist[0];
+			}
 			// The function that gets called every tick. Redefined by the programmer
 			this.tick = function(dt) {
 				// This is what the programmer gets to define
@@ -1092,6 +1121,7 @@ let ice = (function() {
 		time.delay = function(callback, delay) {
 			setTimeout(callback, delay);
 		}
+		
 		// Sleep. should ***NEVER EVER BE USED UNDER ANY CIRCUMSTANCES EVER AT ALL***
 		// SERIOUSLY GUY DON'T DO SOMETHING YOU WILL REGRET THIS IS A TERRIBLE IDEA
 		// AND IS ONLY HERE FOR FUN!!!

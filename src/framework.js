@@ -117,7 +117,7 @@ function iceInit() {
 	
 	// Globalize clock
 	({
-		/*status, */start, pause, resume, tickRate, /*tick,
+		/*status, */start, pause, resume, tickRate, getTps, getRawTps, /*tick,
 		kill*/
 	} = clock);
 	
