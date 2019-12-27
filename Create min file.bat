@@ -1,0 +1,2 @@
+cmd /c "cd C:\Users\Isaac\Desktop\Programming\GitHub repos\Javascript\ice\src & npx terser -c -m -o       ice.min.js --       ice.js"
+cmd /c "cd C:\Users\Isaac\Desktop\Programming\GitHub repos\Javascript\ice\src & npx terser -c -m -o framework.min.js -- framework.js"
