@@ -36,7 +36,7 @@ let ice = (function() {
 		basics.floor  = Math.floor;
 		basics.ceil   = Math.ceil;
 		basics.sqrt   = Math.sqrt;
-		basics.cbrt   = Math.cbrt
+		basics.cbrt   = Math.cbrt;
 		basics.log    = Math.log;
 		basics.pow    = Math.pow;
 		basics.sin    = Math.sin;
@@ -45,8 +45,8 @@ let ice = (function() {
 		basics.asin   = Math.asin;
 		basics.acos   = Math.acos;
 		basics.atan   = Math.atan;
-		basics.deg    = function(rad) {return rad * 180 / PI;}
-		basics.rad    = function(deg) {return deg * PI / 180;}
+		basics.deg    = function(rad) {return rad * 180 / basics.PI;};
+		basics.rad    = function(deg) {return deg * basics.PI / 180;};
 		basics.clamp  = function(n, min, max) {
 			if(max === undefined) return n > min ? min : n;
 			if(min > max) {
@@ -57,7 +57,7 @@ let ice = (function() {
 			if(n < min) return min;
 			if(n > max) return max;
 			return n;
-		}
+		};
 		return basics;
 	})();
 	
@@ -144,7 +144,7 @@ let ice = (function() {
 		example.MY_CONSTANT = "THIS IS MY CONSTANT"; // Not enforced constant
 		
 		// Methods
-		// Recieves {a} and {b}, and returns the sum
+		// Receives {a} and {b}, and returns the sum
 		example.myMethod = function(a, b) {
 			return a + b;
 		}
@@ -166,12 +166,23 @@ let ice = (function() {
 	 *     • None
 	 */
 	ice.meta = (function() {
+		function Name(first, middle, last) {
+			this.first = first;
+			this.middle = middle;
+			this.last = last;
+			this.middleInitial = middle.substr(0, 1);
+
+			this.toString = function() {
+				return `${this.first} ${this.middleInitial}. ${this.last}`;
+			}
+		}
+
 		let meta = {};
 		
 		// Properties
 		meta.version = version;
 		meta.author = {
-			"name": "Isaac J. Chen",
+			"name": new Name("Isaac", "Joseph", "Chen"),
 			"email": "isaacjchen1@gmail.com",
 			"github": "https://github.com/caasinehc"
 		};
@@ -277,7 +288,7 @@ let ice = (function() {
 			this.toString = function() {
 				return this.css;
 			}
-		}
+		};
 		
 		// Properties
 		debug.styles = {};
@@ -302,7 +313,7 @@ let ice = (function() {
 				if(!(style instanceof debug.Style)) style = new debug.Style(style);
 				console.log("%c" + text, style.toString());
 			}
-		}
+		};
 		// Similar to console.info, but allows for custom styles
 		debug.info = function(text, style) {
 			if(style === undefined) console.info(text);
@@ -310,7 +321,7 @@ let ice = (function() {
 				if(!(style instanceof debug.Style)) style = new debug.Style(style);
 				console.info("%c" + text, style.toString());
 			}
-		}
+		};
 		// Similar to console.warn, but allows for custom styles
 		debug.warn = function(text, style) {
 			if(style === undefined) console.warn(text);
@@ -318,7 +329,7 @@ let ice = (function() {
 				if(!(style instanceof debug.Style)) style = new debug.Style(style);
 				console.warn("%c" + text, style.toString());
 			}
-		}
+		};
 		// Similar to console.error, but allows for custom styles
 		debug.err = function(text, style) {
 			if(style === undefined) console.error(text);
@@ -326,7 +337,7 @@ let ice = (function() {
 				if(!(style instanceof debug.Style)) style = new debug.Style(style);
 				console.error("%c" + text, style.toString());
 			}
-		}
+		};
 		
 		// Acts like an asynchronous eval using webworkers. Returns a promise
 		debug.aval = function(code, abortTime = 60) {
@@ -346,15 +357,15 @@ let ice = (function() {
 					clearTimeout(timer);
 					worker.terminate();
 					resolve(e.data);
-				}
+				};
 				worker.onerror = e => {
 					clearTimeout(timer);
 					worker.terminate();
 					reject(e.message);
-				}
+				};
 				worker.postMessage("START");
 			});
-		}
+		};
 		
 		// Runs a function {sampleSize} times, collecting information about
 		// the outputs. When complete (or aborted), it logs and returns info
@@ -366,10 +377,9 @@ let ice = (function() {
 			let min, max;
 			let resultsText = {};
 			let totalResults = 0;
-			let totalUniqueResults = 0;
+			let totalUniqueResults;
 			let percent = basics.floor(sampleSize / 100);
 			let clearString = Array(100).join("\n");
-			let runtime = 0;
 			console.clear();
 			let before = performance.now();
 			// Calls the function {sampleSize} times, tracking the results
@@ -424,7 +434,7 @@ let ice = (function() {
 				"Actual sample size": totalResults,
 				"Total unique results": totalUniqueResults,
 				"Total time": totalTime,
-				// Interesting facts from wikipedia:
+				// Interesting facts from Wikipedia:
 				// 1 nanosecond is one billionth of a second, or 0.000000001 seconds
 				// 0.33 nanoseconds – The time it takes a common 3.0 GHz CPU to complete a processing cycle
 				// ~1.02 nanoseconds - The time it takes light to travel a foot!
@@ -432,16 +442,16 @@ let ice = (function() {
 				// 350 million nanoseconds - The average human eye blink
 				"Average time": (1000000 * (after - before) / totalResults).toFixed(4) + " nanoseconds",
 				"Expected frequency (assuming even distribution)": basics.round((totalResults / totalUniqueResults)) + "(" + (100 / totalUniqueResults).toFixed(2) + "%)",
-				"Most common": max + ", occuring a whopping " + results[max] + " times (" + ((results[max] / totalResults) * 100).toFixed(2) + "%)",
-				"Least common": min + ", occuring only " + results[min] + " times (" + ((results[min] / totalResults) * 100).toFixed(2) + "%)"
-			}
+				"Most common": max + ", occurring a whopping " + results[max] + " times (" + ((results[max] / totalResults) * 100).toFixed(2) + "%)",
+				"Least common": min + ", occurring only " + results[min] + " times (" + ((results[min] / totalResults) * 100).toFixed(2) + "%)"
+			};
 			console.table(summary);
 			console.groupCollapsed("Results");
 			console.table(resultsText);
 			console.groupEnd();
 			summary["Results"] = resultsText;
 			return summary;
-		}
+		};
 		
 		debug.summonDebugDoug = function() {
 			let debugDougWindow = window.open("", "debugdoug", "width=405 height=380");
@@ -482,8 +492,8 @@ let ice = (function() {
 				"left: 0;" +
 				"word-wrap: normal;" +
 				"white-space: pre-wrap;" +
-				"width: 400;" +
-				"height: 350;" +
+				"width: 400px;" +
+				"height: 350px;" +
 				"}" +
 				"</style>"
 			);
@@ -494,7 +504,7 @@ let ice = (function() {
 				"}" +
 				"</script>"
 			);
-		}
+		};
 		
 		logImport("debug");
 		return debug;
@@ -560,8 +570,6 @@ let ice = (function() {
 				hash = hash.slice(0, 8);
 				
 				for(let i = 0; i < 64; i++) {
-					let i2 = i + j;
-
 					let w15 = w[i - 15];
 					let w2  = w[i - 2];
 
@@ -604,13 +612,12 @@ let ice = (function() {
 
 			if(binary) {
 				result = result.split("").map(char => {
-					bin = parseInt(char, 16).toString(2);
-					paddedBin = "0".repeat(4 - bin.length) + bin;
-					return paddedBin;
+					let bin = parseInt(char, 16).toString(2);
+					return "0".repeat(4 - bin.length) + bin;
 				}).join("");
 			}
 			return result;
-		}
+		};
 		
 		logImport("crypto");
 		return crypto;
@@ -622,7 +629,7 @@ let ice = (function() {
 	 * [Dependencies] none.
 	 * [Level]        1
 	 * [Description]  Everything math. It's got the basics, like PI, sin(), and
-	 *     random(), as well as more advanced stuff like perlin noise.
+	 *     random(), as well as more advanced stuff like Perlin noise.
 	 * [TODO]
 	 *     • None
 	 */
@@ -630,13 +637,12 @@ let ice = (function() {
 		let math = {};
 		
 		// Private methods
-		var clz32 = Math.clz32;
+		let clz32 = Math.clz32;
 		
 		// Constructors
 		math.PerlinNoiseMono = function() {
 			// Big thanks to Flafla2 for writing this incredibly helpful post on Perlin Noise!
 			// https://flafla2.github.io/2014/08/09/perlinnoise.html
-			let tile = 0;
 			let p = [...Array(256)].map(() => basics.floor(basics.random() * 256));
 			for(let i = 0; i < 256; i++) p[i + 256] = (p[i]);
 			
@@ -693,7 +699,7 @@ let ice = (function() {
 				
 				return(lerp(w, y1, y2) + 1) / 2;
 			}
-		}
+		};
 		math.PerlinNoise = function(octaves = 8, falloff = 2) {
 			// Allows omitting the "new" keyword
 			if(new.target === undefined) {
@@ -719,7 +725,7 @@ let ice = (function() {
 				
 				return noise / maxNoise;
 			}
-		}
+		};
 		
 		// Properties
 		math.PI    = basics.PI;
@@ -732,12 +738,12 @@ let ice = (function() {
 		// Translates radians to degrees
 		math.deg = function(rad) {
 			return basics.deg(rad);
-		}
+		};
 		
 		// Translates degrees to radians
 		math.rad = function(deg) {
 			return basics.rad(deg);
-		}
+		};
 		
 		// Returns a random int in the interval [min, max]
 		math.randomInt = function(min, max) {
@@ -748,7 +754,7 @@ let ice = (function() {
 			let minInt = basics.ceil (min);
 			let maxInt = basics.floor(max);
 			return basics.floor(basics.random() * (maxInt - minInt + 1) + minInt);
-		}
+		};
 		
 		// Returns a random float in the interval [min, max)
 		math.randomFloat = function(min, max) {
@@ -757,13 +763,13 @@ let ice = (function() {
 				min = 0;
 			}
 			return basics.random() * (max - min) + min;
-		}
+		};
 		
 		// Returns a random element from an array or character from a string
 		math.randomFrom = function(input) {
 			if(typeof input === "string") input = input.split("");
 			return input[basics.floor(basics.random() * input.length)];
-		}
+		};
 		
 		// Acts like randomFrom if given a string or array, but randomFloat
 		// otherwise. Useful as a generic "random" function.
@@ -786,7 +792,7 @@ let ice = (function() {
 				}
 				return basics.random() * (arg2 - arg1) + arg1;
 			}
-		}
+		};
 		
 		// Returns a random number from a gaussian (normal) distribution, with
 		// a given mean and standard deviation.
@@ -818,39 +824,39 @@ let ice = (function() {
 		// chance >= 1	   : always returns true
 		math.chance = function(chance) {
 			return basics.random() < chance;
-		}
+		};
 		
 		// Returns true 50% of the time (like flipping a coin). Can also be
 		// thought of as returning a random boolean.
 		math.coinFlip = function() {
 			return basics.random() < 0.5;
-		}
+		};
 		
 		// Returns the length of the hypotenuse from two side lengths
 		// a² + b² = c² -> c = √(a² + b²)
 		math.pythag = function(a, b) {
 			return basics.sqrt(a * a + b * b);
-		}
+		};
 		
 		// Returns the length of the hypotenuse squared from two side lengths
 		// a² + b² = c² -> c² = a² + b²
 		math.pythagSq = function(a, b) {
 			return a * a + b * b;
-		}
+		};
 		
 		// Returns the distance between two points
 		math.dist = function(x1, y1, x2 = 0, y2 = 0) {
 			let dx = x1 - x2;
 			let dy = y1 - y2;
 			return basics.sqrt(dx * dx + dy * dy);
-		}
+		};
 		
 		// Returns the square of the distance between two points
 		math.distSq = function(x1, y1, x2 = 0, y2 = 0) {
 			let dx = x1 - x2;
 			let dy = y1 - y2;
 			return dx * dx + dy * dy;
-		}
+		};
 		
 		// Maps a number linearly from one range to another range
 		math.map = function(n, oldMin, oldMax, newMin, newMax, clamp) {
@@ -867,7 +873,7 @@ let ice = (function() {
 			let mapped = (n - oldMin) * (newMax - newMin) / (oldMax - oldMin) + newMin;
 			if(clamp) mapped = basics.clamp(mapped, newMin, newMax);
 			return mapped;
-		}
+		};
 		
 		// Returns whether or not a number is prime (negatives, 0, 1,
 		// non-integers, and Infinity are not considered prime)
@@ -879,7 +885,7 @@ let ice = (function() {
 				if(n % i === 0 || n % (i + 2) === 0) return false;
 			}
 			return true;
-		}
+		};
 		
 		// Returns all positive integers which n is divisible by
 		math.factors = function(n) {
@@ -895,7 +901,7 @@ let ice = (function() {
 			}
 
 			return factors.sort((a, b) => a - b);
-		}
+		};
 		
 		// Returns the greatest common divisor (aka gcd or gcf) of a and b
 		// TODO make it work with more than 2 numbers
@@ -914,13 +920,13 @@ let ice = (function() {
 				if(a === 0) return b;
 				b %= a;
 			}
-		}
+		};
 		
 		// Returns the least common multiple (aka lcm) of a and b
 		// TODO make it work with more than 2 numbers
 		math.lcm = function(a, b) {
 			return basics.abs(a * b) / math.gcd(a, b);
-		}
+		};
 		
 		// Returns the nth fibonacci number. The nth fibonacci number is defined
 		// as the sum of the two fibonacci numbers before it, with fibonacci(0)
@@ -940,18 +946,18 @@ let ice = (function() {
 		// Returns a number restricted to a given range
 		math.clamp = function(x, min, max) {
 			return basics.clamp(x, min, max);
-		}
+		};
 		
 		// Returns a string representing the number in binary form
 		math.binary = function(x, pad = false) {
 			let padding = pad ? "0".repeat(clz32(x)) : "";
 			return padding + (x >>> 0).toString(2);
-		}
+		};
 		
 		// The sigmoid function (https://en.wikipedia.org/wiki/Sigmoid_function)
 		math.sigmoid = function(x) {
-			return 1 / (1 + E ** -x);
-		}
+			return 1 / (1 + basics.E ** -x);
+		};
 		
 		// Math synonyms
 		// Misc math functions
@@ -1057,7 +1063,7 @@ let ice = (function() {
 					tpsTracker(dt);
 					this.tick(dt);
 				}
-			}
+			};
 			
 			// Properties
 			this.status = this.statuses.NOT_STARTED;
@@ -1067,17 +1073,17 @@ let ice = (function() {
 			this.start = () => {
 				ticking = true;
 				this.status = this.statuses.TICKING;
-			}
+			};
 			// Pauses clock
 			this.pause = () => {
 				ticking = false;
 				this.status = this.statuses.PAUSED;
-			}
+			};
 			// Resumes clock
 			this.resume = () => {
 				ticking = true;
 				this.status = this.statuses.TICKING;
-			}
+			};
 			// Sets the tick rate of the clock
 			this.tickRate = function(newTickRate) {
 				if(newTickRate === undefined) {
@@ -1086,41 +1092,41 @@ let ice = (function() {
 				tickRate = newTickRate;
 				clearInterval(interval);
 				interval = setInterval(tick, 1000 / tickRate);
-			}
+			};
 			// Gets the tps (smoothed)
 			this.getTps = function() {
 				return tps;
-			}
+			};
 			// Gets the raw tps (unsmoothed);
 			this.getRawTps = function() {
 				return tpsHist[0];
-			}
+			};
 			// The function that gets called every tick. Redefined by the programmer
 			this.tick = function(dt) {
 				// This is what the programmer gets to define
-			}
+			};
 			// Terminates the clock properly.
 			this.kill = () => {
 				clearInterval(interval);
 				for(let key in this) delete this[key];
 				this.status = this.statuses.KILLED;
-			}
+			};
 			
 			// Finalization
 			interval = setInterval(tick, 1000 / tickRate);
-		}
+		};
 		time.Clock.prototype.statuses = {
 			NOT_STARTED: "not started",
 			TICKING: "ticking",
 			PAUSED: "paused",
 			KILLED: "killed"
-		}
+		};
 		
 		// Methods
 		// setTimeout synonym
 		time.delay = function(callback, delay) {
 			setTimeout(callback, delay);
-		}
+		};
 		
 		// Sleep. should ***NEVER EVER BE USED UNDER ANY CIRCUMSTANCES EVER AT ALL***
 		// SERIOUSLY GUY DON'T DO SOMETHING YOU WILL REGRET THIS IS A TERRIBLE IDEA
@@ -1131,7 +1137,7 @@ let ice = (function() {
 			while(performance.now() - start < delay) {
 				// do nothing. seriously don't use this or you are a horrible person
 			}
-		}
+		};
 		
 		logImport("time");
 		return time;
@@ -1204,7 +1210,7 @@ let ice = (function() {
 			b = b.length === 1 ? "0" + b : b;
 			let rgb = "#" + r + g + b;
 			if(a !== undefined && a < 1) {
-				a = parseInt(a * 255).toString(16);
+				a = basics.floor(a * 255).toString(16);
 				a = a.length === 1 ? "0" + a : a;
 				rgb += a;
 			}
@@ -1260,7 +1266,7 @@ let ice = (function() {
 			return [h, s, l, a];
 		}
 		// Translates an hsl color to an rgb array
-		var hslToRgb = (function() {
+		let hslToRgb = (function() {
 			// Helper function for hslToRgb
 			function hueToRgb(p, q, t) {
 				t = (t % 360 + 360) % 360;
@@ -1494,60 +1500,60 @@ let ice = (function() {
 		colors.LIGHT_GREY  = colors.LIGHT_GRAY;
 		colors.DARK_GREY   = colors.DARK_GRAY;
 		colors.TRANSPARENT = colors.CLEAR;
-		colors.GREYSCALE   = colors.GRAYSCALE;
+		colors.greyscale   = colors.grayscale;
 		
 		// Methods
 		// Interprets a color from the given inputs (returns an array [rgb, hsl, hex])
 		colors.interpret = function(arg1, arg2, arg3, arg4) {
 			return interpretColor(arg1, arg2, arg3, arg4);
-		}
+		};
 		// Translates a hex color to an rgb array
 		colors.hexToRgb = function(hex) {
 			return hexToRgb(hex);
-		}
+		};
 		// Translates an rgb color to a hex string
 		colors.rgbToHex = function(r, g, b, a) {
 			return rgbToHex(r, g, b, a);
-		}
+		};
 		// Translates an rgb color to an hsl array
 		colors.rgbToHsl = function(r, g, b, a) {
 			return rgbToHsl(r, g, b, a);
-		}
+		};
 		// Translates an hsl color to an rgb array
 		colors.hslToRgb = function(h, s, l, a) {
 			return hslToRgb(h, s, l, a);
-		}
+		};
 		// Translates an hsl color to a hex string
 		colors.hslToHex = function(h, s, l, a) {
 			return hslToHex(h, s, l, a);
-		}
+		};
 		// Translates a hex color to an hsl array
 		colors.hexToHsl = function(hex) {
 			return hexToHsl(hex);
-		}
+		};
 		// Returns a random color from the given list, or huesExt if no list is specified
 		colors.random = function(list = colors.huesExt) {
 			return ice.math.randomFrom(list);
-		}
+		};
 		// Linearly interpolates between two given colors (returns the color frac * 100% from color1 to color2 as an rgb array)
 		colors.lerp = function(frac, color1, color2) {
-			color1Rgb = interpretColor(color1)[0];
-			color2Rgb = interpretColor(color2)[0];
+			let color1Rgb = interpretColor(color1)[0];
+			let color2Rgb = interpretColor(color2)[0];
 			let r = color1Rgb[0] * (1 - frac) + color2Rgb[0] * frac;
 			let g = color1Rgb[1] * (1 - frac) + color2Rgb[1] * frac;
 			let b = color1Rgb[2] * (1 - frac) + color2Rgb[2] * frac;
 			let a = color1Rgb[3] * (1 - frac) + color2Rgb[3] * frac;
 			return [r, g, b, a];
-		}
+		};
 		// Inverts a color (does not invert alpha!)
 		colors.invert = function(color) {
-			colorRgb = interpretColor(color)[0];
+			let colorRgb = interpretColor(color)[0];
 			let r = 255 - colorRgb[0];
 			let g = 255 - colorRgb[1];
 			let b = 255 - colorRgb[2];
 			let a =       colorRgb[3];
 			return [r, g, b, a];
-		}
+		};
 		
 		logImport("colors");
 		return colors;
@@ -1582,173 +1588,173 @@ let ice = (function() {
 			// Properties
 			this.x = x;
 			this.y = y;
-		}
+		};
 		// Vector addition (works with a vector, an xy, or an x and a y)
 		physics.Vector.prototype.add = function(x, y = x) {
 			this.x += x.x !== undefined ? x.x : x;
 			this.y += x.y !== undefined ? x.y : y;
 			return this;
-		}
+		};
 		// Vector addition for the x component (works with a vector or an x)
 		physics.Vector.prototype.addX = function(x) {
 			this.x += x.x !== undefined ? x.x : x;
 			return this;
-		}
+		};
 		// Vector addition for the y component (works with a vector or a y)
 		physics.Vector.prototype.addY = function(y) {
 			this.y += y.x !== undefined ? y.x : y;
 			return this;
-		}
+		};
 		// Vector subtraction (works with a vector, an xy, or an x and a y)
 		physics.Vector.prototype.sub = function(x, y = x) {
 			this.x -= x.x !== undefined ? x.x : x;
 			this.y -= x.y !== undefined ? x.y : y;
 			return this;
-		}
+		};
 		// Vector subtraction for the x component (works with a vector or an x)
 		physics.Vector.prototype.subX = function(x) {
 			this.x -= x.x !== undefined ? x.x : x;
 			return this;
-		}
+		};
 		// Vector subtraction for the y component (works with a vector or a y)
 		physics.Vector.prototype.subY = function(y) {
 			this.y -= y.x !== undefined ? y.x : y;
 			return this;
-		}
+		};
 		// Vector multiplication (works with a vector, an xy, or an x and a y)
 		physics.Vector.prototype.mult = function(x, y = x) {
 			this.x *= x.x !== undefined ? x.x : x;
 			this.y *= x.y !== undefined ? x.y : y;
 			return this;
-		}
+		};
 		// Vector multiplication for the x component (works with a vector or an x)
 		physics.Vector.prototype.multX = function(x) {
 			this.x *= x.x !== undefined ? x.x : x;
 			return this;
-		}
+		};
 		// Vector multiplication for the y component (works with a vector or a y)
 		physics.Vector.prototype.multY = function(y) {
 			this.y *= y.x !== undefined ? y.x : y;
 			return this;
-		}
+		};
 		// Vector division (works with a vector, an xy, or an x and a y)
 		physics.Vector.prototype.div = function(x, y = x) {
 			this.x /= x.x !== undefined ? x.x : x;
 			this.y /= x.y !== undefined ? x.y : y;
 			return this;
-		}
+		};
 		// Vector division for the x component (works with a vector or an x)
 		physics.Vector.prototype.divX = function(x) {
 			this.x /= x.x !== undefined ? x.x : x;
 			return this;
-		}
+		};
 		// Vector division for the y component (works with a vector or a y)
 		physics.Vector.prototype.divY = function(y) {
 			this.y /= y.x !== undefined ? y.x : y;
 			return this;
-		}
+		};
 		// Vector modulation (works with a vector, an xy, or an x and a y)
 		physics.Vector.prototype.mod = function(x, y = x) {
 			this.x %= x.x !== undefined ? x.x : x;
 			this.y %= x.y !== undefined ? x.y : y;
 			return this;
-		}
+		};
 		// Vector modulation for the x component (works with a vector or an x)
 		physics.Vector.prototype.modX = function(x) {
 			this.x %= x.x !== undefined ? x.x : x;
 			return this;
-		}
+		};
 		// Vector modulation for the y component (works with a vector or a y)
 		physics.Vector.prototype.modY = function(y) {
 			this.y %= y.x !== undefined ? y.x : y;
 			return this;
-		}
+		};
 		// Vector setting (works with a vector, an xy, or an x and a y)
 		physics.Vector.prototype.set = function(x, y = x) {
 			this.x = x.x !== undefined ? x.x : x;
 			this.y = x.y !== undefined ? x.y : y;
 			return this;
-		}
+		};
 		// Vector setting for the x component (works with a vector or an x)
 		physics.Vector.prototype.setX = function(x) {
 			this.x = x.x !== undefined ? x.x : x;
 			return this;
-		}
+		};
 		// Vector setting for the y component (works with a vector or a y)
 		physics.Vector.prototype.setY = function(y) {
 			this.y = y.x !== undefined ? y.x : y;
 			return this;
-		}
+		};
 		// Returns a clone of the vector
 		physics.Vector.prototype.clone = function() {
 			return new this.constructor(this.x, this.y);
-		}
+		};
 		// Returns the magnitude of the vector
 		physics.Vector.prototype.mag = function() {
 			return basics.sqrt(this.x * this.x + this.y * this.y);
-		}
+		};
 		// Returns the magnitude of the vector squared (faster for comparisons)
 		physics.Vector.prototype.magSq = function() {
 			return this.x * this.x + this.y * this.y;
-		}
+		};
 		// Returns the dot product of the vector and another vector
 		physics.Vector.prototype.dot = function(vec) {
 			return this.x * vec.x + this.y * vec.y;
-		}
+		};
 		// Returns the cross product of the vector and another vector
 		physics.Vector.prototype.cross = function(vec) {
 			return (this.x * vec.y) - (this.y * vec.x);
-		}
+		};
 		// Returns the angular distance between two vectors, in radians
 		physics.Vector.prototype.rad = function(vec) {
 			let rad = ice.math.atan2(this.y, this.x);
 			if(vec !== undefined) rad -= ice.math.atan2(vec.y, vec.x);
 			return (rad + basics.TAU) % basics.TAU;
-		}
+		};
 		// Returns the angular distance between two vectors, in degrees
 		physics.Vector.prototype.deg = function(vec) {
 			return basics.deg(this.rad(vec));
-		}
+		};
 		// Returns the Euclidean distance between the vectors
 		physics.Vector.prototype.dist = function(vec = origin) {
 			let dx = this.x - vec.x;
 			let dy = this.y - vec.y;
 			return basics.sqrt(dx * dx + dy * dy);
-		}
+		};
 		// Returns the Euclidean distance between the vectors squared (faster for comparisons)
 		physics.Vector.prototype.distSq = function(vec = origin) {
 			let dx = this.x - vec.x;
 			let dy = this.y - vec.y;
 			return dx * dx + dy * dy;
-		}
+		};
 		// Returns the horizontal (x) distance between the vectors
 		physics.Vector.prototype.distX = function(vec = origin) {
 			return basics.abs(this.x - vec.x);
-		}
+		};
 		// Returns the vertical (y) distance between the vectors
 		physics.Vector.prototype.distY = function(vec = origin) {
 			return basics.abs(this.y - vec.y);
-		}
+		};
 		// Returns the manhattan distance between the vectors
 		physics.Vector.prototype.distManhattan = function(vec = origin) {
 			return basics.abs(this.x - vec.x) + basics.abs(this.y - vec.y);
-		}
+		};
 		// Returns whether or not two vectors have the same x and y
 		physics.Vector.prototype.equals = function(vec) {
 			return this.x === vec.x && this.y === vec.y;
-		}
+		};
 		// Returns the vector as a string
 		physics.Vector.prototype.toString = function() {
 			return `[object ice.physics.Vector] {x: ${this.x}, y: ${this.y}}`;
-		}
+		};
 		// Returns the vector as an object
 		physics.Vector.prototype.toObject = function() {
 			return {x: this.x, y: this.y};
-		}
+		};
 		// Returns the vector as an array
 		physics.Vector.prototype.toArray = function() {
 			return [this.x, this.y];
-		}
+		};
 		// Normalized the vector (sets it's magnitude to 1, angle remains unchanged)
 		physics.Vector.prototype.norm = function() {
 			let mag = this.mag();
@@ -1756,19 +1762,19 @@ let ice = (function() {
 			// This one line could save lots of headaches. YW future me <3
 			if(mag === 0) console.warn("ice.physics warning: Attempted to normalize a zero vector!");
 			return this.div(mag || 1);
-		}
+		};
 		// Sets the vector's magnitude (angle remains unchanged)
 		physics.Vector.prototype.setMag = function(n) {
 			return this.norm().mult(n);
-		}
+		};
 		// Moves the vector towards another (by absolute distance)
 		physics.Vector.prototype.towards = function(vec, dist) {
 			return this.add(vec.clone().sub(this).norm().mult(dist === undefined ? 1 : dist));
-		}
+		};
 		// Moves the vector frac of the way to another (by relative distance)
 		physics.Vector.prototype.lerp = function(vec, frac) {
 			return this.add(vec.clone().sub(this).mult(frac));
-		}
+		};
 		// Rotates the vector around another by a certain angle (in radians)
 		physics.Vector.prototype.rotate = function(ang, center = origin) {
 			let cos = basics.cos(ang);
@@ -1779,22 +1785,22 @@ let ice = (function() {
 			this.x = x * cos - y * sin + center.x;
 			this.y = x * sin + y * cos + center.y;
 			return this;
-		}
+		};
 		// Rotates the vector around another by a certain angle (in degrees)
 		physics.Vector.prototype.rotateDeg = function(ang, center) {
 			return this.rotate(basics.rad(ang), center);
-		}
+		};
 		// Sets the angle of the vector in radians (magnitude remains unchanged)
 		physics.Vector.prototype.setAngle = function(ang) {
 			let mag = this.mag();
 			this.x = basics.cos(ang) * mag;
 			this.y = basics.sin(ang) * mag;
 			return this;
-		}
+		};
 		// Sets the angle of the vector in degrees (magnitude remains unchanged)
 		physics.Vector.prototype.setDegrees = function(ang) {
 			return this.setAngle(basics.rad(ang));
-		}
+		};
 		// Inverts the vector about another (same as rotating 180° around a point)
 		physics.Vector.prototype.invert = function(center) {
 			if(center === undefined) {
@@ -1806,35 +1812,36 @@ let ice = (function() {
 				this.y = ((this.y - center.y) * -1) + center.y;
 			}
 			return this;
-		}
+		};
 		// Inverts the vector's x component about another
 		physics.Vector.prototype.invertX = function(center) {
 			if(center === undefined) this.x *= -1;
 			else this.x = ((this.x - center.x) * -1) + center.x;
 			return this;
-		}
+		};
 		// Inverts the vector's y component about another
 		physics.Vector.prototype.invertY = function(center) {
 			if(center === undefined) this.x *= -1;
 			else this.x = ((this.x - center.x) * -1) + center.x;
 			return this;
-		}
+		};
 		// Clamps the vector to between two others
 		physics.Vector.prototype.clamp = function(corner1, corner2 = origin) {
 			this.x = basics.clamp(this.x, corner1.x, corner2.x);
 			this.y = basics.clamp(this.y, corner1.y, corner2.y);
 			return this;
-		}
+		};
 		// Clamps the vector's x component
+		// noinspection JSUnusedGlobalSymbols
 		physics.Vector.prototype.clampX = function(min, max = 0) {
 			this.x = basics.clamp(this.x, min, max);
 			return this;
-		}
+		};
 		// Clamps the vector's y component
 		physics.Vector.prototype.clampY = function(min, max = 0) {
 			this.y = basics.clamp(this.y, min, max);
 			return this;
-		}
+		};
 		// Clamps the vector's magnitude
 		physics.Vector.prototype.clampMag = function(min, max = 0) {
 			let magSq = this.magSq();
@@ -1842,7 +1849,7 @@ let ice = (function() {
 			// I should be able to avoid this sqrt operation, but it doesn't seem necessary
 			if(magSq !== magSqClamped) this.setMag(basics.sqrt(magSqClamped));
 			return this;
-		}
+		};
 		// Randomizes the vector (acts like randAng if no args are provided, otherwise randXY)
 		physics.Vector.prototype.rand = function(corner1, corner2) {
 			if(corner1 === undefined) return this.randAng();
@@ -1850,8 +1857,8 @@ let ice = (function() {
 			this.x = basics.random(corner1.x, corner2.x);
 			this.y = basics.random(corner1.y, corner2.y);
 			return this;
-		}
-		// Randomizes the vector's angle (magnitude remains unchanced)
+		};
+		// Randomizes the vector's angle (magnitude remains unchanged)
 		physics.Vector.prototype.randAng = function(min, max) {
 			let ang;
 			
@@ -1863,47 +1870,46 @@ let ice = (function() {
 			this.x = basics.cos(ang);
 			this.y = basics.sin(ang);
 			return this;
-		}
+		};
 		// Randomizes the vector's angle in degrees (magnitude remains unchanged)
 		physics.Vector.prototype.randDeg = function(min, max) {
 			return this.randAng(basics.rad(min), basics.rad(max));
-		}
+		};
 		// Randomizes the vector's x component
 		physics.Vector.prototype.randX = function(min, max = 0) {
 			this.x = ice.math.random(min, max);
 			return this;
-		}
+		};
 		// Randomizes the vector's y component
 		physics.Vector.prototype.randY = function(min, max = 0) {
 			this.y = ice.math.random(min, max);
 			return this;
-		}
+		};
 		// Randomizes the vector's x and y component
 		physics.Vector.prototype.randXY = function(corner1 = oneOne, corner2 = origin) {
 			this.x = ice.math.random(corner1.x, corner2.x);
 			this.y = ice.math.random(corner1.y, corner2.y);
 			return this;
-		}
+		};
 		
 		// Methods
 		// Returns a zero vector
 		physics.origin = function() {
 			return origin.clone();
-		}
+		};
 		// Returns a unit vector
 		physics.unit = function() {
 			return unit.clone();
-		}
+		};
 		// Returns a vector with a random angle and magnitude 1
 		physics.random = function() {
 			let ang = ice.math.random(basics.TAU);
 			return new physics.Vector(basics.cos(ang), basics.sin(ang));
-		}
+		};
 		
 		// Finalization
 		origin = new physics.Vector(0, 0);
 		unit   = new physics.Vector(1, 0);
-		oneOne = new physics.Vector(1, 1);
 		
 		logImport("physics");
 		return physics;
@@ -1956,8 +1962,8 @@ let ice = (function() {
 				console.error(
 					  "ice.dom error: The ice.dom.InputListener constructor "
 					+ "requires an HTML element as it's argument!"
-				)
-				return undefined;
+				);
+				return;
 			}
 			// If elem is a canvas element with a negative tab index, change
 			// the tab index and warn the user
@@ -1968,7 +1974,7 @@ let ice = (function() {
 					elem,
 					  `from ${elem.tabIndex} to 0! see https://stackoverflow.co`
 					+ "m/q/12886286 for information on why."
-				)
+				);
 				elem.tabIndex = 0;
 			}
 			
@@ -1977,20 +1983,20 @@ let ice = (function() {
 			eventFuncs.key   = {};
 			eventFuncs.mouse = {};
 			
-			eventFuncs.key.press = e => {this.key.press(e, e.key, getModifiers(e));}
-			eventFuncs.key.down  = e => {this.key.down (e, e.key, getModifiers(e));}
-			eventFuncs.key.up    = e => {this.key.up   (e, e.key, getModifiers(e));}
+			eventFuncs.key.press = e => {this.key.press(e, e.key, getModifiers(e));};
+			eventFuncs.key.down  = e => {this.key.down (e, e.key, getModifiers(e));};
+			eventFuncs.key.up    = e => {this.key.up   (e, e.key, getModifiers(e));};
 			
 			eventFuncs.mouse.click = e => {
 				this.mouse.click(e);
-			}
+			};
 			eventFuncs.mouse.doubleClick = e => {
 				this.mouse.doubleClick(e);
-			}
+			};
 			eventFuncs.mouse.down = e => {
 				this.mouse.isDown = true;
 				this.mouse.down(e, getMouseButton(e.button));
-			}
+			};
 			eventFuncs.mouse.up = e => {
 				// TODO breaks with (left down) (right down) (right up), as left
 				// is still down but isDown is false. Intended behavior is that
@@ -1998,14 +2004,14 @@ let ice = (function() {
 				// middle.
 				this.mouse.isDown = false;
 				this.mouse.up(e, getMouseButton(e.button));
-			}
+			};
 			eventFuncs.mouse.move = e => {
 				this.mouse.pos.set(e.offsetX, e.offsetY);
 				this.mouse.move(e, e.offsetX, e.offsetY, e.movementX, e.movementY);
-			}
+			};
 			eventFuncs.mouse.wheel = e => {
 				this.mouse.wheel(e, e.deltaY);
-			}
+			};
 			
 			elem.addEventListener("keypress",   eventFuncs.key.press);
 			elem.addEventListener("keydown",    eventFuncs.key.down);
@@ -2061,44 +2067,44 @@ let ice = (function() {
 			// Called when a key is pressed
 			this.key.press = function(e, key, modifiers) {
 				// This is what the programmer gets to define
-			}
+			};
 			// Called when a key is pressed
 			this.key.down = function(e, key, modifiers) {
 				// This is what the programmer gets to define
-			}
+			};
 			// Called when a key is pressed
 			this.key.up = function(e, key, modifiers) {
 				// This is what the programmer gets to define
-			}
+			};
 			
 			// Called when the mouse is clicked
 			this.mouse.click = function(e) {
 				// This is what the programmer gets to define
-			}
+			};;
 			// Called when the mouse is clicked
 			this.mouse.doubleClick = function(e) {
 				// This is what the programmer gets to define
-			}
+			};;
 			// Called when the mouse is down
 			this.mouse.down = function(e, type) {
 				// This is what the programmer gets to define
-			}
+			};;
 			// Called when the mouse released
 			this.mouse.up = function(e, type) {
 				// This is what the programmer gets to define
-			}
+			};;
 			// Whether or not the mouse is down
 			this.mouse.isDown = false;
 			// Called when the mouse is moved
 			this.mouse.move = function(e, x, y, deltaX, deltaY) {
 				// This is what the programmer gets to define
-			}
+			};;
 			// The current position of the mouse
 			this.mouse.pos = new ice.physics.Vector();
 			// Called when the mouse wheel is turned
 			this.mouse.wheel = function(e, deltaY) {
 				// This is what the programmer gets to define
-			}
+			};;
 			
 			// Methods
 			this.kill = function() {
@@ -2113,119 +2119,119 @@ let ice = (function() {
 				elem.removeEventListener("mousemove",  eventFuncs.mouse.move);
 				elem.removeEventListener("mousewheel", eventFuncs.mouse.wheel);
 			}
-		}
+		};;
 		
 		// Methods
 		// Shortcut for document.querySelector
 		dom.$ = function(path) {
 			return $(path);
-		}
+		};;
 		
 		// Shortcut for document.getElementById
 		dom.id = function(idString) {
 			return id(idString);
-		}
+		};
 		
 		// Appends elem as a child of target, or to the body if no target is
 		// specified. Elem will be appended as the last child
 		dom.append = function(elem, target = document.body) {
 			target.appendChild(elem);
 			return elem;
-		}
+		};
 		
 		// Appends elem as a sibling before target
 		dom.appendBefore = function(elem, target) {
 			target.parentNode.insertBefore(elem, target);
 			return elem;
-		}
+		};
 		
 		// Appends elem as a sibling after target
 		dom.appendAfter = function(elem, target) {
 			target.parentNode.insertBefore(elem, target.nextSibling);
 			return elem;
-		}
+		};
 		
 		// Removes elem
 		dom.remove = function(elem) {
 			elem.parentElement.removeChild(elem);
 			return elem;
-		}
+		};
 		
 		// Returns elem's parent element
 		dom.getParent = function(elem) {
 			return elem.parentNode;
-		}
+		};
 		
 		// Returns all sibling elements of elem (including itself)
 		dom.getSiblings = function(elem) {
 			return elem.parentNode.children;
-		}
+		};
 		
 		// Returns elem's children elements
 		dom.getChildren = function(elem) {
 			return elem.children;
-		}
+		};
 		
 		// Returns the sibling element before elem
 		dom.getPrevSibling = function(elem) {
 			return elem.previousSibling;
-		}
+		};
 		
 		// Returns the sibling element after elem
 		dom.getNextSibling = function(elem) {
 			return elem.nextSibling;
-		}
+		};
 		
 		// Returns the window title (the text on the tab)
 		dom.getTitle = function() {
 			return document.title;
-		}
+		};
 		
 		// Changes the window title (the text on the tab)
 		dom.setTitle = function(title) {
 			document.title = title;
-		}
+		};
 		
 		// Returns the URL
 		dom.getURL = function() {
 			return document.URL;
-		}
+		};
 		
 		// Enters fullscreen
 		dom.fullscreen = function(elem = document.documentElement) {
 			elem.requestFullscreen();
-		}
+		};
 		
 		// Exits fullscreen
 		dom.exitFullscreen = function() {
 			document.exitFullscreen();
-		}
+		};
 		
 		// Returns whether or not we are in fullscreen
 		dom.getFullscreen = function() {
-			return document.fullscreen;
-		}
+			return document.fullscreenElement !== null;
+		};
 		
 		// Enters pointer lock on elem
 		dom.pointerLock = function(elem = document.documentElement) {
 			elem.focus();
 			elem.requestPointerLock();
-		}
+		};
 		
 		// Exits pointer lock
 		dom.exitFullscreen = function() {
 			document.exitPointerLock();
-		}
+		};
 		
 		// Returns whether or not we are in pointer lock
 		dom.getPointerLock = function() {
 			return document.pointerLockElement !== null;
-		}
+		};
 		
 		// Returns the element with pointer lock on (or null if pointer lock is off)
 		dom.getPointerLockElem = function() {
 			return document.pointerLockElement;
-		}
+		};
 		
 		/*
 		 * To create:
@@ -2243,7 +2249,7 @@ let ice = (function() {
 		// Generic create function. Not preferable to a specific one (ex. createP)
 		dom.create = function(tag) {
 			return create(tag);
-		}
+		};
 		
 		// Creates an a (link) element
 		dom.createA = function(text = "", href, target) {
@@ -2261,12 +2267,12 @@ let ice = (function() {
 			if(href   !== undefined) elem.href   = href;
 			if(target !== undefined) elem.target = target;
 			return elem;
-		}
+		};
 		
 		// Creates a br (break) element
 		dom.createBr = function() {
 			return create("br");
-		}
+		};
 		
 		// Creates a button element
 		dom.createButton = function(text = "", onclick) {
@@ -2275,7 +2281,7 @@ let ice = (function() {
 			if(onclick !== undefined) elem.onclick = onclick;
 			elem.appendChild(textNode(text));
 			return elem;
-		}
+		};
 		
 		// Creates a canvas element
 		dom.createCanvas = function(width, height) {
@@ -2292,54 +2298,54 @@ let ice = (function() {
 			elem.width = width;
 			elem.height = height;
 			return elem;
-		}
+		};
 		
 		// Creates a div element
 		dom.createDiv = function() {
 			return create("div");
-		}
+		};
 		
 		// Creates a h1 element
 		dom.createH1 = function(text = "") {
 			let elem = create("h1");
 			elem.appendChild(textNode(text));
 			return elem;
-		}
+		};
 		
 		// Creates a h2 element
 		dom.createH2 = function(text = "") {
 			let elem = create("h2");
 			elem.appendChild(textNode(text));
 			return elem;
-		}
+		};
 		
 		// Creates a h3 element
 		dom.createH3 = function(text = "") {
 			let elem = create("h3");
 			elem.appendChild(textNode(text));
 			return elem;
-		}
+		};
 		
 		// Creates a h4 element
 		dom.createH4 = function(text = "") {
 			let elem = create("h4");
 			elem.appendChild(textNode(text));
 			return elem;
-		}
+		};
 		
 		// Creates a h5 element
 		dom.createH5 = function(text = "") {
 			let elem = create("h5");
 			elem.appendChild(textNode(text));
 			return elem;
-		}
+		};
 		
 		// Creates a h6 element
 		dom.createH6 = function(text = "") {
 			let elem = create("h6");
 			elem.appendChild(textNode(text));
 			return elem;
-		}
+		};
 		
 		// Creates an img (image) element
 		dom.createImg = function(src, width, height, alt) {
@@ -2354,14 +2360,14 @@ let ice = (function() {
 			if(height !== undefined) elem.height = height;
 			if(alt    !== undefined) elem.alt    = alt;
 			return elem;
-		}
+		};
 		
 		// Creates a paragraph element
 		dom.createP = function(text = "") {
 			let elem = create("p");
 			elem.appendChild(textNode(text));
 			return elem;
-		}
+		};
 		
 		// Creates a progress element
 		dom.createProgress = function(value = 0, max = 100) {
@@ -2369,12 +2375,12 @@ let ice = (function() {
 			elem.value = value;
 			elem.max = max;
 			return elem;
-		}
+		};
 		
 		// Creates a span element
 		dom.createSpan = function() {
 			return create("span");
-		}
+		};
 		
 		logImport("dom");
 		return dom;
@@ -2398,8 +2404,6 @@ let ice = (function() {
 		// Private properties
 		let WHITE       = ice.colors.WHITE;
 		let BLACK       = ice.colors.BLACK;
-		let SILVER      = ice.colors.SILVER;
-		let TRANSPARENT = ice.colors.TRANSPARENT;
 		
 		// Constructors
 		graphics.Scene = function(canvas) {
@@ -2418,7 +2422,7 @@ let ice = (function() {
 			 *     • charts/graphs
 			 *     • Go through and make sure everything is nice and clean
 			 *         (ctx vs this.ctx, whitespace, etc)
-			 *     • canvas to image (returns an HTMLImageELement)
+			 *     • canvas to image (returns an HTMLImageElement)
 			 */
 			// Allows omitting the "new" keyword
 			if(new.target === undefined) {
@@ -2429,8 +2433,8 @@ let ice = (function() {
 				console.error(
 					  "ice.graphics error: The ice.graphics.Scene constructor "
 					+ "requires a canvas as it's argument!"
-				)
-				return undefined;
+				);
+				return;
 			}
 			
 			// Private variables
@@ -2570,20 +2574,20 @@ let ice = (function() {
 			// Clears the canvas
 			this.clear = function() {
 				ctx.clearRect(0, 0, this.width, this.height);
-			}
+			};
 			
 			// Draws a background
 			this.background = function(arg1, arg2, arg3, arg4) {
 				ctx.fillStyle = interpretColor(arg1, arg2, arg3, arg4, settings.bgColor);
 				ctx.fillRect(0, 0, this.width, this.height);
-			}
+			};
 			
 			// Sets the default background color
 			this.setBackground = function(arg1, arg2, arg3, arg4) {
 				return settings.bgColor = interpretColor(
 					arg1, arg2, arg3, arg4, settings.bgColor
 				);
-			}
+			};
 			
 			// Resizes the canvas, and updates variables related to it's size
 			this.resize = function(w, h = w) {
@@ -2595,36 +2599,36 @@ let ice = (function() {
 				this.midH     = h / 2;
 				this.size.set(w, h);
 				this.middle.set(w / 2, h / 2);
-			}
+			};
 			
 			// Sets the fill color
 			this.fill = function(arg1, arg2, arg3, arg4) {
 				return settings.fill = interpretColor(
 					arg1, arg2, arg3, arg4, settings.fill
 				);
-			}
+			};
 			
 			// Sets the stroke color
 			this.stroke = function(arg1, arg2, arg3, arg4) {
 				return settings.stroke = interpretColor(
 					arg1, arg2, arg3, arg4, settings.stroke
 				);
-			}
+			};
 			
 			// Sets the stroke width (also lineWidth, "thickness", "thiccness")
 			this.strokeWidth = function(width = settings.strokeWidth) {
 				return settings.strokeWidth = width;
-			}
+			};
 			
 			// Disables fill
 			this.noFill = function() {
 				settings.fill = false;
-			}
+			};
 			
 			// Disables stroke
 			this.noStroke = function () {
 				settings.stroke = false;
-			}
+			};
 			
 			// Sets the font family and/or size
 			this.font = function(arg1, arg2) {
@@ -2641,7 +2645,7 @@ let ice = (function() {
 					}
 				}
 				return getFont(false);
-			}
+			};
 			
 			// Sets the text align
 			this.textAlign = function(arg1, arg2) {
@@ -2664,56 +2668,56 @@ let ice = (function() {
 					if(alignOptions.includes(arg2)) settings.text.align = arg2;
 				}
 				return [settings.text.base, settings.text.align];
-			}
+			};
 			
 			// Sets whether or not the text is bold
 			this.bold = function(bold = settings.text.bold) {
 				return settings.text.bold = bold;
-			}
+			};
 			
 			// Sets whether or not the text is italic
 			this.italic = function(italic = settings.text.italic) {
 				return settings.text.italic = italic;
-			}
+			};
 			
 			// Sets the color mode (can be "rgb" or "hsl")
 			this.colorMode = function(mode) {
 				if(typeof mode === "string") mode = mode.toLowerCase();
 				if(mode === "rgb" || mode === "hsl") settings.colorMode = mode;
 				return settings.colorMode;
-			}
+			};
 			
 			// Sets the angle mode (can be "radians" or "degrees")
 			this.angleMode = function(mode) {
 				if(typeof mode === "string") mode = mode.toLowerCase();
 				if(mode === "radians" || mode === "degrees") settings.angleMode = mode;
 				return settings.angleMode;
-			}
+			};
 			
 			// Saves the current canvas state to the transform stack
 			this.push = function() {
 				ctx.save();
-			}
+			};
 			
 			// Restores the most recent canvas state from the transform stack
 			this.pop = function() {
 				ctx.restore();
-			}
+			};
 			
 			// Sets the transform back to the identity matrix
 			this.setTransform = function(scaleX, scaleY, skewX, skewY, moveX, moveY) {
 				ctx.setTransform(scaleX, skewX, scaleY, skewY, moveX, moveY);
-			}
+			};
 			
 			// Resets the transform back to the identity matrix
 			this.resetTransform = function() {
 				ctx.resetTransform();
-			}
+			};
 			
 			// Translates the origin of the canvas
 			this.translate = function(x, y) {
 				ctx.translate(x, y);
-			}
+			};
 			
 			// Rotates the canvas about a specified point, or the origin
 			this.rotate = function(angle, x, y) {
@@ -2726,7 +2730,7 @@ let ice = (function() {
 				else {
 					ctx.rotate(angle);
 				}
-			}
+			};
 			
 			// Scales the canvas from a specified point, or the origin
 			this.scale = function(scaleX, scaleY, x, y) {
@@ -2738,14 +2742,14 @@ let ice = (function() {
 				else {
 					ctx.scale(scaleX, scaleY);
 				}
-			}
+			};
 			
 			// Draws a rectangle with given x, y, width, and height
 			// Not to be confused with "rekt"
 			this.rect = function(x, y, w, h = w) {
 				if(prepFill())   ctx.fillRect  (x, y, w, h);
 				if(prepStroke()) ctx.strokeRect(x, y, w, h);
-			}
+			};
 			
 			// Draws an ellipse with given x, y, width, height, and rotation
 			this.ellipse = function(x, y, w, h = w, rot = 0) {
@@ -2753,19 +2757,19 @@ let ice = (function() {
 				ctx.beginPath();
 				ctx.ellipse(x, y, w / 2, h / 2, rot, 0, basics.TAU);
 				renderPath();
-			}
+			};
 			
 			// Draws a circle with given x, y, and radius
 			this.circle = function(x, y, rad = 8) {
 				ctx.beginPath();
 				ctx.arc(x, y, rad, 0, basics.TAU);
 				renderPath();
-			}
+			};
 			
 			// Draws a point (like circle, but expects a physics.Vector object)
 			this.point = function(pos, rad = 1) {
 				this.circle(pos.x, pos.y, rad);
-			}
+			};
 			
 			// Draws a line from (x1, y1) to (x2, y2)
 			// Can also accept two physics.Vector objects
@@ -2782,7 +2786,7 @@ let ice = (function() {
 				ctx.moveTo(x1, y1);
 				ctx.lineTo(x2, y2);
 				renderPath();
-			}
+			};
 			
 			// Draws an equilateral triangle ("normal" triangle) with a center
 			// at (x, y), a distance to each vertex dist, and an angle rot
@@ -2858,12 +2862,12 @@ let ice = (function() {
 				ctx.lineTo(x2, y2);
 				ctx.lineTo(x3, y3);
 				renderPath();
-			}
+			};
 			
 			// Draws a triangle given it's three vertices
 			this.triangle = function(x1, y1, x2, y2, x3, y3) {
 				// If there are only three arguments, assume they are physics.Vector objects
-				if(v2y === undefined) {
+				if(y2 === undefined) {
 					// The order here is important
 					y3 = x2.y;
 					x3 = x2.x;
@@ -2877,11 +2881,11 @@ let ice = (function() {
 				ctx.lineTo(x2, y2);
 				ctx.lineTo(x3, y3);
 				renderPath();
-			}
+			};
 			
 			// Draws a regular polygon with a center at (x, y), a number of
-			// sides sides, a distance to each vertex dist, and an angle rot
-			this.regPolygon = function(x, y, sides, dist, rot = 0) {
+			// sides sides, a distance from the center to each vertex dist, and an angle rot
+			this.regPolygon = function(x, y, sides, rad, rot = 0) {
 				sides = basics.floor(sides);
 				if(sides <= 1) {
 					this.circle(x, y, rad);
@@ -2901,7 +2905,7 @@ let ice = (function() {
 				}
 				ctx.closePath();
 				renderPath();
-			}
+			};
 			
 			// Draws a polygon given an array of vertices (must be physics.Vector objects)
 			this.polygon = function(vertices) {
@@ -2913,7 +2917,7 @@ let ice = (function() {
 				}
 				ctx.closePath();
 				renderPath();
-			}
+			};
 			
 			// Draws text at a given location (x, y)
 			this.text = function(text, x, y, maxWidth) {
@@ -2922,7 +2926,7 @@ let ice = (function() {
 				ctx.textBaseline = settings.text.base;
 				if(prepFill()) ctx.fillText(text, x, y, maxWidth);
 				if(prepStroke()) ctx.strokeText(text, x, y, maxWidth);
-			}
+			};
 			
 			// Loads an image for use later
 			this.loadImage = function(img, key) {
@@ -2955,7 +2959,7 @@ let ice = (function() {
 				}
 				
 				images[key] = img;
-			}
+			};
 			
 			// Draws image at a given location (Image must be an instance of
 			// HTMLImageElement, or a key for an image previously loaded with
@@ -2983,7 +2987,7 @@ let ice = (function() {
 					ctx.drawImage(img, x, y, width, height);
 				}
 				else ctx.drawImage(img, clipX, clipY, clipWidth, clipHeight, x, y, width, height);
-			}
+			};
 			
 			// Pixel editing
 			this.pixel = (function(scene) {
@@ -3003,7 +3007,7 @@ let ice = (function() {
 					}
 					open = true;
 					imgData = ctx.getImageData(0, 0, scene.width, scene.height);
-				}
+				};
 				
 				// Stops pixel editing for the scene
 				pixel.close = function() {
@@ -3016,12 +3020,12 @@ let ice = (function() {
 						return;
 					}
 					open = false;
-				}
+				};
 				
 				// Applies the pixel data to the scene
 				pixel.apply = function() {
 					ctx.putImageData(imgData, 0, 0);
-				}
+				};
 				
 				// Sets a pixel's r, g, b, and a
 				pixel.set = function(x, y, r, g, b, a) {
@@ -3030,11 +3034,11 @@ let ice = (function() {
 					imgData.data[i + 1] = g;
 					imgData.data[i + 2] = b;
 					imgData.data[i + 3] = a * 255;
-				}
+				};
 				
 				return pixel;
 			})(this);
-		}
+		};
 		
 		// Properties
 		graphics.RGB = "rgb";

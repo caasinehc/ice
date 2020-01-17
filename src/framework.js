@@ -98,6 +98,7 @@ function iceInit() {
 	});
 	scene = new Scene(canvas);
 	inputListener = new InputListener(canvas);
+	// noinspection JSUnresolvedFunction
 	clock = new Clock();
 	
 	// Globalize scene
@@ -130,7 +131,7 @@ function iceInit() {
 	// Clock initialization
 	clock.tick = function(dt) {
 		tick(dt);
-	}
+	};
 	clock.start();
 	
 	// Render loop

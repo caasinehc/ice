@@ -5,7 +5,7 @@ function expect(desc) {
 	// But I don't think there's a better alternative
 	// that is nearly as clean or convenient.
 	let val = eval(desc);
-	let retVal = {}
+	let retVal = {};
 	const t = "";
 	const c = "color: black; background: #C0C0C0;";
 	retVal.toExist = function() {
@@ -21,7 +21,7 @@ function expect(desc) {
 			);
 		}
 		return this;
-	}
+	};
 	retVal.toBe = function(expected) {
 		if(val !== expected) {
 			failures++;
@@ -36,7 +36,7 @@ function expect(desc) {
 			);
 		}
 		return this;
-	}
+	};
 	retVal.toBeA = function(expected) {
 		if(typeof expected === "string") {
 			if(typeof val !== expected) {
@@ -68,7 +68,7 @@ function expect(desc) {
 			}
 			return this;
 		}
-	}
+	};
 	retVal.toBeAn = retVal.toBeA;
 	retVal.toBeIn = function(expected) {
 		if(!expected.includes(val)) {
@@ -85,7 +85,7 @@ function expect(desc) {
 			);
 		}
 		return this;
-	}
+	};
 	retVal.toPass = function(expected) {
 		if(!expected(val)) {
 			failures++;
@@ -100,7 +100,7 @@ function expect(desc) {
 			);
 		}
 		return this;
-	}
+	};
 	return retVal;
 }
 
@@ -136,6 +136,18 @@ expect("ice.meta.author")
 	.toExist()
 	.toBeAn("object");
 expect("ice.meta.author.name")
+	.toExist()
+	.toBeAn("object");
+expect("ice.meta.author.name.first")
+	.toExist()
+	.toBeA("string");
+expect("ice.meta.author.name.middle")
+	.toExist()
+	.toBeA("string");
+expect("ice.meta.author.name.last")
+	.toExist()
+	.toBeA("string");
+expect("ice.meta.author.name.toString()")
 	.toExist()
 	.toBeA("string");
 expect("ice.meta.author.email")
