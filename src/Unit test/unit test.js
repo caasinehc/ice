@@ -112,7 +112,7 @@ console.log("%cBeginning unit test...", "font-size: 24px;");
  *                           *
 \*****************************/
 
-// Just a test. All of these should pass
+// Just a generic test. All of these should pass
 expect(`"test"`)
 	.toExist()
 	.toBe("test")
@@ -126,82 +126,110 @@ expect("ice")
 	.toBeAn("object");
 
 // Meta
-expect("ice.meta")
-	.toExist()
-	.toBeAn("object");
-expect("ice.meta.version")
-	.toExist()
-	.toBeA("string");
-expect("ice.meta.author")
-	.toExist()
-	.toBeAn("object");
-expect("ice.meta.author.name")
-	.toExist()
-	.toBeAn("object");
-expect("ice.meta.author.name.first")
-	.toExist()
-	.toBeA("string");
-expect("ice.meta.author.name.middle")
-	.toExist()
-	.toBeA("string");
-expect("ice.meta.author.name.last")
-	.toExist()
-	.toBeA("string");
-expect("ice.meta.author.name.toString()")
-	.toExist()
-	.toBeA("string");
-expect("ice.meta.author.email")
-	.toExist()
-	.toBeA("string");
-expect("ice.meta.author.github")
-	.toExist()
-	.toBeA("string");
+(function() {
+	expect("ice.meta")
+		.toExist()
+		.toBeAn("object");
+
+	// Version
+	expect("ice.meta.version")
+		.toExist()
+		.toBeA("string");
+
+	// Author
+	expect("ice.meta.author")
+		.toExist()
+		.toBeAn("object");
+	// Author > name
+	expect("ice.meta.author.name")
+		.toExist()
+		.toBeAn("object");
+	expect("ice.meta.author.name.first")
+		.toExist()
+		.toBeA("string");
+	expect("ice.meta.author.name.middle")
+		.toExist()
+		.toBeA("string");
+	expect("ice.meta.author.name.last")
+		.toExist()
+		.toBeA("string");
+	expect("ice.meta.author.name.middleInitial")
+		.toExist()
+		.toBeA("string")
+		.toPass(str => str.length === 1);
+	expect("ice.meta.author.name.toString()")
+		.toExist()
+		.toBeA("string");
+	// Author > email
+	expect("ice.meta.author.email")
+		.toExist()
+		.toBeA("string")
+		.toPass(str => /[^@]+@[^\.]+\..+/.test(str));
+	// Author > github
+	expect("ice.meta.author.github")
+		.toExist()
+		.toBeA("string");
+
+	// Framework
+	expect("ice.meta.framework")
+		.toExist()
+		.toBeAn("object");
+	expect("ice.meta.framework.initialized")
+		.toExist()
+		.toBeA("boolean");
+})();
 
 // Debug
-expect("ice.debug")
-	.toExist()
-	.toBeAn("object");
-expect("ice.debug.Style")
-	.toExist()
-	.toBeA("function");
-expect("ice.debug.styles")
-	.toExist()
-	.toBeAn("object");
-expect("ice.debug.styles.BOLD")
-	.toExist()
-	.toBeAn(ice.debug.Style);
-expect("ice.debug.styles.BOLD.toString()")
-	.toExist()
-	.toBeA("string");
-expect("ice.debug.log")
-	.toExist()
-	.toBeA("function");
-expect("ice.debug.info")
-	.toExist()
-	.toBeA("function");
-expect("ice.debug.warn")
-	.toExist()
-	.toBeA("function");
-expect("ice.debug.err")
-	.toExist()
-	.toBeA("function");
-expect("ice.debug.aval")
-	.toExist()
-	.toBeA("function");
-expect(`ice.debug.aval("2 + 2")`)
-	.toExist()
-	.toBeA(Promise);
-expect("ice.debug.testFunction")
-	.toExist()
-	.toBeA("function");
-expect("ice.debug.summonDebugDoug")
-	.toExist()
-	.toBeA("function");
+(function() {
+	expect("ice.debug")
+		.toExist()
+		.toBeAn("object");
+
+	// Style
+	expect("ice.debug.Style")
+		.toExist()
+		.toBeA("function");
+	expect("ice.debug.styles")
+		.toExist()
+		.toBeAn("object");
+	expect("ice.debug.styles.BOLD")
+		.toExist()
+		.toBeAn(ice.debug.Style);
+	expect("ice.debug.styles.BOLD.toString()")
+		.toExist()
+		.toBeA("string");
+	expect("ice.debug.log")
+		.toExist()
+		.toBeA("function");
+	expect("ice.debug.info")
+		.toExist()
+		.toBeA("function");
+	expect("ice.debug.warn")
+		.toExist()
+		.toBeA("function");
+	expect("ice.debug.err")
+		.toExist()
+		.toBeA("function");
+	expect("ice.debug.aval")
+		.toExist()
+		.toBeA("function");
+	expect(`ice.debug.aval("2 + 2")`)
+		.toExist()
+		.toBeA(Promise);
+	expect("ice.debug.testFunction")
+		.toExist()
+		.toBeA("function");
+	expect("ice.debug.summonDebugDoug")
+		.toExist()
+		.toBeA("function");
+})();
 
 // Dom
-expect("ice.dom")
-	.toExist()
-	.toBeAn("object");
+(function() {
+	expect("ice.dom")
+		.toExist()
+		.toBeAn("object");
+})();
 
 /***************************\
  *                         *

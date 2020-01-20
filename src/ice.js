@@ -203,9 +203,7 @@ let ice = (function() {
 	 *     functions, make custom console logs with pretty colors or
 	 *     images, and even summon the man himself, Debug Doug.
 	 * [TODO]
-	 *     • Log images
-	 *     • Log bars
-	 *     • Expect (unit testing)
+	 *     • None
 	 */
 	ice.debug = (function() {
 		let debug = {};
